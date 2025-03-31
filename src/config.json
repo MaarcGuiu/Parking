@@ -1,0 +1,7 @@
+DbPort = 3306
+serverIp = "localhost"
+DbName = "parkingdpo"
+user = "root"
+pwd = "root"
+adminPwd = "admin"
+vehicleTime =
