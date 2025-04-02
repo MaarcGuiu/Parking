@@ -1,5 +1,9 @@
 package persistence;
 
+import persistence.ConfigDao.Config;
+import persistence.ConfigDao.ConfigDao;
+import persistence.ConfigDao.ConfigJsonDao;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -11,15 +15,17 @@ public class ConnectionDB {
 
     public static Connection getInstance() throws SQLException {
         if (instance == null) {
+            ConfigDao configDao = new ConfigJsonDao();
+            Config config = configDao.loadAllConfig();
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
                 throw new SQLException("MySQL JDBC Driver no encontrado.");
             }
-            String url = "jdbc:mysql://localhost:3306/parkingdpo?useSSL=false&serverTimezone=UTC";
-            String usr = "root";
-            String pwd = "";
+            String url = config.getServerIp();
+            String usr = config.getUser();
+            String pwd = config.getPwd();
             instance = DriverManager.getConnection(url, usr, pwd);
         }
         return instance;
