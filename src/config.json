@@ -1,7 +1,9 @@
-DbPort = 3306
-serverIp = "localhost"
-DbName = "parkingdpo"
-user = "root"
-pwd = "root"
-adminPwd = "admin"
-vehicleTime =
+{
+  "DbPort": 3306,
+  "serverIp": "jdbc:mysql://localhost:3306/parkingdpo?useSSL=false&serverTimezone=UTC",
+  "DbName": "parkingdpo",
+  "user": "root",
+  "pwd": "",
+  "adminPwd": "admin",
+  "vehicleTime": 10000
+}
