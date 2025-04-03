@@ -63,4 +63,31 @@ public class UserSqlDao {
 
         return null;
     }
+
+    public String register(String username, String password, String email) throws SQLException {
+        // 1. Verificar si el nombre de usuario ya existe
+        if (getUser(username) != null) {
+            return "El nombre de usuario ya está en uso.";
+        }
+
+        // 2. Verificar si el correo electrónico ya existe
+        if (getUser(email) != null) {
+            return "El correo electrónico ya está registrado.";
+        }
+
+        // 3. Insertar el nuevo usuario
+        String insertQuery = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
+            insertStmt.setString(1, username);
+            insertStmt.setString(2, password); // ⚠ Aquí puedes aplicar hashing
+            insertStmt.setString(3, email);
+
+            int affectedRows = insertStmt.executeUpdate();
+            if (affectedRows > 0) {
+                return "success";
+            } else {
+                return "Error al registrar el usuario.";
+            }
+        }
+    }
 }
