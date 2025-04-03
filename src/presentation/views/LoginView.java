@@ -39,6 +39,16 @@ public class LoginView extends JPanel {
         backArrow.setBounds(20, 20, 30, 30);
         mainPanel.add(backArrow);
 
+        // Acción para volver atrás sin abrir una nueva instancia
+        backArrow.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(LoginView.this);
+                parentFrame.setContentPane(new MainView());  // Cambia el contenido por MainView
+                parentFrame.revalidate();
+                parentFrame.repaint();
+            }
+        });
+
         // Título
         JLabel title = new JLabel("Log In");
         title.setFont(new Font("Arial", Font.BOLD, 30));

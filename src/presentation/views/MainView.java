@@ -5,14 +5,12 @@ import presentation.components.RoundButton;
 import javax.swing.*;
 import java.awt.*;
 
-public class MainView extends JFrame {
+public class MainView extends JPanel {
 
     public MainView() {
-        // Configuración básica del JFrame
-        setTitle("THE PARKING LS");
-        setSize(900, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);  // Centra la ventana en la pantalla
+        // Configuración básica del JPanel
+        setLayout(null);
+        setPreferredSize(new Dimension(900, 500));
 
         // Fondo con degradado
         JPanel backgroundPanel = new JPanel() {
@@ -26,6 +24,7 @@ public class MainView extends JFrame {
             }
         };
         backgroundPanel.setLayout(null);
+        backgroundPanel.setBounds(0, 0, 900, 500);
 
         // Título
         JLabel title = new JLabel("THE PARKING LS");
@@ -46,24 +45,23 @@ public class MainView extends JFrame {
         signUpButton.addActionListener(e -> switchToSignUp());
         backgroundPanel.add(signUpButton);
 
-        // Añadir el panel de fondo al JFrame
+        // Añadir el panel de fondo al JPanel
         add(backgroundPanel);
-
-        // Hacer visible el JFrame
-        setVisible(true);
     }
 
     private void switchToLogin() {
         // Cambiar el contenido del JFrame a la vista de login
-        setContentPane(new LoginView());  // Suponiendo que LoginView es otro JPanel
-        revalidate();
-        repaint();
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        parentFrame.setContentPane(new LoginView());  // Suponiendo que LoginView es otro JPanel
+        parentFrame.revalidate();
+        parentFrame.repaint();
     }
 
     private void switchToSignUp() {
         // Cambiar el contenido del JFrame a la vista de sign-up
-        //setContentPane(new SignUpView());  // Suponiendo que SignUpView es otro JPanel
-        revalidate();
-        repaint();
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        parentFrame.setContentPane(new RegisterView());  // Suponiendo que RegisterView es otro JPanel
+        parentFrame.revalidate();
+        parentFrame.repaint();
     }
 }
