@@ -1,5 +1,6 @@
 package presentation.views;
 
+import business.model.User;
 import presentation.components.RoundButton;
 
 import javax.swing.*;
@@ -7,9 +8,12 @@ import java.awt.*;
 
 public class UserMenuView extends JPanel {
     private JPanel mainPanel;
+    private User loggedUser;
 
-    public UserMenuView() {
-        setLayout(null); // Permitir posicionamiento absoluto
+    public UserMenuView(User loggedUser) {
+        this.loggedUser = loggedUser;
+        // Permitir posicionamiento absoluto
+        setLayout(null);
 
         // Panel principal con degradado
         mainPanel = new JPanel() {
@@ -39,20 +43,40 @@ public class UserMenuView extends JPanel {
         menuPanel.add(menuTitle);
 
         // Botones del menú
-        String[] menuItems = {"Bookings", "Parking Status", "Statistics", "Enter - Leave parking"};
-        int yPosition = 70;
-        for (String item : menuItems) {
-            JButton button = new RoundButton(item);
-            button.setBounds(20, yPosition, 160, 40);
-            button.setBackground(new Color(150, 130, 200));
-            button.setForeground(Color.BLACK);
-            button.setFocusPainted(false);
-            menuPanel.add(button);
-            yPosition += 60;
-        }
+        // Botón 1: Bookings
+        JButton bookingsButton = new RoundButton("Bookings");
+        bookingsButton.setBounds(20, 70, 160, 40);
+        bookingsButton.setBackground(new Color(150, 130, 200));
+        bookingsButton.setForeground(Color.BLACK);
+        bookingsButton.setFocusPainted(false);
+        menuPanel.add(bookingsButton);
+
+        // Botón 2: Parking Status
+        JButton parkingStatusButton = new RoundButton("Parking Status");
+        parkingStatusButton.setBounds(20, 130, 160, 40);
+        parkingStatusButton.setBackground(new Color(150, 130, 200));
+        parkingStatusButton.setForeground(Color.BLACK);
+        parkingStatusButton.setFocusPainted(false);
+        menuPanel.add(parkingStatusButton);
+
+        // Botón 3: Statistics
+        JButton statisticsButton = new RoundButton("Statistics");
+        statisticsButton.setBounds(20, 190, 160, 40);
+        statisticsButton.setBackground(new Color(150, 130, 200));
+        statisticsButton.setForeground(Color.BLACK);
+        statisticsButton.setFocusPainted(false);
+        menuPanel.add(statisticsButton);
+
+        // Botón 4: Enter - Leave parking
+        JButton enterLeaveButton = new RoundButton("Enter - Leave parking");
+        enterLeaveButton.setBounds(20, 250, 160, 40);
+        enterLeaveButton.setBackground(new Color(150, 130, 200));
+        enterLeaveButton.setForeground(Color.BLACK);
+        enterLeaveButton.setFocusPainted(false);
+        menuPanel.add(enterLeaveButton);
 
         mainPanel.add(menuPanel);
-        add(mainPanel); // Asegurar que el panel se agregue a UserMenuView
+        add(mainPanel);
     }
 
     public JPanel getMainPanel() {

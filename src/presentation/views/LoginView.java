@@ -1,5 +1,6 @@
 package presentation.views;
 
+import business.model.User;
 import presentation.components.RoundButton;
 import presentation.components.RoundPasswordField;
 import presentation.components.RoundTextField;
@@ -83,13 +84,14 @@ public class LoginView extends JPanel {
                 String result = loginController.login(user, pass);
 
                 if ("success".equals(result)) {
-                    JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso", "Bienvenido", JOptionPane.INFORMATION_MESSAGE);
+                    User loggedUser = loginController.getUser(user);
+                    JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso", "Bienvenido " + loggedUser.getUserName(), JOptionPane.INFORMATION_MESSAGE);
 
                     // Reemplazar la vista en lugar de abrir una nueva ventana
                     // Aquí pasamos el panel de usuario después de login
                     setVisible(false);
                     JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-                    parentFrame.setContentPane(new UserMenuView());  // Suponiendo que UserMenuView es un JPanel
+                    parentFrame.setContentPane(new UserMenuView(loggedUser));  // Suponiendo que UserMenuView es un JPanel
                     parentFrame.revalidate();
                     parentFrame.repaint();
                 } else {

@@ -1,6 +1,7 @@
 package presentation.controllers;
 
 import business.LoginManager;
+import business.model.User;
 
 public class LoginController {
     private LoginManager loginManager;
@@ -11,5 +12,9 @@ public class LoginController {
 
     public String login(String emailOrName, String password) {
         return loginManager.login(emailOrName, password);
+    }
+
+    public User getUser(String emailOrName) {
+        return loginManager.getUser(emailOrName);
     }
 }

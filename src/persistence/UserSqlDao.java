@@ -1,5 +1,7 @@
 package persistence;
 
+import business.model.User;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,5 +40,27 @@ public class UserSqlDao {
                 return "success";
             }
         }
+    }
+
+    public User getUser(String emailOrName) throws SQLException {
+        String query = "SELECT id, username, password, email FROM users WHERE username = ? OR email = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, emailOrName);
+            stmt.setString(2, emailOrName);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {  // Si encuentra un usuario
+                    return new User(
+                            rs.getInt("id"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("email")
+                    );
+                }
+            }
+        }
+
+        return null;
     }
 }
