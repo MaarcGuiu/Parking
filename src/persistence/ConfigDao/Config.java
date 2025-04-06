@@ -6,7 +6,7 @@ public class Config {
     private String dbName;
     private String user;
     private String pwd;
-    private String adminPwq;
+    private String adminPwd;
     private int vehicleTime;
 
     public int getDbPort() {
@@ -29,8 +29,8 @@ public class Config {
         return pwd;
     }
 
-    public String getAdminPwq() {
-        return adminPwq;
+    public String getAdminPwd() {
+        return adminPwd;
     }
 
     public int getVehicleTime() {

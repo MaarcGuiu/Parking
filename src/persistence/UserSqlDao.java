@@ -18,8 +18,17 @@ public class UserSqlDao {
         }
     }
 
-    public String login(String emailOrName, String password) throws SQLException {
-        // Primero, verificar si el usuario/email existe en la base de datos
+    public String login(String emailOrName, String password, String adminPwd) throws SQLException {
+        //Verificar si es admin
+        if ("admin".equals(emailOrName)) {
+            if (password.equals(adminPwd)) {
+                return "admin_success";
+            } else {
+                return "Contraseña de administrador incorrecta.";
+            }
+        }
+
+        // Verificar si el usuario/email existe en la base de datos
         String checkUserQuery = "SELECT password FROM users WHERE username = ? OR email = ?";
         try (PreparedStatement checkUserStmt = connection.prepareStatement(checkUserQuery)) {
             checkUserStmt.setString(1, emailOrName);

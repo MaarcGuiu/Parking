@@ -105,7 +105,12 @@ public class LoginView extends JPanel {
                     parentFrame.revalidate();
                     parentFrame.repaint();
                 } else {
-                    JOptionPane.showMessageDialog(this, result, "Error", JOptionPane.ERROR_MESSAGE);
+                    if ("admin_success".equals(result)) {
+                        JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso", "Bienvenido Admin", JOptionPane.INFORMATION_MESSAGE);
+
+                    } else {
+                        JOptionPane.showMessageDialog(this, result, "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         });
