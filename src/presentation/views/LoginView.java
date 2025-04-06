@@ -108,6 +108,11 @@ public class LoginView extends JPanel {
                     if ("admin_success".equals(result)) {
                         JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso", "Bienvenido Admin", JOptionPane.INFORMATION_MESSAGE);
 
+                        setVisible(false);
+                        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+                        parentFrame.setContentPane(new AdminMenuView());  // Suponiendo que UserMenuView es un JPanel
+                        parentFrame.revalidate();
+                        parentFrame.repaint();
                     } else {
                         JOptionPane.showMessageDialog(this, result, "Error", JOptionPane.ERROR_MESSAGE);
                     }
