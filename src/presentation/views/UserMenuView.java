@@ -73,7 +73,14 @@ public class UserMenuView extends JPanel {
             };
             String[] columns = {"Code", "Floor", "License Plate", "Current Status", "Reservation Status"};
 
-            JTable table = new JTable(data, columns);
+            javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(data, columns) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+
+            JTable table = new JTable(model);
 
             JTableHeader header = table.getTableHeader();
             header.setFont(new Font("Arial", Font.BOLD, 14));
@@ -95,21 +102,8 @@ public class UserMenuView extends JPanel {
             mainPanel.add(scrollPane);
             mainPanel.revalidate();
             mainPanel.repaint();
-
-
-            //TODO: Si es admin anar a una view de detall
-            table.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseClicked(java.awt.event.MouseEvent evt) {
-                    int row = table.getSelectedRow();
-                    int column = table.getSelectedColumn();
-                    if (row != -1 && column != -1) {
-                        Object value = table.getValueAt(row, column);
-                        //TODO: Si es admin anar a una view de detall
-                    }
-                }
-            });
         });
+
 
         // Botón 3: Statistics
         JButton statisticsButton = new RoundButton("Statistics");
