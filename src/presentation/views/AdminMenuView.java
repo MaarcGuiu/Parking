@@ -4,6 +4,8 @@ import business.model.User;
 import presentation.components.RoundButton;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 
 public class AdminMenuView extends JPanel {
@@ -81,11 +83,103 @@ public class AdminMenuView extends JPanel {
         parkingStatusButton.setFocusPainted(false);
         menuPanel.add(parkingStatusButton);
 
+        parkingStatusButton.addActionListener(e -> {
+            parkingStatusButton.setBackground(Color.YELLOW);
+
+            String[][] data = {
+                    {"###", "1", "0000", "0", "0"},
+                    {"###", "2", "0000", "0", "0"},
+                    {"###", "3", "0000", "0", "0"}
+            };
+            String[] columns = {"Code", "Floor", "License Plate", "Current Status", "Reservation Status"};
+
+            javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(data, columns) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+            JTable table = new JTable(model);
+
+            JTableHeader header = table.getTableHeader();
+            header.setFont(new Font("Arial", Font.BOLD, 14));
+            header.setBackground(new Color(70, 60, 130));
+            header.setForeground(Color.WHITE);
+
+            DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
+            cellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+            cellRenderer.setBackground(new Color(230, 230, 250));
+            cellRenderer.setForeground(Color.BLACK);
+            table.setDefaultRenderer(Object.class, cellRenderer);
+
+            table.setRowHeight(30);
+            table.setShowGrid(true);
+            table.setGridColor(Color.GRAY);
+
+            JScrollPane scrollPane = new JScrollPane(table);
+            scrollPane.setBounds(220, 50, 600, 400);
+            mainPanel.add(scrollPane);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+
+
+            table.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    int row = table.getSelectedRow();
+                    int column = table.getSelectedColumn();
+                    if (row != -1 && column != -1) {
+                        Object value = table.getValueAt(row, column);
+                        //TODO: Si es admin anar a una view de detall
+                        showReservationPopUp();
+                    }
+                }
+            });
+        });
+
         mainPanel.add(menuPanel);
         add(mainPanel);
     }
 
     public JPanel getMainPanel() {
         return mainPanel;
+    }
+    private void showReservationPopUp() {
+
+        JDialog dialog = new JDialog((Frame) null, "Reservation Details", true);
+        dialog.setSize(300, 200);
+        dialog.setLayout(null);
+        dialog.setLocationRelativeTo(null); // Center the dialog on the screen
+
+        // Add labels and fields
+        JLabel vehicleTypeLabel = new JLabel("Vehicle type: car");
+        vehicleTypeLabel.setBounds(20, 20, 200, 20);
+        dialog.add(vehicleTypeLabel);
+
+        JLabel userNameLabel = new JLabel("User name: Admin");
+        userNameLabel.setBounds(20, 50, 200, 20);
+        dialog.add(userNameLabel);
+
+        JLabel userEmailLabel = new JLabel("User email: 123@123.com");
+        userEmailLabel.setBounds(20, 80, 200, 20);
+        dialog.add(userEmailLabel);
+
+
+        JButton okButton = new JButton("Ok");
+        okButton.setBounds(30, 120, 50, 30);
+        dialog.add(okButton);
+
+        JButton cancelButton = new JButton("Cancel reservation");
+        cancelButton.setBounds(120, 120, 150, 30);
+        dialog.add(cancelButton);
+
+        // Add action listener to the button
+        cancelButton.addActionListener(e -> {
+            System.out.println("Reservation canceled");
+            dialog.dispose(); // Close the dialog
+        });
+
+        // Show the dialog
+        dialog.setVisible(true);
     }
 }
