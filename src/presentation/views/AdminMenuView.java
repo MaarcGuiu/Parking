@@ -2,11 +2,14 @@ package presentation.views;
 
 import business.model.User;
 import presentation.components.RoundButton;
+import presentation.components.RoundTextField;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AdminMenuView extends JPanel {
     private JPanel mainPanel;
@@ -83,8 +86,31 @@ public class AdminMenuView extends JPanel {
         parkingStatusButton.setFocusPainted(false);
         menuPanel.add(parkingStatusButton);
 
+        // MODIFICAR EL COLOR DE LOS BOTONES DEL MENU
+        List<JButton> menuButtons = new ArrayList<>();
+        menuButtons.add(createButton);
+        menuButtons.add(editButton);
+        menuButtons.add(deleteButton);
+        menuButtons.add(statisticsButton);
+        menuButtons.add(parkingStatusButton);
+
+        Color defaultButtonColor = new Color(150, 130, 200);
+
+        Runnable resetMainPanel = () -> {
+            for (JButton btn : menuButtons) {
+                btn.setBackground(defaultButtonColor);
+            }
+            mainPanel.removeAll();
+            mainPanel.add(menuPanel);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        };
+
         parkingStatusButton.addActionListener(e -> {
+            resetMainPanel.run();
             parkingStatusButton.setBackground(Color.YELLOW);
+            mainPanel.removeAll();
+            mainPanel.add(menuPanel);
 
             String[][] data = {
                     {"###", "1", "0000", "0", "0"},
@@ -137,6 +163,209 @@ public class AdminMenuView extends JPanel {
             });
         });
 
+        createButton.addActionListener(e -> {
+            resetMainPanel.run();
+            createButton.setBackground(Color.YELLOW);
+            mainPanel.removeAll();
+            mainPanel.add(menuPanel);
+
+            JPanel formPanel = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    Graphics2D g2d = (Graphics2D) g;
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    GradientPaint gp = new GradientPaint(0, 0, new Color(190, 180, 230), getWidth(), getHeight(), new Color(140, 130, 180));
+                    g2d.setPaint(gp);
+                    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+                }
+            };
+            formPanel.setLayout(null);
+            formPanel.setBounds(250, 80, 400, 300);
+            formPanel.setOpaque(false);
+
+            JLabel titleLabel = new JLabel("CREATE NEW SLOT");
+            titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
+            titleLabel.setForeground(Color.BLACK);
+            titleLabel.setBounds(270, 30, 300, 30);
+            mainPanel.add(titleLabel);
+
+            JLabel idLabel = new JLabel("ID:");
+            idLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            idLabel.setBounds(40, 30, 100, 25);
+            formPanel.add(idLabel);
+
+            RoundTextField idField = new RoundTextField(15);
+            idField.setBounds(140, 30, 200, 30);
+            formPanel.add(idField);
+
+            JLabel floorLabel = new JLabel("FLOOR:");
+            floorLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            floorLabel.setBounds(40, 80, 100, 25);
+            formPanel.add(floorLabel);
+
+            JComboBox<String> floorCombo = new JComboBox<>(new String[]{"1", "2", "3"});
+            floorCombo.setBounds(140, 80, 200, 30);
+            formPanel.add(floorCombo);
+
+            JLabel vehicleLabel = new JLabel("VEHICLE:");
+            vehicleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            vehicleLabel.setBounds(40, 130, 100, 25);
+            formPanel.add(vehicleLabel);
+
+            JComboBox<String> vehicleCombo = new JComboBox<>(new String[]{"Car", "Motorbike", "Truck"});
+            vehicleCombo.setBounds(140, 130, 200, 30);
+            formPanel.add(vehicleCombo);
+
+            RoundButton confirmButton = new RoundButton("CREATE");
+            confirmButton.setBounds(120, 200, 160, 40);
+            confirmButton.setBackground(new Color(210, 160, 20));
+            confirmButton.setForeground(Color.WHITE);
+            confirmButton.setFocusPainted(false);
+            formPanel.add(confirmButton);
+
+            confirmButton.addActionListener(ev -> {
+                String id = idField.getText();
+                String floor = (String) floorCombo.getSelectedItem();
+                String vehicle = (String) vehicleCombo.getSelectedItem();
+
+                JOptionPane.showMessageDialog(mainPanel,
+                        "Slot creado:\nID: " + id + "\nFloor: " + floor + "\nVehicle: " + vehicle,
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+            });
+
+            mainPanel.add(formPanel);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        });
+
+        editButton.addActionListener(e -> {
+            resetMainPanel.run();
+            editButton.setBackground(Color.YELLOW);
+
+            JLabel titleLabel = new JLabel("EDIT SLOT");
+            titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
+            titleLabel.setForeground(Color.BLACK);
+            titleLabel.setBounds(270, 30, 300, 30);
+            mainPanel.add(titleLabel);
+
+            JPanel formPanel = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    Graphics2D g2d = (Graphics2D) g;
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    GradientPaint gp = new GradientPaint(0, 0, new Color(190, 180, 230), getWidth(), getHeight(), new Color(140, 130, 180));
+                    g2d.setPaint(gp);
+                    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+                }
+            };
+            formPanel.setLayout(null);
+            formPanel.setBounds(250, 80, 400, 250);
+            formPanel.setOpaque(false);
+
+            JLabel occupiedLabel = new JLabel("Is Occupied:");
+            occupiedLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            occupiedLabel.setBounds(40, 30, 100, 25);
+            formPanel.add(occupiedLabel);
+
+            RoundTextField occupiedField = new RoundTextField(15);
+            occupiedField.setBounds(140, 30, 200, 30);
+            formPanel.add(occupiedField);
+
+            JLabel floorLabel = new JLabel("FLOOR:");
+            floorLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            floorLabel.setBounds(40, 80, 100, 25);
+            formPanel.add(floorLabel);
+
+            RoundTextField floorField = new RoundTextField(15);
+            floorField.setBounds(140, 80, 200, 30);
+            formPanel.add(floorField);
+
+            JLabel vehicleLabel = new JLabel("VEHICLE:");
+            vehicleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            vehicleLabel.setBounds(40, 130, 100, 25);
+            formPanel.add(vehicleLabel);
+
+            RoundTextField vehicleField = new RoundTextField(15);
+            vehicleField.setBounds(140, 130, 200, 30);
+            formPanel.add(vehicleField);
+
+            RoundButton editConfirmButton = new RoundButton("EDIT");
+            editConfirmButton.setBounds(120, 180, 160, 40);
+            editConfirmButton.setBackground(new Color(210, 160, 20));
+            editConfirmButton.setForeground(Color.WHITE);
+            editConfirmButton.setFocusPainted(false);
+            formPanel.add(editConfirmButton);
+
+            editConfirmButton.addActionListener(ev -> {
+                String occupied = occupiedField.getText();
+                String floor = floorField.getText();
+                String vehicle = vehicleField.getText();
+
+                JOptionPane.showMessageDialog(mainPanel,
+                        "Slot actualizado:\nOccupied: " + occupied + "\nFloor: " + floor + "\nVehicle: " + vehicle,
+                        "Edited", JOptionPane.INFORMATION_MESSAGE);
+            });
+
+            mainPanel.add(formPanel);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        });
+
+        deleteButton.addActionListener(e -> {
+            resetMainPanel.run();
+            deleteButton.setBackground(Color.YELLOW);
+
+            JLabel titleLabel = new JLabel("DELETE SLOT");
+            titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
+            titleLabel.setForeground(Color.BLACK);
+            titleLabel.setBounds(270, 30, 300, 30);
+            mainPanel.add(titleLabel);
+
+            JPanel formPanel = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    Graphics2D g2d = (Graphics2D) g;
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    GradientPaint gp = new GradientPaint(0, 0, new Color(190, 180, 230), getWidth(), getHeight(), new Color(140, 130, 180));
+                    g2d.setPaint(gp);
+                    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+                }
+            };
+            formPanel.setLayout(null);
+            formPanel.setBounds(250, 80, 400, 200);
+            formPanel.setOpaque(false);
+
+            JLabel idLabel = new JLabel("ID:");
+            idLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            idLabel.setBounds(40, 40, 100, 25);
+            formPanel.add(idLabel);
+
+            RoundTextField idField = new RoundTextField(15);
+            idField.setBounds(140, 40, 200, 30);
+            formPanel.add(idField);
+
+            RoundButton deleteConfirmButton = new RoundButton("Delete");
+            deleteConfirmButton.setBounds(120, 100, 160, 40);
+            deleteConfirmButton.setBackground(new Color(210, 160, 20));
+            deleteConfirmButton.setForeground(Color.WHITE);
+            deleteConfirmButton.setFocusPainted(false);
+            formPanel.add(deleteConfirmButton);
+
+            deleteConfirmButton.addActionListener(ev -> {
+                String id = idField.getText();
+                JOptionPane.showMessageDialog(mainPanel,
+                        "Slot eliminado: ID " + id,
+                        "Deleted", JOptionPane.INFORMATION_MESSAGE);
+            });
+
+            mainPanel.add(formPanel);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        });
+
         mainPanel.add(menuPanel);
         add(mainPanel);
     }
@@ -163,7 +392,6 @@ public class AdminMenuView extends JPanel {
         JLabel userEmailLabel = new JLabel("User email: 123@123.com");
         userEmailLabel.setBounds(20, 80, 200, 20);
         dialog.add(userEmailLabel);
-
 
         JButton okButton = new JButton("Ok");
         okButton.setBounds(30, 120, 50, 30);
