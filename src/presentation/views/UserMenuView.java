@@ -4,6 +4,8 @@ import business.model.User;
 import presentation.components.RoundButton;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 
 public class UserMenuView extends JPanel {
@@ -58,6 +60,50 @@ public class UserMenuView extends JPanel {
         parkingStatusButton.setForeground(Color.BLACK);
         parkingStatusButton.setFocusPainted(false);
         menuPanel.add(parkingStatusButton);
+
+        parkingStatusButton.addActionListener(e -> {
+            // Cambiar el color del botón a amarillo
+            parkingStatusButton.setBackground(Color.YELLOW);
+
+            // Crear datos y columnas para la tabla
+            String[][] data = {
+                    {"###", "1", "0000", "0", "0"},
+                    {"###", "2", "0000", "0", "0"},
+                    {"###", "3", "0000", "0", "0"}
+            };
+            String[] columns = {"Code", "Floor", "License Plate", "Current Status", "Reservation Status"};
+
+            javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(data, columns) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+
+            JTable table = new JTable(model);
+
+            JTableHeader header = table.getTableHeader();
+            header.setFont(new Font("Arial", Font.BOLD, 14));
+            header.setBackground(new Color(70, 60, 130));
+            header.setForeground(Color.WHITE);
+
+            DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
+            cellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+            cellRenderer.setBackground(new Color(230, 230, 250));
+            cellRenderer.setForeground(Color.BLACK);
+            table.setDefaultRenderer(Object.class, cellRenderer);
+
+            table.setRowHeight(30);
+            table.setShowGrid(true);
+            table.setGridColor(Color.GRAY);
+
+            JScrollPane scrollPane = new JScrollPane(table);
+            scrollPane.setBounds(220, 50, 600, 400);
+            mainPanel.add(scrollPane);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        });
+
 
         // Botón 3: Statistics
         JButton statisticsButton = new RoundButton("Statistics");
