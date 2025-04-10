@@ -1,7 +1,6 @@
 package presentation.controllers;
 
 import business.DeleteAccountManager;
-import business.LoginManager;
 
 public class DeleteAccountController {
     private DeleteAccountManager deleteAccountManager;

@@ -1,20 +1,25 @@
 package presentation.views;
 
+import business.model.User;
 import presentation.components.RoundButton;
 import presentation.controllers.DeleteAccountController;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
 public class SettingsView extends JPanel {
     private JPanel mainPanel;
+    private JButton deleteAccountButton;
+    private JButton logoutButton;
 
-    public SettingsView() {
-        setLayout(new BorderLayout()); // Cambiamos a BorderLayout para mejor manejo
+    public SettingsView(User loggedUser) {
+        setLayout(new BorderLayout());
 
         // Panel principal con degradado
-        mainPanel = new JPanel() {
+        mainPanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -25,68 +30,45 @@ public class SettingsView extends JPanel {
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         };
-        mainPanel.setLayout(new BorderLayout());
 
-        // Flecha de regreso
-        JLabel backArrow = new JLabel("←");
-        backArrow.setFont(new Font("Arial", Font.BOLD, 20));
-        backArrow.setForeground(Color.BLACK);
-        backArrow.setBounds(20, 20, 30, 30);
-        mainPanel.add(backArrow);
+        // Panel superior con botón de cerrar
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        topPanel.setOpaque(false);
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Menú lateral
-        JPanel menuPanel = createMenuPanel();
-        mainPanel.add(menuPanel, BorderLayout.WEST);
+        JLabel closeButton = new JLabel("\u2716");
+        closeButton.setFont(new Font("Dialog", Font.BOLD, 22));
+        closeButton.setForeground(Color.BLACK);
+        closeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        topPanel.add(closeButton);
+        mainPanel.add(topPanel, BorderLayout.NORTH);
 
-        // Panel de configuración (parte derecha)
-        JPanel settingsContentPanel = createSettingsContentPanel();
+        // Panel de configuración
+        JPanel settingsContentPanel = createSettingsContentPanel(loggedUser);
         mainPanel.add(settingsContentPanel, BorderLayout.CENTER);
 
         add(mainPanel);
-    }
 
-    private JPanel createMenuPanel() {
-        JPanel menuPanel = new JPanel();
-        menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
-        menuPanel.setBackground(new Color(70, 60, 130));
-        menuPanel.setPreferredSize(new Dimension(200, 500));
-
-        // Título del menú
-        JLabel menuTitle = new JLabel("MENU", SwingConstants.CENTER);
-        menuTitle.setForeground(Color.WHITE);
-        menuTitle.setFont(new Font("Arial", Font.BOLD, 20));
-        menuTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        menuPanel.add(Box.createVerticalStrut(20));
-        menuPanel.add(menuTitle);
-        menuPanel.add(Box.createVerticalStrut(30));
-
-        // Botón de Delete Account
-        RoundButton deleteButton = new RoundButton("Delete Account");
-        deleteButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        deleteButton.setMaximumSize(new Dimension(160, 40));
-        deleteButton.setBackground(new Color(150, 130, 200));
-        deleteButton.setForeground(Color.BLACK);
-        deleteButton.setFocusPainted(false);
-
-        deleteButton.addActionListener(e -> {
-            DeleteAccountController deleteAccountController = new DeleteAccountController();
-            deleteAccountController.deleteAccount("jan", "1234");
-            System.out.println("delete account");
+        // Listeners
+        closeButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                setVisible(false);
+                JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(SettingsView.this);
+                parentFrame.setContentPane(new UserMenuView(loggedUser));
+                parentFrame.revalidate();
+                parentFrame.repaint();
+            }
         });
-
-        menuPanel.add(deleteButton);
-        menuPanel.add(Box.createVerticalStrut(20));
-
-        return menuPanel;
     }
 
-    private JPanel createSettingsContentPanel() {
+    private JPanel createSettingsContentPanel(User loggedUser) {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setOpaque(false); // Para que se vea el degradado
+        contentPanel.setOpaque(false);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // Título de configuración
+        // Título
         JLabel title = new JLabel("CONFIGURACIÓN", SwingConstants.CENTER);
         title.setForeground(Color.WHITE);
         title.setFont(new Font("Arial", Font.BOLD, 24));
@@ -94,45 +76,61 @@ public class SettingsView extends JPanel {
         contentPanel.add(title);
         contentPanel.add(Box.createVerticalStrut(40));
 
-        // Opciones de configuración
-        addSettingOption(contentPanel, "Tema:", new JComboBox<>(new String[]{"Claro", "Oscuro", "Azul"}));
-        addSettingOption(contentPanel, "Notificaciones:", new JCheckBox("Activar"));
-        addSettingOption(contentPanel, "Idioma:", new JComboBox<>(new String[]{"Español", "Inglés", "Catalán"}));
+        // Botones
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new GridLayout(2, 1, 10, 20));
+        buttonsPanel.setOpaque(false);
+        buttonsPanel.setMaximumSize(new Dimension(300, 150));
+
+        deleteAccountButton = new RoundButton("Delete Account");
+        deleteAccountButton.setBackground(new Color(255, 100, 100));
+        deleteAccountButton.setForeground(Color.WHITE);
+        deleteAccountButton.setFont(new Font("Arial", Font.BOLD, 16));
+        deleteAccountButton.setFocusPainted(false);
+
+        logoutButton = new RoundButton("Log out");
+        logoutButton.setBackground(new Color(100, 150, 255));
+        logoutButton.setForeground(Color.WHITE);
+        logoutButton.setFont(new Font("Arial", Font.BOLD, 16));
+        logoutButton.setFocusPainted(false);
+
+        buttonsPanel.add(deleteAccountButton);
+        buttonsPanel.add(logoutButton);
+
+        contentPanel.add(buttonsPanel);
+        contentPanel.add(Box.createVerticalGlue());
+
+        // Añadir listeners a los botones
+        deleteAccountButton.addActionListener(e -> handleDeleteAccount(loggedUser));
+        logoutButton.addActionListener(e -> handleLogout());
 
         return contentPanel;
     }
 
-    private void addSettingOption(JPanel panel, String label, JComponent component) {
-        JPanel optionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
-        optionPanel.setOpaque(false);
+    private void handleDeleteAccount(User loggedUser) {
+        int option = JOptionPane.showConfirmDialog(
+                this,
+                "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
 
-        JLabel optionLabel = new JLabel(label);
-        optionLabel.setForeground(Color.WHITE);
-        optionLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        optionLabel.setPreferredSize(new Dimension(150, 30));
+        if (option == JOptionPane.YES_OPTION) {
+            DeleteAccountController deleteAccountController = new DeleteAccountController();
+            deleteAccountController.deleteAccount(loggedUser.getUserName(), loggedUser.getPassword());
 
-        component.setPreferredSize(new Dimension(200, 30));
-        if (component instanceof JComboBox) {
-            ((JComboBox<?>) component).setBackground(Color.WHITE);
+            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            parentFrame.setContentPane(new MainView());
+            parentFrame.revalidate();
+            parentFrame.repaint();
         }
-
-        optionPanel.add(optionLabel);
-        optionPanel.add(component);
-
-        panel.add(optionPanel);
-        panel.add(Box.createVerticalStrut(20));
     }
 
-    public void setBackAction(ActionListener action) {
-        // Buscar botones en el menú para asignar la acción de volver
-        for (Component comp : mainPanel.getComponents()) {
-            if (comp instanceof JPanel ) {
-                for (Component subComp : ((JPanel) comp).getComponents()) {
-                    if (subComp instanceof JButton) {
-                        ((JButton) subComp).addActionListener(action);
-                    }
-                }
-            }
-        }
+    private void handleLogout() {
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        parentFrame.setContentPane(new MainView());
+        parentFrame.revalidate();
+        parentFrame.repaint();
     }
 }

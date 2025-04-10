@@ -99,4 +99,39 @@ public class UserSqlDao {
             }
         }
     }
+
+    public String deleteAccount(String emailOrName, String password) throws SQLException {
+        // Primero, verificar si el usuario/email existe y la contraseña es correcta
+        String checkUserQuery = "SELECT id, password FROM users WHERE username = ? OR email = ?";
+        try (PreparedStatement checkUserStmt = connection.prepareStatement(checkUserQuery)) {
+            checkUserStmt.setString(1, emailOrName);
+            checkUserStmt.setString(2, emailOrName);
+
+            try (ResultSet rs = checkUserStmt.executeQuery()) {
+                if (!rs.next()) {
+                    return "Usuario no encontrado.";
+                }
+
+                // Comparar la contraseña
+                String storedPassword = rs.getString("password");
+                if (!storedPassword.equals(password)) {
+                    return "Contraseña incorrecta.";
+                }
+
+                // Si la verificación es exitosa, proceder a eliminar la cuenta
+                int userId = rs.getInt("id");
+                String deleteQuery = "DELETE FROM users WHERE id = ?";
+                try (PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery)) {
+                    deleteStmt.setInt(1, userId);
+                    int rowsAffected = deleteStmt.executeUpdate();
+
+                    if (rowsAffected > 0) {
+                        return "success"; // Cuenta eliminada exitosamente
+                    } else {
+                        return "Error al eliminar la cuenta.";
+                    }
+                }
+            }
+        }
+    }
 }

@@ -11,11 +11,17 @@ import java.awt.*;
 public class UserMenuView extends JPanel {
     private JPanel mainPanel;
     private User loggedUser;
+    private CardLayout cardLayout;  // Necesitamos esto para cambiar de vista
+    private JPanel cardPanel;      // Panel que contendrá todas las vistas
+
 
     public UserMenuView(User loggedUser) {
         this.loggedUser = loggedUser;
         // Permitir posicionamiento absoluto
         setLayout(null);
+
+        cardLayout = new CardLayout();
+        cardPanel = new JPanel(cardLayout);
 
         // Panel principal con degradado
         mainPanel = new JPanel() {
@@ -121,8 +127,28 @@ public class UserMenuView extends JPanel {
         enterLeaveButton.setFocusPainted(false);
         menuPanel.add(enterLeaveButton);
 
+
+        // Botón 5 de Settings (Ajustes)
+        JButton settingsButton = new RoundButton("Settings");
+        settingsButton.setBounds(20, 310, 160, 40);
+        settingsButton.setBackground(new Color(150, 130, 200));
+        settingsButton.setForeground(Color.BLACK);
+        settingsButton.setFocusPainted(false);
+        menuPanel.add(settingsButton);
+
+
         mainPanel.add(menuPanel);
         add(mainPanel);
+
+        settingsButton.addActionListener(e -> {
+            settingsButton.setBackground(Color.YELLOW);
+
+            setVisible(true);
+            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            parentFrame.setContentPane(new SettingsView(loggedUser));
+            parentFrame.revalidate();
+            parentFrame.repaint();
+        });
 
         enterLeaveButton.addActionListener(e -> {
             setVisible(false);
