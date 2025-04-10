@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class UserSqlDao {
     static Connection connection;
 
-    public UserSqlDao() {
+    public UserSqlDao () {
         try {
             this.connection = ConnectionDB.getInstance();
         } catch (SQLException e) {
