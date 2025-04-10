@@ -1,10 +1,10 @@
-package business;
+package business.Managers;
 
-import persistence.UserSqlDao;
+import persistence.SqlDaos.UserSqlDao;
 
 import java.sql.SQLException;
 
-public class RegisterManager {
+public class    RegisterManager {
 
     private boolean isValidEmail(String email) {
         if (email == null || email.isEmpty()) {

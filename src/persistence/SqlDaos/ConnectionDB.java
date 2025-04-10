@@ -1,4 +1,4 @@
-package persistence;
+package persistence.SqlDaos;
 
 import persistence.ConfigDao.Config;
 import persistence.ConfigDao.ConfigDao;

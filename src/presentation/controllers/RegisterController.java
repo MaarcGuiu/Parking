@@ -1,7 +1,6 @@
 package presentation.controllers;
 
-import business.LoginManager;
-import business.RegisterManager;
+import business.Managers.RegisterManager;
 
 public class RegisterController {
     private RegisterManager registerManager;

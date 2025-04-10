@@ -1,8 +1,6 @@
-import persistence.ConnectionDB;
 import presentation.controllers.MainController;
 
 import java.sql.*;
-import java.util.Scanner;
 
 public class Main {
 

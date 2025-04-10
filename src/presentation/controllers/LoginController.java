@@ -1,6 +1,6 @@
 package presentation.controllers;
 
-import business.LoginManager;
+import business.Managers.LoginManager;
 import business.model.User;
 
 public class LoginController {

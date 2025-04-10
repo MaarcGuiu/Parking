@@ -1,7 +1,7 @@
-package business;
+package business.Managers;
 
 import business.model.User;
-import persistence.UserSqlDao;
+import persistence.SqlDaos.UserSqlDao;
 
 import java.sql.SQLException;
 
