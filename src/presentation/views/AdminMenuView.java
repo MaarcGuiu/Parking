@@ -1,8 +1,10 @@
 package presentation.views;
 
+import business.model.Slot;
 import business.model.User;
 import presentation.components.RoundButton;
 import presentation.components.RoundTextField;
+import presentation.controllers.SlotController;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -13,6 +15,7 @@ import java.util.List;
 
 public class AdminMenuView extends JPanel {
     private JPanel mainPanel;
+    private final SlotController slotController = new SlotController();
 
     public AdminMenuView() {
         // Permitir posicionamiento absoluto
@@ -225,13 +228,22 @@ public class AdminMenuView extends JPanel {
             formPanel.add(confirmButton);
 
             confirmButton.addActionListener(ev -> {
-                String id = idField.getText();
-                String floor = (String) floorCombo.getSelectedItem();
-                String vehicle = (String) vehicleCombo.getSelectedItem();
+                try {
+                    int id = Integer.parseInt(idField.getText());
+                    int floor = Integer.parseInt((String) floorCombo.getSelectedItem());
+                    String vehicle = (String) vehicleCombo.getSelectedItem();
 
-                JOptionPane.showMessageDialog(mainPanel,
-                        "Slot creado:\nID: " + id + "\nFloor: " + floor + "\nVehicle: " + vehicle,
-                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                    Slot slot = new Slot(vehicle, id, floor);
+                    slotController.createSlot(slot);
+
+                    JOptionPane.showMessageDialog(mainPanel,
+                            "Slot creado:\nID: " + id + "\nFloor: " + floor + "\nVehicle: " + vehicle,
+                            "Success", JOptionPane.INFORMATION_MESSAGE);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(mainPanel,
+                            "ID y Floor deben ser números válidos.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
             });
 
             mainPanel.add(formPanel);
@@ -261,51 +273,76 @@ public class AdminMenuView extends JPanel {
                 }
             };
             formPanel.setLayout(null);
-            formPanel.setBounds(250, 80, 400, 250);
+            formPanel.setBounds(250, 80, 400, 350);
             formPanel.setOpaque(false);
+
+            JLabel idLabel = new JLabel("ID:");
+            idLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            idLabel.setBounds(40, 30, 100, 25);
+            formPanel.add(idLabel);
+
+            RoundTextField idField = new RoundTextField(15);
+            idField.setBounds(140, 30, 200, 30);
+            formPanel.add(idField);
 
             JLabel occupiedLabel = new JLabel("Is Occupied:");
             occupiedLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            occupiedLabel.setBounds(40, 30, 100, 25);
+            occupiedLabel.setBounds(40, 80, 100, 25);
             formPanel.add(occupiedLabel);
 
             RoundTextField occupiedField = new RoundTextField(15);
-            occupiedField.setBounds(140, 30, 200, 30);
+            occupiedField.setBounds(140, 80, 200, 30);
             formPanel.add(occupiedField);
 
             JLabel floorLabel = new JLabel("FLOOR:");
             floorLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            floorLabel.setBounds(40, 80, 100, 25);
+            floorLabel.setBounds(40, 130, 100, 25);
             formPanel.add(floorLabel);
 
             RoundTextField floorField = new RoundTextField(15);
-            floorField.setBounds(140, 80, 200, 30);
+            floorField.setBounds(140, 130, 200, 30);
             formPanel.add(floorField);
 
             JLabel vehicleLabel = new JLabel("VEHICLE:");
             vehicleLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            vehicleLabel.setBounds(40, 130, 100, 25);
+            vehicleLabel.setBounds(40, 180, 100, 25);
             formPanel.add(vehicleLabel);
 
             RoundTextField vehicleField = new RoundTextField(15);
-            vehicleField.setBounds(140, 130, 200, 30);
+            vehicleField.setBounds(140, 180, 200, 30);
             formPanel.add(vehicleField);
 
             RoundButton editConfirmButton = new RoundButton("EDIT");
-            editConfirmButton.setBounds(120, 180, 160, 40);
+            editConfirmButton.setBounds(120, 230, 160, 40);
             editConfirmButton.setBackground(new Color(210, 160, 20));
             editConfirmButton.setForeground(Color.WHITE);
             editConfirmButton.setFocusPainted(false);
             formPanel.add(editConfirmButton);
 
             editConfirmButton.addActionListener(ev -> {
-                String occupied = occupiedField.getText();
-                String floor = floorField.getText();
-                String vehicle = vehicleField.getText();
+                try {
+                    int id = Integer.parseInt(idField.getText());
+                    int occupied = Integer.parseInt(occupiedField.getText());
+                    int floor = Integer.parseInt(floorField.getText());
+                    String vehicle = vehicleField.getText();
 
-                JOptionPane.showMessageDialog(mainPanel,
-                        "Slot actualizado:\nOccupied: " + occupied + "\nFloor: " + floor + "\nVehicle: " + vehicle,
-                        "Edited", JOptionPane.INFORMATION_MESSAGE);
+                    Slot updatedSlot = new Slot(vehicle, id, floor, occupied); // Crear objeto Slot actualizado
+                    boolean updated = slotController.editSlot(updatedSlot); // Usar el método correcto
+
+                    if (updated) {
+                        JOptionPane.showMessageDialog(mainPanel,
+                                "Slot actualizado:\nID: " + id + "\nFloor: " + floor + "\nVehicle: " + vehicle,
+                                "Edited", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(mainPanel,
+                                "No se encontró un slot con ese ID.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(mainPanel,
+                            "ID y Floor deben ser números válidos.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
             });
 
             mainPanel.add(formPanel);
@@ -355,10 +392,23 @@ public class AdminMenuView extends JPanel {
             formPanel.add(deleteConfirmButton);
 
             deleteConfirmButton.addActionListener(ev -> {
-                String id = idField.getText();
-                JOptionPane.showMessageDialog(mainPanel,
-                        "Slot eliminado: ID " + id,
-                        "Deleted", JOptionPane.INFORMATION_MESSAGE);
+                try {
+                    int id = Integer.parseInt(idField.getText());
+                    boolean deleted = slotController.deleteSlot(id);
+                    if (deleted) {
+                        JOptionPane.showMessageDialog(mainPanel,
+                                "Slot eliminado: ID " + id,
+                                "Deleted", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(mainPanel,
+                                "No se encontró un slot con ese ID.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(mainPanel,
+                            "ID debe ser un número válido.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
             });
 
             mainPanel.add(formPanel);
