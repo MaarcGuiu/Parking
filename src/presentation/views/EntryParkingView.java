@@ -1,5 +1,6 @@
 package presentation.views;
 
+import business.model.User;
 import presentation.components.RoundButton;
 import presentation.components.RoundTextField;
 
@@ -8,10 +9,10 @@ import java.awt.*;
 
 public class EntryParkingView extends JPanel {
     private JPanel mainPanel;
-    //private User loggedUser;
+    private User loggedUser;
 
-    public EntryParkingView(/*User loggedUser*/) {
-        //this.loggedUser = loggedUser;
+    public EntryParkingView(User loggedUser) {
+        this.loggedUser = loggedUser;
         // Permitir posicionamiento absoluto
         setLayout(null);
 
@@ -35,6 +36,13 @@ public class EntryParkingView extends JPanel {
         exitParkingTitle.setFont(new Font("Arial", Font.BOLD, 20));
         exitParkingTitle.setBounds(300, 20, 500, 30);
         mainPanel.add(exitParkingTitle);
+
+        JLabel closeButton = new JLabel("\u2716");
+        closeButton.setFont(new Font("Dialog", Font.BOLD, 22));
+        closeButton.setForeground(Color.BLACK);
+        closeButton.setBounds(840, 20, 30, 30);
+        closeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        mainPanel.add(closeButton);
 
         JPanel userInteractionPanel = new JPanel() {
             @Override
@@ -139,9 +147,20 @@ public class EntryParkingView extends JPanel {
         leaveParkingButton.addActionListener(e -> {
             setVisible(false);
             JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            parentFrame.setContentPane(new ExitParkingView());
+            parentFrame.setContentPane(new ExitParkingView(loggedUser));
             parentFrame.revalidate();
             parentFrame.repaint();
+        });
+
+        closeButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                setVisible(false);
+                JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(EntryParkingView.this);
+                parentFrame.setContentPane(new UserMenuView(loggedUser));
+                parentFrame.revalidate();
+                parentFrame.repaint();
+            }
         });
     }
 

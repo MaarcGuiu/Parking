@@ -81,7 +81,7 @@ public class UserMenuView extends JPanel {
         enterLeaveButton.addActionListener(e -> {
             setVisible(false);
             JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            parentFrame.setContentPane(new EntryParkingView());
+            parentFrame.setContentPane(new EntryParkingView(loggedUser));
             parentFrame.revalidate();
             parentFrame.repaint();
         });
