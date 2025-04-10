@@ -7,11 +7,11 @@ import presentation.components.RoundTextField;
 import javax.swing.*;
 import java.awt.*;
 
-public class ExitParkingView extends JPanel {
+public class EntryParkingView extends JPanel {
     private JPanel mainPanel;
     private User loggedUser;
 
-    public ExitParkingView(User loggedUser) {
+    public EntryParkingView(User loggedUser) {
         this.loggedUser = loggedUser;
         // Permitir posicionamiento absoluto
         setLayout(null);
@@ -31,7 +31,7 @@ public class ExitParkingView extends JPanel {
         mainPanel.setLayout(null);
         mainPanel.setBounds(0, 0, 900, 500);
 
-        JLabel exitParkingTitle = new JLabel("LEAVE PARKING", SwingConstants.CENTER);
+        JLabel exitParkingTitle = new JLabel("ENTER PARKING", SwingConstants.CENTER);
         exitParkingTitle.setForeground(Color.WHITE);
         exitParkingTitle.setFont(new Font("Arial", Font.BOLD, 20));
         exitParkingTitle.setBounds(300, 20, 500, 30);
@@ -58,9 +58,7 @@ public class ExitParkingView extends JPanel {
                 g2.dispose();
             }
         };
-        //userInteractionPanel.setBounds(350, 120, 400, 200);
         userInteractionPanel.setBounds(335, 120, 425, 270);
-
         userInteractionPanel.setLayout(null);
         userInteractionPanel.setOpaque(false);
         mainPanel.add(userInteractionPanel);
@@ -76,12 +74,24 @@ public class ExitParkingView extends JPanel {
         plateField.setBounds(120, 30, 200, 30);
         userInteractionPanel.add(plateField);
 
-        JButton leaveActionButton = new RoundButton("LEAVE");
-        leaveActionButton.setBounds(145, 200, 150, 40);
-        leaveActionButton.setBackground(new Color(204, 140, 0));
-        leaveActionButton.setForeground(Color.WHITE);
-        leaveActionButton.setFont(new Font("Arial", Font.BOLD, 14));
-        userInteractionPanel.add(leaveActionButton);
+        JLabel vehicleLabel = new JLabel("VEHICLE");
+        vehicleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        vehicleLabel.setForeground(Color.BLACK);
+        vehicleLabel.setBounds(30, 100, 100, 30);
+        userInteractionPanel.add(vehicleLabel);
+
+        String[] vehicleTypes = {"Car", "Truck", "Motorcycle"};
+        JComboBox<String> vehicleComboBox = new JComboBox<>(vehicleTypes);
+        vehicleComboBox.setSelectedIndex(1);
+        vehicleComboBox.setBounds(120, 100, 200, 30);
+        userInteractionPanel.add(vehicleComboBox);
+
+        JButton enterActionButton = new RoundButton("ENTER");
+        enterActionButton.setBounds(145, 200, 150, 40);
+        enterActionButton.setBackground(new Color(204, 140, 0));
+        enterActionButton.setForeground(Color.WHITE);
+        enterActionButton.setFont(new Font("Arial", Font.BOLD, 14));
+        userInteractionPanel.add(enterActionButton);
 
         // Menú lateral
         JPanel menuPanel = new JPanel();
@@ -100,7 +110,7 @@ public class ExitParkingView extends JPanel {
         // Botón 1: Enter Parking
         JButton enterParkingButton = new RoundButton("Enter Parking");
         enterParkingButton.setBounds(20, 150, 160, 40);
-        enterParkingButton.setBackground(new Color(150, 130, 200));
+        enterParkingButton.setBackground(new Color(255, 200, 0));
         enterParkingButton.setForeground(Color.BLACK);
         enterParkingButton.setFocusPainted(false);
         menuPanel.add(enterParkingButton);
@@ -108,7 +118,7 @@ public class ExitParkingView extends JPanel {
         // Botón 2: Leave Parking
         JButton leaveParkingButton = new RoundButton("Leave Parking");
         leaveParkingButton.setBounds(20, 230, 160, 40);
-        leaveParkingButton.setBackground(new Color(255, 200, 0));
+        leaveParkingButton.setBackground(new Color(150, 130, 200));
         leaveParkingButton.setForeground(Color.BLACK);
         leaveParkingButton.setFocusPainted(false);
         menuPanel.add(leaveParkingButton);
@@ -117,7 +127,7 @@ public class ExitParkingView extends JPanel {
         mainPanel.add(menuPanel);
         add(mainPanel);
 
-        leaveActionButton.addActionListener(e -> {
+        enterActionButton.addActionListener(e -> {
             String plate = plateField.getText();
 
             if (plate.isEmpty()) {
@@ -127,17 +137,17 @@ public class ExitParkingView extends JPanel {
                 //String result = leaveController(plate);
 
                 //if ("success".equals(result)) {
-                    JOptionPane.showMessageDialog(this, "The vehicle is outside!", "Exit Parking", JOptionPane.INFORMATION_MESSAGE);
-                /*} else {
-                    JOptionPane.showMessageDialog(this, "Invalid license plate number", "Error", JOptionPane.ERROR_MESSAGE);
-                }*/
+                JOptionPane.showMessageDialog(this, "The vehicle is inside!", "Enter Parking", JOptionPane.INFORMATION_MESSAGE);
+            /*} else {
+                JOptionPane.showMessageDialog(this, "Invalid license plate number", "Error", JOptionPane.ERROR_MESSAGE);
+            }*/
             }
         });
 
-        enterParkingButton.addActionListener(e -> {
+        leaveParkingButton.addActionListener(e -> {
             setVisible(false);
             JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            parentFrame.setContentPane(new EntryParkingView(loggedUser));
+            parentFrame.setContentPane(new ExitParkingView(loggedUser));
             parentFrame.revalidate();
             parentFrame.repaint();
         });
@@ -146,7 +156,7 @@ public class ExitParkingView extends JPanel {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 setVisible(false);
-                JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(ExitParkingView.this);
+                JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(EntryParkingView.this);
                 parentFrame.setContentPane(new UserMenuView(loggedUser));
                 parentFrame.revalidate();
                 parentFrame.repaint();
