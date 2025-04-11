@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
 public class ConfigJsonDao implements ConfigDao{
 
     @Override
-    public Config loadAllConfig() {
+    public Config  loadAllConfig() {
         File file = new File("src/config.json");
         if (file.exists()) {
             try (FileReader reader = new FileReader(file)) {
