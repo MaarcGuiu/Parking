@@ -18,7 +18,7 @@ public class SlotManager {
             throw new IllegalArgumentException("Invalid floor number.");
         }
         totalSlots++;                           // Ester será el id de las plazas.
-        slotSqlDao.createSlot(newSlot,totalSlots);
+        slotSqlDao.createSlot(newSlot,newSlot.getIdSlot());
 
         return true;
     }
