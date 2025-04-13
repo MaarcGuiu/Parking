@@ -21,7 +21,7 @@ public class SlotSqlDao {
 
     //SLOT_NUMER ES LO QUE OCUPA dependiendo si es CAR, MOTORBIKE o TRUCK
     public Slot getSlot(int idSlot) throws SQLException {
-        String query = "SELECT id, plant, is_occupied, slot_number FROM slots WHERE id = ?";
+        String query = "SELECT id, plant,slot_number ,is_occupied,vehicle_plate FROM slots WHERE id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, idSlot);
@@ -30,9 +30,11 @@ public class SlotSqlDao {
                 if (rs.next()) {
 
                     return new Slot(
-                            getVehicleTypeFromSlotNumber(rs.getInt("slot_number")),
                             rs.getInt("id"),
-                            rs.getInt("plant")
+                            rs.getInt("plant"),
+                            getVehicleTypeFromSlotNumber(rs.getInt("slot_number")),
+                            rs.getInt("is_occupied"),
+                            rs.getString("vehicle_plate")
                     );
                 }
             }
@@ -42,7 +44,7 @@ public class SlotSqlDao {
 
     public ArrayList<Slot> getByFloor(int floor) throws SQLException {
         ArrayList<Slot> slots = new ArrayList<>();
-        String query = "SELECT id, plant, is_occupied, slot_number FROM slots WHERE plant = ?";
+        String query = "SELECT id, plant,slot_number, is_occupied,vehicle_plate  FROM slots WHERE plant = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, floor);
@@ -50,9 +52,11 @@ public class SlotSqlDao {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Slot slot = new Slot(
-                            getVehicleTypeFromSlotNumber(rs.getInt("slot_number")),
                             rs.getInt("id"),
-                            rs.getInt("plant")
+                            rs.getInt("plant"),
+                            getVehicleTypeFromSlotNumber(rs.getInt("slot_number")),
+                            rs.getInt("is_occupied"),
+                            rs.getString("vehicle_plate")
                     );
                     slots.add(slot);
                 }
@@ -61,19 +65,21 @@ public class SlotSqlDao {
         return slots;
     }
 
-    public ArrayList<Slot> getByVehicle(int vehicle) throws SQLException {
+    public ArrayList<Slot> getByVehicle(String vehicle) throws SQLException {
         ArrayList<Slot> slots = new ArrayList<>();
-        String query = "SELECT id, plant, is_occupied, slot_number FROM slots WHERE slot_number = ?";
+        String query = "SELECT id, plant,slot_number ,is_occupied,vehicle_plate FROM slots WHERE slot_number = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, vehicle);
+            stmt.setInt(1, setSlotNumber(vehicle));
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Slot slot = new Slot(
-                            getVehicleTypeFromSlotNumber(rs.getInt("slot_number")),
                             rs.getInt("id"),
-                            rs.getInt("plant")
+                            rs.getInt("plant"),
+                            getVehicleTypeFromSlotNumber(rs.getInt("slot_number")),
+                            rs.getInt("is_occupied"),
+                            rs.getString("vehicle_plate")
                     );
                     slots.add(slot);
                 }
@@ -82,25 +88,27 @@ public class SlotSqlDao {
         return slots;
     }
     public void editSlot(Slot slot) throws SQLException {
-        String query = "UPDATE slots SET slot_number = ?, plant = ?, is_occupied = ? WHERE id = ?";
+        String query = "UPDATE slots SET id = ?, plant = ?, slot_number = ?, is_occupied = ?,vehicle_plate = ? WHERE id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, setSlotNumber(slot.getVehicle()));
+            stmt.setInt(1, slot.getIdSlot());
             stmt.setInt(2, slot.getFloor());
-            stmt.setInt(3, slot.getAvailabilityState());
-            stmt.setInt(4, slot.getIdSlot());
-
+            stmt.setInt(3, setSlotNumber(slot.getType()));
+            stmt.setInt(4, slot.getAvailabilityState());
+            stmt.setString(5, slot.getVehiclePlate());
+            stmt.setInt(6, slot.getIdSlot());
             stmt.executeUpdate();
         }
     }
-    public void createSlot(Slot slot, int slotId) throws SQLException {
-        String query = "INSERT INTO slots (id, slot_number, plant, is_occupied) VALUES (?, ?, ?, ?)";
+    public void createSlot(Slot slot) throws SQLException {
+        String query = "INSERT INTO slots (id,plant, slot_number, is_occupied,vehicle_plate) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, slotId);
-            stmt.setInt(2, setSlotNumber(slot.getVehicle()));
-            stmt.setInt(3, slot.getFloor());
+            stmt.setInt(1, slot.getIdSlot());
+            stmt.setInt(2, slot.getFloor());
+            stmt.setInt(3, setSlotNumber(slot.getType()));        // Lo pasamos de String a int para guardarlo en la bbdd
             stmt.setInt(4, slot.getAvailabilityState());
+            stmt.setString(5, slot.getVehiclePlate());
             stmt.executeUpdate();
         }
     }

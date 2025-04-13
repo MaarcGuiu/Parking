@@ -8,7 +8,7 @@ public class Main {
 
     static Connection connection;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         MainController controller = new MainController();
         controller.run();
     }

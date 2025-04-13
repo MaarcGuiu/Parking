@@ -4,6 +4,7 @@ import business.SlotManager;
 import business.model.Slot;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class SlotController {
     private SlotManager slotManager;
@@ -37,5 +38,14 @@ public class SlotController {
             System.out.println("Error deleting slot: " + e.getMessage());
             return false;
         }
+    }
+    public Slot getSlot(int idSlot) throws SQLException {
+        return slotManager.getSlot(idSlot);
+    }
+    public ArrayList<Slot> getByVehicle(String vehicle) throws SQLException {
+        return slotManager.getByVehicle(vehicle);
+    }
+    public ArrayList<Slot> getByFloor(int floor) throws SQLException {
+        return slotManager.getByFloor(floor);
     }
 }

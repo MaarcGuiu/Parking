@@ -233,7 +233,7 @@ public class AdminMenuView extends JPanel {
                     int floor = Integer.parseInt((String) floorCombo.getSelectedItem());
                     String vehicle = (String) vehicleCombo.getSelectedItem();
 
-                    Slot slot = new Slot(vehicle, id, floor);
+                    Slot slot = new Slot(id,floor,vehicle,0,"0");
                     slotController.createSlot(slot);
 
                     JOptionPane.showMessageDialog(mainPanel,
@@ -326,7 +326,7 @@ public class AdminMenuView extends JPanel {
                     int floor = Integer.parseInt(floorField.getText());
                     String vehicle = vehicleField.getText();
 
-                    Slot updatedSlot = new Slot(vehicle, id, floor, occupied); // Crear objeto Slot actualizado
+                    Slot updatedSlot = new Slot(id,floor,vehicle,0,"0"); // Crear objeto Slot actualizado
                     boolean updated = slotController.editSlot(updatedSlot); // Usar el método correcto
 
                     if (updated) {
