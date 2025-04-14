@@ -1,10 +1,9 @@
 package presentation.views;
 
 import business.model.Slot;
-import business.model.User;
 import presentation.components.RoundButton;
 import presentation.components.RoundTextField;
-import presentation.controllers.SlotController;
+import presentation.controllers.AdminController;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -15,7 +14,7 @@ import java.util.List;
 
 public class AdminMenuView extends JPanel {
     private JPanel mainPanel;
-    private final SlotController slotController = new SlotController();
+    private final AdminController adminController = new AdminController();
 
     public AdminMenuView() {
         // Permitir posicionamiento absoluto
@@ -234,7 +233,7 @@ public class AdminMenuView extends JPanel {
                     String vehicle = (String) vehicleCombo.getSelectedItem();
 
                     Slot slot = new Slot(vehicle, id, floor);
-                    slotController.createSlot(slot);
+                    adminController.createSlot(slot);
 
                     JOptionPane.showMessageDialog(mainPanel,
                             "Slot creado:\nID: " + id + "\nFloor: " + floor + "\nVehicle: " + vehicle,
@@ -327,7 +326,7 @@ public class AdminMenuView extends JPanel {
                     String vehicle = vehicleField.getText();
 
                     Slot updatedSlot = new Slot(vehicle, id, floor, occupied); // Crear objeto Slot actualizado
-                    boolean updated = slotController.editSlot(updatedSlot); // Usar el método correcto
+                    boolean updated = adminController.editSlot(updatedSlot); // Usar el método correcto
 
                     if (updated) {
                         JOptionPane.showMessageDialog(mainPanel,
@@ -394,7 +393,7 @@ public class AdminMenuView extends JPanel {
             deleteConfirmButton.addActionListener(ev -> {
                 try {
                     int id = Integer.parseInt(idField.getText());
-                    boolean deleted = slotController.deleteSlot(id);
+                    boolean deleted = adminController.deleteSlot(id);
                     if (deleted) {
                         JOptionPane.showMessageDialog(mainPanel,
                                 "Slot eliminado: ID " + id,
