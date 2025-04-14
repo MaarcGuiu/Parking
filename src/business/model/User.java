@@ -17,4 +17,5 @@ public class User {
         return this.username;
     }
     public String getPassword() { return this.password; }
+    public String getEmail() { return this.email; }
 }
