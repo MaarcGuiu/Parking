@@ -73,6 +73,27 @@ public class UserSqlDao {
         return null;
     }
 
+    public User getUserById(int id) throws SQLException {
+        String query = "SELECT id, username, password, email FROM users WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                            rs.getInt("id"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("email")
+                    );
+                }
+            }
+        }
+
+        return null;
+    }
+
     public String register(String username, String password, String email) throws SQLException {
         // 1. Verificar si el nombre de usuario ya existe
         if (getUser(username) != null) {

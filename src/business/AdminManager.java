@@ -43,7 +43,7 @@ public class AdminManager {
         if (slot == null) {
             throw new IllegalArgumentException("Slot doesn't exist.");
         }
-        if (slot.getAvailabilityState() == 1 || slot.getBooked() == "Booked") {
+        if (slot.getAvailabilityState() == 1 || slot.getBooked() == true) {
             throw new IllegalArgumentException("Slot is occupied, cannot be delete.");
         }
         slotSqlDao.deleteSlot(idSlot);

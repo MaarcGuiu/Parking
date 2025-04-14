@@ -113,6 +113,28 @@ public class SlotSqlDao {
         }
     }
 
+    public ArrayList<Slot> getAllSlots() throws SQLException {
+        ArrayList<Slot> slots = new ArrayList<>();
+        String query = "SELECT vehicle_plate, plant, is_occupied, id, booked FROM slots";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Slot slot = new Slot(
+                        rs.getString("vehicle_plate"),
+                        rs.getInt("id"),
+                        rs.getInt("is_occupied"),
+                        rs.getInt("plant"),
+                        rs.getInt("booked") != 0
+                );
+                slots.add(slot);
+            }
+        }
+
+        return slots;
+    }
+
     private int setSlotNumber(String vehicle) {
         switch (vehicle) {
             case "Motorbike":

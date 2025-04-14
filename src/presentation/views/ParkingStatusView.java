@@ -1,23 +1,37 @@
 package presentation.views;
 
+import business.model.Slot;
 import presentation.components.RoundButton;
+import presentation.controllers.LoginController;
+import presentation.controllers.ParkingStatusController;
 
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 
 public class ParkingStatusView {
+    private static ParkingStatusController parkingStatusController;
 
     public static void show(JPanel mainPanel, JPanel menuPanel, Runnable resetMainPanel, boolean isAdmin) {
+        parkingStatusController = new ParkingStatusController();
         resetMainPanel.run();
 
-        String[][] data = {
-                {"P01", "1", "ABC123", "Occupied", "1", "XYZ987"},
-                {"P02", "2", "DEF456", "Free", "0", ""},
-                {"P03", "3", "GHI789", "Occupied", "1", "LMN654"}
-        };
-        String[] columns = {"Code", "Floor", "License Plate", "Current Status", "Reservation Status", "Vehicle Plate"};
+        List<Slot> slots = parkingStatusController.getAllSlots();
+
+        String[][] data = new String[slots.size()][5];
+
+        for (int i = 0; i < slots.size(); i++) {
+            Slot slot = slots.get(i);
+            data[i][0] = slot.getIdSlot()+"";
+            data[i][1] = String.valueOf(slot.getFloor());
+            data[i][2] = slot.getAvailabilityState() == 1 ? "Occupied" : "Free";
+            data[i][3] = slot.getBooked() ? "Reserved" : "Not reserved";
+            data[i][4] = slot.getVehiclePlate() != null ? slot.getVehiclePlate() : "";
+        }
+        // Code =idslot,Floor= plant, availabilityState= ocupado o no,booked= reservado o no, vehiclePlate= vehicle_plate
+        String[] columns = {"Code", "Floor", "Current Status", "Reservation Status", "Vehicle Plate"};
 
         DefaultTableModel model = new DefaultTableModel(data, columns) {
             @Override
@@ -58,8 +72,17 @@ public class ParkingStatusView {
                 if (row != -1) {
                     String code = (String) table.getValueAt(row, 0);
                     String floor = (String) table.getValueAt(row, 1);
-                    String vehicleType = "Car";
-                    boolean isReserved = "1".equals((String) table.getValueAt(row, 4));
+                    String vehicleType = "";
+                    String ownerName = "";
+                    String ownerEmail = "";
+                    for (Slot slot : slots) {
+                        if (slot.getIdSlot() == Integer.parseInt(code)) {
+                            vehicleType = slot.getVehicleObject().getType();
+                            ownerName = slot.getVehicleObject().getVehicleOwner().getUserName();
+                            ownerEmail =  slot.getVehicleObject().getVehicleOwner().getEmail();
+                        }
+                    }
+                    boolean isReserved = "Reserved".equals((String) table.getValueAt(row, 3));
 
                     mainPanel.removeAll();
                     mainPanel.add(menuPanel);
@@ -103,13 +126,13 @@ public class ParkingStatusView {
                     gradientPanel.add(typeLabel);
 
                     if (isReserved) {
-                        JLabel userLabel = new JLabel("Usuari: Admin");
+                        JLabel userLabel = new JLabel("Usuari: " +  ownerName);
                         userLabel.setFont(new Font("Arial", Font.PLAIN, 16));
                         userLabel.setForeground(Color.BLACK);
                         userLabel.setBounds(40, 160, 320, 25);
                         gradientPanel.add(userLabel);
 
-                        JLabel emailLabel = new JLabel("Email: admin@example.com");
+                        JLabel emailLabel = new JLabel("Email: " + ownerEmail);
                         emailLabel.setFont(new Font("Arial", Font.PLAIN, 16));
                         emailLabel.setForeground(Color.BLACK);
                         emailLabel.setBounds(40, 190, 320, 25);
