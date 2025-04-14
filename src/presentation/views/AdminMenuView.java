@@ -244,27 +244,27 @@ public class AdminMenuView extends JPanel {
             occupiedLabel.setBounds(40, 80, 100, 25);
             formPanel.add(occupiedLabel);
 
-            RoundTextField occupiedField = new RoundTextField(15);
-            occupiedField.setBounds(140, 80, 200, 30);
-            formPanel.add(occupiedField);
+            JComboBox<String> occupiedCombo = new JComboBox<>(new String[]{"Yes", "No"});
+            occupiedCombo.setBounds(140, 80, 200, 30);
+            formPanel.add(occupiedCombo);
 
             JLabel floorLabel = new JLabel("FLOOR:");
             floorLabel.setFont(new Font("Arial", Font.BOLD, 14));
             floorLabel.setBounds(40, 130, 100, 25);
             formPanel.add(floorLabel);
 
-            RoundTextField floorField = new RoundTextField(15);
-            floorField.setBounds(140, 130, 200, 30);
-            formPanel.add(floorField);
+            JComboBox<Integer> floorCombo = new JComboBox<>(new Integer[]{1, 2, 3});
+            floorCombo.setBounds(140, 130, 200, 30);
+            formPanel.add(floorCombo);
 
             JLabel vehicleLabel = new JLabel("VEHICLE:");
             vehicleLabel.setFont(new Font("Arial", Font.BOLD, 14));
             vehicleLabel.setBounds(40, 180, 100, 25);
             formPanel.add(vehicleLabel);
 
-            RoundTextField vehicleField = new RoundTextField(15);
-            vehicleField.setBounds(140, 180, 200, 30);
-            formPanel.add(vehicleField);
+            JComboBox<String> vehicleCombo = new JComboBox<>(new String[]{"Car", "Motorbike", "Truck"});
+            vehicleCombo.setBounds(140, 180, 200, 30);
+            formPanel.add(vehicleCombo);
 
             RoundButton editConfirmButton = new RoundButton("EDIT");
             editConfirmButton.setBounds(120, 230, 160, 40);
@@ -276,9 +276,9 @@ public class AdminMenuView extends JPanel {
             editConfirmButton.addActionListener(ev -> {
                 try {
                     int id = Integer.parseInt(idField.getText());
-                    int occupied = Integer.parseInt(occupiedField.getText());
-                    int floor = Integer.parseInt(floorField.getText());
-                    String vehicle = vehicleField.getText();
+                    int occupied = occupiedCombo.getSelectedItem().equals("Yes") ? 1 : 0;
+                    int floor = (Integer) floorCombo.getSelectedItem();
+                    String vehicle = (String) vehicleCombo.getSelectedItem();
 
                     Slot updatedSlot = new Slot(vehicle, id, floor, occupied); // Crear objeto Slot actualizado
                     boolean updated = adminController.editSlot(updatedSlot); // Usar el método correcto
