@@ -2,27 +2,23 @@ package business;
 import business.model.Slot;
 import persistence.SlotSqlDao;
 
-import java.security.PublicKey;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class SlotManager {
     SlotSqlDao slotSqlDao = new SlotSqlDao();
     private static int totalSlots;
     public SlotManager() {
+        totalSlots = 60;                       // Creamos unas 60 plazas, y a partir de ahi las que creemos se irá sumando a ese numero
     }
     public boolean createSlot(Slot newSlot) throws SQLException {
-        if (slotSqlDao.getSlot(newSlot.getIdSlot()) != null) {
-            throw new IllegalArgumentException("Slot ID already exists.");
-        }
-        /*if (!isValidVehicleType(newSlot.getVehiclePlate())) {
+        if (!isValidVehicleType(newSlot.getVehicle())) {
             throw new IllegalArgumentException("Invalid vehicle type.");
-        }*/
+        }
         if (newSlot.getFloor() < 0 || newSlot.getFloor() > 3) {
             throw new IllegalArgumentException("Invalid floor number.");
         }
         totalSlots++;                           // Ester será el id de las plazas.
-        slotSqlDao.createSlot(newSlot);
+        slotSqlDao.createSlot(newSlot,newSlot.getIdSlot());
 
         return true;
     }
@@ -31,9 +27,9 @@ public class SlotManager {
         if (existingSlot == null) {
             throw new IllegalArgumentException("Slot does not exist.");
         }
-        /*if (!isValidVehicleType(editSlot.getVehiclePlate())) {
+        if (!isValidVehicleType(editSlot.getVehicle())) {
             throw new IllegalArgumentException("Invalid vehicle type.");
-        }*/
+        }
         if (editSlot.getFloor() < 0 || editSlot.getFloor() > 3) { // Suponemos que hay maximo 3 plantas
             throw new IllegalArgumentException("Invalid floor number.");
         }
@@ -47,27 +43,18 @@ public class SlotManager {
         if (slot == null) {
             throw new IllegalArgumentException("Slot doesn't exist.");
         }
-        if (slot.getAvailabilityState() == 1 || slot.getBooked().equalsIgnoreCase("Booked")) {
+        if (slot.getAvailabilityState() == 1 || slot.getBooked() == "Booked") {
             throw new IllegalArgumentException("Slot is occupied, cannot be delete.");
         }
         slotSqlDao.deleteSlot(idSlot);
 
         return true;
     }
-    /*private boolean isValidVehicleType(String vehicle) {
+    private boolean isValidVehicleType(String vehicle) {
         switch (vehicle) {
             case "Car", "Motorbike", "Truck":return true;
             default:return false;
         }
-    }*/
-    public Slot getSlot(int idSlot) throws SQLException {
-        return slotSqlDao.getSlot(idSlot);
-    }
-    public ArrayList<Slot> getByVehicle(String vehicle) throws SQLException {
-        return slotSqlDao.getByVehicle(vehicle);
-    }
-    public ArrayList<Slot> getByFloor(int floor) throws SQLException {
-        return slotSqlDao.getByFloor(floor);
     }
 
 }

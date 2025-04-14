@@ -3,23 +3,27 @@ package business.model;
 public class Slot {
     private int idSlot;
     private int floor;
+    private String vehicle;
     private int availabilityState;
     private String booked; // New attribute
     private String vehiclePlate;
-    private String type;
 
-    public Slot(int idSlot, int floor, String type,int occupied, String vehicle) {
-        this.vehiclePlate = vehicle;
+    public Slot(String vehicle, int idSlot, int floor) {
+        this.vehicle = vehicle;
         this.idSlot = idSlot;
-        this.type = type;
         this.floor = floor;
-        this.availabilityState = occupied; // Default state
+        this.availabilityState = 0; // Default state
         this.booked = "notBooked";
     }
 
-    public String getType() {
-        return type;
+    public Slot(String vehicle, int idSlot, int floor, int occupeid) {
+        this.vehicle = vehicle;
+        this.idSlot = idSlot;
+        this.floor = floor;
+        this.availabilityState = occupeid; // Default state
+        this.booked = "notBooked";
     }
+
     public int getIdSlot() {
         return idSlot;
     }
@@ -32,6 +36,11 @@ public class Slot {
         return floor;
     }
 
+    public String getVehicle() {
+        return vehicle;
+    }
+
+    // New getter for booked
     public String getBooked() {
         return booked;
     }
@@ -44,6 +53,7 @@ public class Slot {
         this.vehiclePlate = vehiclePlate;
     }
 
+    // New setter for booked
     public void setBooked(String booked) {
         this.booked = booked;
     }
