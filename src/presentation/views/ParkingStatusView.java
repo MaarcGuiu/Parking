@@ -77,9 +77,11 @@ public class ParkingStatusView {
                     String ownerEmail = "";
                     for (Slot slot : slots) {
                         if (slot.getIdSlot() == Integer.parseInt(code)) {
-                            vehicleType = slot.getVehicleObject().getType();
-                            ownerName = slot.getVehicleObject().getVehicleOwner().getUserName();
-                            ownerEmail =  slot.getVehicleObject().getVehicleOwner().getEmail();
+                            vehicleType = slot.getVehicle();
+                            if (slot.getVehicleObject() != null) {
+                                ownerName = slot.getVehicleObject().getVehicleOwner().getUserName();
+                                ownerEmail =  slot.getVehicleObject().getVehicleOwner().getEmail();
+                            }
                         }
                     }
                     boolean isReserved = "Reserved".equals((String) table.getValueAt(row, 3));

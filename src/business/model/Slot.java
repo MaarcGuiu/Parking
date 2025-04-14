@@ -17,12 +17,13 @@ public class Slot {
         this.booked = false;
     }
 
-    public Slot(String vehiclePlate, int idSlot, int isOccupeid , int floor, boolean booked) {
+    public Slot(String vehiclePlate, int idSlot, int isOccupeid , int floor, boolean booked, String vehicleType) {
         this.vehiclePlate = vehiclePlate;
         this.idSlot = idSlot;
         this.floor = floor;
         this.availabilityState = isOccupeid;
         this.booked = booked;
+        this.vehicle = vehicleType;
     }
 
     public Slot(String vehicle, int idSlot, int floor, int occupeid) {
