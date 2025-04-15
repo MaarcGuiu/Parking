@@ -147,9 +147,47 @@ public class ParkingStatusView {
                             cancelButton.setForeground(Color.WHITE);
                             cancelButton.setFocusPainted(false);
                             cancelButton.addActionListener(ev -> {
-                                JOptionPane.showMessageDialog(mainPanel, "Reserva cancel·lada. L’usuari serà notificat en el proper inici de sessió.");
-                                model.setValueAt("0", row, 4);
-                                model.setValueAt("", row, 5);
+                                for (Slot slot : slots) {
+                                    if (slot.getIdSlot() == Integer.parseInt(code)) {
+                                        if (slot.getAvailabilityState() == 0) {
+                                            if (parkingStatusController.cancelSlot(slot.getIdSlot())) {
+                                                JOptionPane.showMessageDialog(mainPanel, "Reserva cancel·lada. L’usuari serà notificat en el proper inici de sessió.");
+                                                List<Slot> updatedSlots = parkingStatusController.getAllSlots();
+
+                                                String[][] updatedData = new String[updatedSlots.size()][5];
+                                                for (int i = 0; i < updatedSlots.size(); i++) {
+                                                    Slot slot1 = updatedSlots.get(i);
+                                                    updatedData[i][0] = slot1.getIdSlot() + "";
+                                                    updatedData[i][1] = String.valueOf(slot1.getFloor());
+                                                    updatedData[i][2] = slot1.getAvailabilityState() == 1 ? "Occupied" : "Free";
+                                                    updatedData[i][3] = slot1.getBooked() ? "Reserved" : "Not reserved";
+                                                    updatedData[i][4] = slot1.getVehiclePlate() != null ? slot1.getVehiclePlate() : "";
+                                                }
+
+                                                DefaultTableModel updatedModel = new DefaultTableModel(updatedData, columns) {
+                                                    @Override
+                                                    public boolean isCellEditable(int row, int column) {
+                                                        return false;
+                                                    }
+                                                };
+
+                                                table.setModel(updatedModel);
+                                                table.revalidate();
+                                                table.repaint();
+                                                mainPanel.removeAll();
+                                                mainPanel.add(menuPanel);
+                                                mainPanel.add(scrollPane);
+                                                mainPanel.revalidate();
+                                                mainPanel.repaint();
+                                            } else {
+                                                JOptionPane.showMessageDialog(mainPanel, "Error al cancelar la reserva.");
+                                            }
+                                        } else {
+                                            JOptionPane.showMessageDialog(mainPanel, "Error al cancelar la reserva. El espacio esta ocupado actualmente.");
+                                        }
+                                    }
+                                }
+
                             });
                             gradientPanel.add(cancelButton);
                         }

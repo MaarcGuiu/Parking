@@ -15,4 +15,8 @@ public class ParkingStatusController {
     public List<Slot> getAllSlots() {
         return parkingStatusManager.getAllSlots();
     }
+
+    public boolean cancelSlot(int slotId) {
+        return parkingStatusManager.cancelSlot(slotId);
+    }
 }
