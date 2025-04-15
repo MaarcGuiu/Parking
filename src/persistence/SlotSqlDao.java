@@ -39,7 +39,32 @@ public class SlotSqlDao {
         }
         return null;
     }
+    public int getTotalSlots() throws SQLException {
+        String query = "SELECT COUNT(slots.id) FROM slots ";
 
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
+    public int getNumByFloor(int floor) throws SQLException {
+        String query = "SELECT COUNT(slots.id) FROM slots WHERE slots.plant = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, floor);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
     public ArrayList<Slot> getByFloor(int floor) throws SQLException {
         ArrayList<Slot> slots = new ArrayList<>();
         String query = "SELECT id, plant, is_occupied, slot_number FROM slots WHERE plant = ?";
@@ -175,4 +200,69 @@ public class SlotSqlDao {
                 return "Unknown";
         }
     }
+    public ArrayList<Slot> getFreeUnbookedSlots() throws SQLException {
+        ArrayList<Slot> slots = new ArrayList<>();
+        String query = "SELECT id, plant, is_occupied, vehicle_plate, booked FROM slots WHERE booked = 0 AND is_occupied = 0";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Slot slot = new Slot(
+                            rs.getString("vehicle_plate"),
+                            rs.getInt("id"),
+                            rs.getInt("is_occupied"),
+                            rs.getInt("plant"),
+                            rs.getBoolean("booked"),
+                            rs.getString("vehicle_type")
+                    );
+                    slots.add(slot);
+                }
+            }
+        }
+        return slots;
+    }
+
+
+
+    public Slot getSlotBooked(String vehiclePlate) throws SQLException {
+        String query = "SELECT id, plant, slot_number,is_occupied FROM slots WHERE vehicle_plate = ? AND booked = 1";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, vehiclePlate);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    updateTheSlotUnbooked(vehiclePlate);
+                    return new Slot(
+                            getVehicleTypeFromSlotNumber(rs.getInt("slot_number")),
+                            rs.getInt("id"),
+                            rs.getInt("plant"),
+                            1
+                    );
+                }
+            }
+        }
+        return null;
+    }
+    private void updateTheSlotUnbooked(String plate) throws SQLException {
+        String query = "UPDATE slots SET booked = 0, is_occupied = 1 WHERE vehicle_plate = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, plate);
+            stmt.executeUpdate();
+        }
+    }
+
+
+    public boolean checkUserBooking(String plate) throws SQLException {
+        String query = "SELECT 1 FROM slots WHERE vehicle_plate = ? AND booked = 1 LIMIT 1";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, plate);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
 }

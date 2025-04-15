@@ -56,5 +56,11 @@ public class AdminManager {
             default:return false;
         }
     }
+    public int getNumByFloor (int floor) throws SQLException {
+        return slotSqlDao.getNumByFloor(floor);
+    }
+    public int getTotalSlots () throws SQLException {
+        return slotSqlDao.getTotalSlots();
+    }
 
 }

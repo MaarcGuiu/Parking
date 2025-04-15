@@ -25,6 +25,9 @@ public class ParkingStatusManager {
             return null;
         }
     }
+    public void get() {
+
+    }
 
     public boolean cancelSlot(int slotId) {
         SlotSqlDao dao = new SlotSqlDao();

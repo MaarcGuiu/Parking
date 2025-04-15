@@ -24,4 +24,24 @@ public class Vehicle {
     public User getVehicleOwner() {
         return user;
     }
+
+    public String getPlate() {
+        return plate;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public User getUser() {
+        return user;
+    }
 }

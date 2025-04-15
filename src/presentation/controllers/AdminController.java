@@ -38,4 +38,11 @@ public class AdminController {
             return false;
         }
     }
+    public int getNumByFloor (int floor) throws SQLException {
+        return adminManager.getNumByFloor(floor);
+    }
+    public int getTotalSlots() throws SQLException {
+        return adminManager.getTotalSlots();
+    }
+
 }
