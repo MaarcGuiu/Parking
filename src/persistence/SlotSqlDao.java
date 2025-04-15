@@ -138,6 +138,18 @@ public class SlotSqlDao {
         return slots;
     }
 
+    public void cancelSlot(int slotId) throws SQLException {
+        String query = "UPDATE slots SET vehicle_plate = ?, booked = ? WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, null);
+            stmt.setInt(2, 0);
+            stmt.setInt(3, slotId);
+
+            stmt.executeUpdate();
+        }
+    }
+
     private int setSlotNumber(String vehicle) {
         switch (vehicle) {
             case "Motorbike":

@@ -25,4 +25,14 @@ public class ParkingStatusManager {
             return null;
         }
     }
+
+    public boolean cancelSlot(int slotId) {
+        SlotSqlDao dao = new SlotSqlDao();
+        try {
+            dao.cancelSlot(slotId);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
+    }
 }
