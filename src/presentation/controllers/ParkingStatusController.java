@@ -1,6 +1,7 @@
 package presentation.controllers;
 
 import business.ParkingStatusManager;
+import business.model.CancelledReservation;
 import business.model.Slot;
 
 import java.util.List;
@@ -18,5 +19,21 @@ public class ParkingStatusController {
 
     public boolean cancelSlot(int slotId) {
         return parkingStatusManager.cancelSlot(slotId);
+    }
+
+    public boolean createCancelledReservation(int slotId, int userId, String vehiclePlate) {
+        return parkingStatusManager.createCancelledReservation(slotId, userId, vehiclePlate);
+    }
+
+    public int setUserNewReservationSlot(int slotId, String vehiclePlate) {
+        return parkingStatusManager.setUserNewReservationSlot(slotId, vehiclePlate);
+    }
+
+    public boolean getFreeUnbookedSlots() {
+        return parkingStatusManager.getFreeUnbookedSlots();
+    }
+
+    public Slot getSlot(int slotId) {
+        return parkingStatusManager.getSlot(slotId);
     }
 }

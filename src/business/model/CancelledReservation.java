@@ -4,11 +4,13 @@ public class CancelledReservation {
     private int id;
     private User user;
     private Slot slot;
+    private Vehicle vehicle;
 
-    public CancelledReservation(int id, User user, Slot slot) {
+    public CancelledReservation(int id, User user, Slot slot, Vehicle vehicle) {
         this.id = id;
         this.user = user;
         this.slot = slot;
+        this.vehicle = vehicle;
     }
 
     public int getId() {
@@ -33,6 +35,13 @@ public class CancelledReservation {
 
     public void setSlot(Slot slot) {
         this.slot = slot;
+    }
+
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
     }
 }
 

@@ -1,5 +1,7 @@
 package presentation.views;
 
+import business.model.CancelledReservation;
+import business.model.Slot;
 import business.model.User;
 import presentation.components.RoundButton;
 import presentation.components.RoundPasswordField;
@@ -8,6 +10,7 @@ import presentation.controllers.LoginController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class LoginView extends JPanel {
     private LoginController loginController;
@@ -96,6 +99,7 @@ public class LoginView extends JPanel {
                 if ("success".equals(result)) {
                     User loggedUser = loginController.getUser(user);
                     JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso", "Bienvenido " + loggedUser.getUserName(), JOptionPane.INFORMATION_MESSAGE);
+                    mostrarReservasCanceladas(loggedUser.getId());
 
                     // Reemplazar la vista en lugar de abrir una nueva ventana
                     // Aquí pasamos el panel de usuario después de login
@@ -121,5 +125,29 @@ public class LoginView extends JPanel {
         });
 
         add(mainPanel);
+    }
+
+    private void mostrarReservasCanceladas(int userId) {
+        List<CancelledReservation> canceladas = loginController.getCancelledReservationsByUserId(userId);
+
+        if (canceladas != null && !canceladas.isEmpty()) {
+            StringBuilder mensaje = new StringBuilder("El admin ha cancelado tus siguientes reservas:\n\n");
+            Slot newSlot;
+            for (CancelledReservation reservas : canceladas) {
+                mensaje.append("Anterior Slot Code: ").append(reservas.getSlot().getIdSlot()).append("\n");
+                mensaje.append("Anterior Slot Plant: ").append(reservas.getSlot().getFloor()).append("\n");
+                newSlot = loginController.getSlotByPlate(reservas.getVehicle().getPlate());
+                if (newSlot != null) {
+                    mensaje.append("New Slot Code: ").append(newSlot.getIdSlot()).append("\n");
+                    mensaje.append("New Slot Plant: ").append(newSlot.getFloor()).append("\n");
+                }
+            }
+            JOptionPane.showMessageDialog(null, mensaje.toString(), "Reservas canceladas", JOptionPane.WARNING_MESSAGE);
+
+            for (CancelledReservation c : canceladas) {
+                loginController.deleteCancelledReservationById(c.getId());
+            }
+
+        }
     }
 }

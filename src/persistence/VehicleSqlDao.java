@@ -42,4 +42,26 @@ public class VehicleSqlDao {
             }
         }
     }
+
+    public Vehicle getVehicleByUser(User user) throws SQLException {
+        String query = "SELECT plate, brand, model, color, owner_id, type_vehicle FROM vehicles WHERE owner_id = ? LIMIT 1";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, user.getId());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String plate = rs.getString("plate");
+                    String brand = rs.getString("brand");
+                    String model = rs.getString("model");
+                    String color = rs.getString("color");
+                    int ownerId = rs.getInt("owner_id");
+                    String typeVehicle = rs.getString("type_vehicle");
+
+
+                    return new Vehicle(plate, brand, model, color, user, typeVehicle);
+                } else {
+                    return null;
+                }
+            }
+        }
+    }
 }
