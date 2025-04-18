@@ -16,6 +16,13 @@ public class Vehicle {
         this.user = user;
         this.type = type;
     }
+    public Vehicle(String plate, String brand, String model, String color,String type) {
+        this.plate = plate;
+        this.brand = brand;
+        this.model = model;
+        this.color = color;
+        this.type = type;
+    }
 
     public String getType() {
         return type;

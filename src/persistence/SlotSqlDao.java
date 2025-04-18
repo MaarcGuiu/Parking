@@ -1,7 +1,6 @@
 package persistence;
 
 import business.model.Slot;
-import business.model.User;
 import business.model.Vehicle;
 
 import java.sql.Connection;
@@ -9,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class SlotSqlDao {
     static Connection connection;
@@ -202,7 +202,7 @@ public class SlotSqlDao {
                 return "Unknown";
         }
     }
-    public ArrayList<Slot> getFreeUnbookedSlots() throws SQLException {
+    public ArrayList<Slot> getFreeUnbookedSlots() throws SQLException { // Array de todas las plazas libres del parking
         ArrayList<Slot> slots = new ArrayList<>();
         String query = "SELECT id, plant, is_occupied, vehicle_plate, booked, vehicle_type FROM slots WHERE booked = 0 AND is_occupied = 0";
 
@@ -269,17 +269,84 @@ public class SlotSqlDao {
         }
         return null;
     }
+    // Crear booked
+    public void updateTheSlotBooked(String plate, int idSlot) throws SQLException {
+        String query = "UPDATE slots SET vehicle_plate = ?,booked = 1, is_occupied = 0 WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, plate);
+            stmt.setInt(2, idSlot);
+            stmt.executeUpdate();
+        }
+    }
+    // Cancelar booked
     private void updateTheSlotUnbooked(String plate) throws SQLException {
-        String query = "UPDATE slots SET booked = 0, is_occupied = 1 WHERE vehicle_plate = ?";
+        String query = "UPDATE slots SET booked = 0, is_occupied = 0 WHERE vehicle_plate = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, plate);
             stmt.executeUpdate();
         }
     }
+    // USER CON RESERVA ENTRA AL SLOT
+    //Update del slot; de estar reservado para estar ocupado porque entra al parking
+    public void userEntryIfBooked(String plate) throws SQLException {
+        Slot slot = getSlotBooked(plate);
 
+        String query = "UPDATE slots SET vehicle_plate = ?,booked = 0, is_occupied = 1 WHERE id = ?";
 
-    public boolean checkUserBooking(String plate) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, plate);
+            stmt.setInt(2, slot.getIdSlot());
+            stmt.executeUpdate();
+        }
+    }
+    // USER SIN RESERVA ENTRA AL SLOT
+    //Update del slot; de estar reservado para estar ocupado porque entra al parking
+    public void userEntryNotBooked(String plate,String vehicle_type) throws SQLException {
+        Slot slot = findASlotToPark(vehicle_type);
+        String query = "UPDATE slots SET vehicle_plate = ?,booked = 0, is_occupied = 1 WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, plate);
+            stmt.setInt(2, slot.getIdSlot());
+            stmt.executeUpdate();
+        }
+    }
+    //Te busca una plaza libre, con el criterio de que te de la que tiene el id mas bajo
+    private Slot findASlotToPark (String vehicle_type) throws SQLException {
+        ArrayList<Slot> slots = getFreeUnbookedSlots();
+        int lowestId = 100;
+        for (Slot slotss :slots) {
+            if (slotss.getIdSlot() < lowestId && Objects.equals(vehicle_type, slotss.getVehicle())) {
+                lowestId = slotss.getIdSlot();
+            }
+        }
+        return getSlot(lowestId);
+    }
+    // USER EXIT
+    public void userExit (String vehicle_plate) throws SQLException {
+        String query = "UPDATE slots SET vehicle_plate = ?,booked = 0, is_occupied = 0 WHERE id = ?";
+        Slot slot = getSlotByPlate(vehicle_plate);
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, null);
+            stmt.setInt(2, slot.getIdSlot());
+            stmt.executeUpdate();
+        }
+    }
+    public boolean checkUserVehicleIsParked(String plate) throws SQLException { // True si el user tiene algun coche aparcado
+        String query = "SELECT 1 FROM slots WHERE vehicle_plate = ? AND is_occupied = 1 LIMIT 1";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, plate);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+    public boolean checkUserBooking(String plate) throws SQLException { // True si el user tiene alguna reserva
         String query = "SELECT 1 FROM slots WHERE vehicle_plate = ? AND booked = 1 LIMIT 1";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -309,5 +376,27 @@ public class SlotSqlDao {
             }
         }
         return null;
+    }
+
+    public ArrayList<Vehicle> getPanelBookings(int userId) throws SQLException {
+        ArrayList<Vehicle> vehicles = new ArrayList<>();
+        String query = "SELECT plate, brand, model, color, type_vehicle FROM vehicles WHERE owner_id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Vehicle vehicle = new Vehicle(
+                            rs.getString("plate"),
+                            rs.getString("brand"),
+                            rs.getString("model"),
+                            rs.getString("color"),
+                            rs.getString("type_vehicle")
+                    );
+                    vehicles.add(vehicle);
+                }
+            }
+        }
+        return vehicles;
     }
 }
