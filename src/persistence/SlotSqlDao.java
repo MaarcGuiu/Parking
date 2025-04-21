@@ -53,6 +53,30 @@ public class SlotSqlDao {
         }
         return 0;
     }
+    public int getTotalSlotsFreeAndNotBooked() throws SQLException {
+        String query = "SELECT COUNT(slots.id) FROM slots WHERE slots.booked = 0 AND slots.is_occupied = 0 ";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+    public int getTotalSlotsNotBooked() throws SQLException {
+        String query = "SELECT COUNT(slots.id) FROM slots WHERE slots.booked = 0 ";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
 
     public int getNumByFloor(int floor) throws SQLException {
         String query = "SELECT COUNT(slots.id) FROM slots WHERE slots.plant = ?";
@@ -223,6 +247,27 @@ public class SlotSqlDao {
         }
         return slots;
     }
+    public ArrayList<Slot> getOccupiedSlots() throws SQLException { // Array de todas las plazas libres del parking
+        ArrayList<Slot> slots = new ArrayList<>();
+        String query = "SELECT id, plant, is_occupied, vehicle_plate, booked, vehicle_type FROM slots WHERE booked = 0 AND is_occupied = 1";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Slot slot = new Slot(
+                            rs.getString("vehicle_plate"),
+                            rs.getInt("id"),
+                            rs.getInt("is_occupied"),
+                            rs.getInt("plant"),
+                            rs.getBoolean("booked"),
+                            rs.getString("vehicle_type")
+                    );
+                    slots.add(slot);
+                }
+            }
+        }
+        return slots;
+    }
 
     // Este metodo es para cuando el admin decide cancelar una reserva y se le re asigna una al user
     // este user no se quede con la reserva de el mismo slot que el admin le ha cancelado
@@ -314,7 +359,7 @@ public class SlotSqlDao {
         }
     }
     //Te busca una plaza libre, con el criterio de que te de la que tiene el id mas bajo
-    private Slot findASlotToPark (String vehicle_type) throws SQLException {
+    public Slot findASlotToPark (String vehicle_type) throws SQLException {
         ArrayList<Slot> slots = getFreeUnbookedSlots();
         int lowestId = 100;
         for (Slot slotss :slots) {

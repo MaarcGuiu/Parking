@@ -26,7 +26,7 @@ public class UserController {
     public ArrayList<Slot> getFreeUnbookedSlots() throws SQLException {
         return userManager.getFreeUnbookedSlots();
     }
-    //True si el vehiculo cabe en el slot
+    //True si el slot
     public boolean isYourVehicleCorrect(Slot slot, Vehicle vehicle){
         return userManager.isYourVehicleCorrect(slot,vehicle);
     }
