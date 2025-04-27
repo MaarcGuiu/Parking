@@ -155,4 +155,64 @@ public class UserSqlDao {
             }
         }
     }
+
+    public String userPlate(User loggedUser, String plate) throws SQLException {
+        //Verificar si l'usuari té aquesta matrícula assignada.
+        String query = "SELECT * FROM vehicles WHERE plate = ? AND owner_id = ?;";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, plate);
+            stmt.setInt(2, loggedUser.getId());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return "success";
+                }
+            }
+        }
+
+        //Comprovem addicionalment si aquesta matrícula està dins del parking o no hi és.
+        String query2 = "SELECT * FROM vehicles WHERE plate = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query2)) {
+            stmt.setString(1, plate);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return "Aquest vehicle pertany a un altre usuari.";
+                } else {
+                    return "Cap usuari té aquesta matrícula registrada.";
+                }
+            }
+        }
+    }
+
+    public String plateInside(User loggedUser, String plate) throws SQLException {
+        //Verificar si el vehicle està opcupant una plaça
+        String checkSlotQuery = "SELECT * FROM slots WHERE vehicle_plate = ? AND is_occupied = 1";
+
+        try (PreparedStatement slotStmt = connection.prepareStatement(checkSlotQuery)) {
+            slotStmt.setString(1, plate);
+
+            try (ResultSet rs = slotStmt.executeQuery()) {
+                if (!rs.next()) {
+                    return "El vehicle no està dins del pàrquing.";
+                }
+            }
+        }
+
+        return "success";
+    }
+
+    public String updatePlate(User loggedUser, String plate) throws SQLException {
+        //Alliberem l'slot que l'usuari ha deixat lliure.
+        String updateSlotQuery = "UPDATE slots SET is_occupied = 0, booked = 0, vehicle_plate = NULL WHERE vehicle_plate = ?";
+
+        try (PreparedStatement updateStmt = connection.prepareStatement(updateSlotQuery)) {
+            updateStmt.setString(1, plate);
+            updateStmt.executeUpdate();
+        }
+
+        return "success";
+    }
+
 }

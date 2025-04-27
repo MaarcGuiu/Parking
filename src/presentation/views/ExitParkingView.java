@@ -3,6 +3,7 @@ package presentation.views;
 import business.model.User;
 import presentation.components.RoundButton;
 import presentation.components.RoundTextField;
+import presentation.controllers.LeaveController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,8 +11,10 @@ import java.awt.*;
 public class ExitParkingView extends JPanel {
     private JPanel mainPanel;
     private User loggedUser;
+    private LeaveController leaveController;
 
     public ExitParkingView(User loggedUser) {
+        leaveController = new LeaveController(loggedUser);
         this.loggedUser = loggedUser;
         // Permitir posicionamiento absoluto
         setLayout(null);
@@ -50,7 +53,8 @@ public class ExitParkingView extends JPanel {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(255, 255, 255, 0)); // Transparent
+                GradientPaint gp = new GradientPaint(0, 0, new Color(190, 180, 230), getWidth(), getHeight(), new Color(140, 130, 180));
+                g2.setPaint(gp);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30); // Bordes arrodonits
                 g2.setColor(new Color(255, 255, 255, 50)); // Color del borde (blanc translúcid)
                 g2.setStroke(new BasicStroke(2)); // Amplada del borde
@@ -123,14 +127,20 @@ public class ExitParkingView extends JPanel {
             if (plate.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Enter the license plate number", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                //Afegir lògica
-                //String result = leaveController(plate);
-
-                //if ("success".equals(result)) {
-                    JOptionPane.showMessageDialog(this, "The vehicle is outside!", "Exit Parking", JOptionPane.INFORMATION_MESSAGE);
-                /*} else {
-                    JOptionPane.showMessageDialog(this, "Invalid license plate number", "Error", JOptionPane.ERROR_MESSAGE);
-                }*/
+                String userPlate = leaveController.userPlate(loggedUser, plate);
+                if ("success".equals(userPlate)) {
+                    String plateInside = leaveController.plateInside(loggedUser, plate);
+                    if ("success".equals(plateInside)) {
+                        String updateSlot = leaveController.updateSlot(loggedUser, plate);
+                        if ("success".equals(updateSlot)) {
+                            JOptionPane.showMessageDialog(this, "The vehicle is outside!", "Exit Parking", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, plateInside, "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, userPlate, "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
