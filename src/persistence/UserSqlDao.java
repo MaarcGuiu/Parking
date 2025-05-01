@@ -178,9 +178,9 @@ public class UserSqlDao {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return "Aquest vehicle pertany a un altre usuari.";
+                    return "This vehicle belongs to another user.";
                 } else {
-                    return "Cap usuari té aquesta matrícula registrada.";
+                    return "No user has this license plate registered.";
                 }
             }
         }
@@ -195,7 +195,7 @@ public class UserSqlDao {
 
             try (ResultSet rs = slotStmt.executeQuery()) {
                 if (!rs.next()) {
-                    return "El vehicle no està dins del pàrquing.";
+                    return "The vehicle is not in the parking lot.";
                 }
             }
         }
@@ -215,4 +215,96 @@ public class UserSqlDao {
         return "success";
     }
 
+    public String registeredVehicle(User loggedUser, String plate) throws SQLException {
+        //Mirem si el vehicle està registrat
+        String vehicleRegisteredQuery = "SELECT * FROM vehicles WHERE plate = ?";
+        try (PreparedStatement checkVehicleStmt = connection.prepareStatement(vehicleRegisteredQuery)) {
+            checkVehicleStmt.setString(1, plate);
+            try (ResultSet vehicleRs = checkVehicleStmt.executeQuery()) {
+                if (!vehicleRs.next()) {
+                    // No existeix el vehicle
+                    return "The vehicle entered is not registered.";
+                }
+            }
+        }
+
+        //Comprovem si està dins del pàrking
+        String checkSlotQuery = "SELECT * FROM slots WHERE vehicle_plate = ? AND is_occupied = 1";
+        try (PreparedStatement checkSlotStmt = connection.prepareStatement(checkSlotQuery)) {
+            checkSlotStmt.setString(1, plate);
+            try (ResultSet slotRs = checkSlotStmt.executeQuery()) {
+                if (slotRs.next()) {
+                    // El vehicle està dins del pàrquing
+                    return "is_inside";
+                } else {
+                    // El vehicle està registrat però fora del pàrquing
+                    return "success";
+                }
+            }
+        }
+    }
+
+    public String isBooked(User loggedUser, String plate) throws SQLException {
+        //Mirem si el vehicle té reservada una plaça o no
+        String isBookedQuery = "SELECT * FROM slots WHERE vehicle_plate = ? AND booked = 1";
+        String updateSlotQuery = "UPDATE slots SET is_occupied = 1, vehicle_plate = ? WHERE id = ?";
+
+        try (PreparedStatement checkSlotStmt = connection.prepareStatement(isBookedQuery)) {
+            checkSlotStmt.setString(1, plate);
+            try (ResultSet slotRs = checkSlotStmt.executeQuery()) {
+                if (slotRs.next()) {
+                    int slotId = slotRs.getInt("id");
+                    try (PreparedStatement updateSlotStmt = connection.prepareStatement(updateSlotQuery)) {
+                        updateSlotStmt.setString(1, plate);
+                        updateSlotStmt.setInt(2, slotId);
+                        updateSlotStmt.executeUpdate();
+                    }
+                    return "success";
+                } else {
+                    return null;
+                }
+            }
+        }
+    }
+
+    public String placesAvailable(User loggedUser, String plate, String vehicleType) throws SQLException {
+        //Mirem si hi ha places disponibles, és a dir, que no estiguin ocupades ni reservades i que coincideixin amb el vehicle introduït.
+        String placesAvailableQuery = "SELECT id, plant, slot_number, is_occupied, vehicle_plate, booked, vehicle_type " +
+                "FROM slots WHERE is_occupied = 0 AND booked = 0 AND vehicle_type = ? LIMIT 1";
+        String updateSlotQuery = "UPDATE slots SET is_occupied = 1, vehicle_plate = ? WHERE id = ?";
+
+        try (PreparedStatement findSlotStmt = connection.prepareStatement(placesAvailableQuery)) {
+            findSlotStmt.setString(1, vehicleType);
+            try (ResultSet slotRs = findSlotStmt.executeQuery()) {
+                if (slotRs.next()) {
+                    int plant = slotRs.getInt("plant");
+                    int slotNumber = slotRs.getInt("slot_number");
+                    int slotId = slotRs.getInt("id");
+
+                    try (PreparedStatement updateSlotStmt = connection.prepareStatement(updateSlotQuery)) {
+                        updateSlotStmt.setString(1, plate);
+                        updateSlotStmt.setInt(2, slotId);
+                        updateSlotStmt.executeUpdate();
+                    }
+
+                    return "The vehicle has been assigned to plant " + plant + ", slot number " + slotNumber;
+                } else {
+                    return null;
+                }
+            }
+        }
+    }
+
+    public boolean sameTypeVehicle(User loggedUser, String plate, String vehicle) throws SQLException {
+        //Comprovem que el tipus de vehicle que ens han introduït sigui el mateix tipus que el que tenim registrat, utilitzant la matrícula per comprovar-ho
+        String sameVehicleQuery = "SELECT * FROM vehicles WHERE plate = ? AND type_vehicle = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sameVehicleQuery)) {
+            stmt.setString(1, plate);
+            stmt.setString(2, vehicle);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
 }

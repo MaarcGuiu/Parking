@@ -3,15 +3,20 @@ package presentation.views;
 import business.model.User;
 import presentation.components.RoundButton;
 import presentation.components.RoundTextField;
+import presentation.controllers.EnterController;
+import presentation.controllers.LeaveController;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class EntryParkingView extends JPanel {
+    private static final String SELECT_VEHICLE_OPTION = "--Select vehicle--";
     private JPanel mainPanel;
     private User loggedUser;
+    private EnterController enterController;
 
     public EntryParkingView(User loggedUser) {
+        enterController = new EnterController(loggedUser);
         this.loggedUser = loggedUser;
         // Permitir posicionamiento absoluto
         setLayout(null);
@@ -80,9 +85,9 @@ public class EntryParkingView extends JPanel {
         vehicleLabel.setBounds(30, 100, 100, 30);
         userInteractionPanel.add(vehicleLabel);
 
-        String[] vehicleTypes = {"Car", "Truck", "Motorcycle"};
+        String[] vehicleTypes = {"--Select vehicle--", "Car", "Truck", "Motorcycle"};
         JComboBox<String> vehicleComboBox = new JComboBox<>(vehicleTypes);
-        vehicleComboBox.setSelectedIndex(1);
+        vehicleComboBox.setSelectedIndex(0);
         vehicleComboBox.setBounds(120, 100, 200, 30);
         userInteractionPanel.add(vehicleComboBox);
 
@@ -129,18 +134,39 @@ public class EntryParkingView extends JPanel {
 
         enterActionButton.addActionListener(e -> {
             String plate = plateField.getText();
+            String vehicle = vehicleComboBox.getSelectedItem().toString();
 
             if (plate.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Enter the license plate number", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                //Afegir lògica
-                //String result = leaveController(plate);
-
-                //if ("success".equals(result)) {
-                JOptionPane.showMessageDialog(this, "The vehicle is inside!", "Enter Parking", JOptionPane.INFORMATION_MESSAGE);
-            /*} else {
-                JOptionPane.showMessageDialog(this, "Invalid license plate number", "Error", JOptionPane.ERROR_MESSAGE);
-            }*/
+                String registeredVehicle = enterController.registeredVehicle(loggedUser, plate);
+                if ("success".equals(registeredVehicle)) {
+                    String isBooked = enterController.isBooked(loggedUser, plate);
+                    if ("success".equals(isBooked)) {
+                        JOptionPane.showMessageDialog(this, "The vehicle has been correctly entered into the parking lot thanks to the reservation made for this license plate.", "Enter Parking", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        if (!vehicle.equals(SELECT_VEHICLE_OPTION)) {
+                            if (enterController.sameTypeVehicle(loggedUser, plate, vehicle)) {
+                                String place = enterController.placesAvailable(loggedUser, plate, vehicle);
+                                if (place != null) {
+                                    JOptionPane.showMessageDialog(this, place, "Enter Parking", JOptionPane.INFORMATION_MESSAGE);
+                                } else {
+                                    JOptionPane.showMessageDialog(this, "No available space could be found due to the conditions of this vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog(this, "The vehicle registered does not match the vehicle type selected.", "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Enter the type of vehicle so we can assign you an available space.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                } else {
+                    if ("is_inside".equals(registeredVehicle)) {
+                        JOptionPane.showMessageDialog(this, "The vehicle entered is already inside the parking lot.", "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(this, registeredVehicle, "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             }
         });
 
