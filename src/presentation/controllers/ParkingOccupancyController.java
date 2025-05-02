@@ -1,5 +1,7 @@
 package presentation.controllers;
 
+import business.ParkingOccupancyManager;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.time.LocalDateTime;
