@@ -577,47 +577,8 @@ public class AdminMenuView extends JPanel {
             statsPanel.setBackground(new Color(190, 180, 230));
             statsPanel.setBounds(230, 470, 640, 100);
 
-            // Add statistics - hardcoded values
-            int cars = 35;
-            int motorbikes = 15;
-            int trucks = 10;
-            int total = cars + motorbikes + trucks;
-
-            JLabel totalVehiclesLabel = new JLabel("  Total Vehicles:");
-            totalVehiclesLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            statsPanel.add(totalVehiclesLabel);
-
-            JLabel totalVehiclesValue = new JLabel(String.valueOf(total));
-            totalVehiclesValue.setFont(new Font("Arial", Font.PLAIN, 14));
-            statsPanel.add(totalVehiclesValue);
-
-            JLabel carsLabel = new JLabel("  Cars:");
-            carsLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            statsPanel.add(carsLabel);
-
-            JLabel carsValue = new JLabel(cars + " (" + Math.round(100.0 * cars / total) + "%)");
-            carsValue.setFont(new Font("Arial", Font.PLAIN, 14));
-            statsPanel.add(carsValue);
-
-            JLabel motorbikesLabel = new JLabel("  Motorbikes:");
-            motorbikesLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            statsPanel.add(motorbikesLabel);
-
-            JLabel motorbikesValue = new JLabel(motorbikes + " (" + Math.round(100.0 * motorbikes / total) + "%)");
-            motorbikesValue.setFont(new Font("Arial", Font.PLAIN, 14));
-            statsPanel.add(motorbikesValue);
-
-            JLabel trucksLabel = new JLabel("  Trucks:");
-            trucksLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            statsPanel.add(trucksLabel);
-
-            JLabel trucksValue = new JLabel(trucks + " (" + Math.round(100.0 * trucks / total) + "%)");
-            trucksValue.setFont(new Font("Arial", Font.PLAIN, 14));
-            statsPanel.add(trucksValue);
-
             // Add containers to main panel
             mainPanel.add(chartContainer);
-            mainPanel.add(statsPanel);
             mainPanel.revalidate();
             mainPanel.repaint();
         });
