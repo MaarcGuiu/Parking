@@ -7,47 +7,41 @@ import java.sql.SQLException;
 
 public class EnterManager {
 
-    public String registeredVehicle(User loggedUser, String plate) {
+    public String registeredVehicle(String plate) {
         UserSqlDao dao = new UserSqlDao();
 
         try {
-            return dao.registeredVehicle(loggedUser, plate);
+            return dao.registeredVehicle(plate);
         } catch (SQLException e) {
             e.printStackTrace();
             return "Error en la base de datos.";
         }
     }
 
-    public String isBooked(User loggedUser, String plate) {
+    public String isBooked(String plate) {
         UserSqlDao dao = new UserSqlDao();
 
         try {
-            return dao.isBooked(loggedUser, plate);
+            return dao.isBooked(plate);
         } catch (SQLException e) {
             e.printStackTrace();
             return "Error en la base de datos.";
         }
     }
 
-    public String placesAvailable(User loggedUser, String plate, String vehicle) {
+    public String placesAvailable(String plate, String vehicle) {
         UserSqlDao dao = new UserSqlDao();
 
         try {
-            return dao.placesAvailable(loggedUser, plate, vehicle);
+            if (dao.vehicleExists(plate)) {
+                if (!dao.sameTypeVehicle(plate, vehicle)) {
+                    return "notEqual";
+                }
+            }
+            return dao.placesAvailable(plate, vehicle);
         } catch (SQLException e) {
             e.printStackTrace();
             return "Error en la base de datos.";
-        }
-    }
-
-    public boolean sameTypeVehicle(User loggedUser, String plate, String vehicle) {
-        UserSqlDao dao = new UserSqlDao();
-
-        try {
-            return dao.sameTypeVehicle(loggedUser, plate, vehicle);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
         }
     }
 }

@@ -17,22 +17,26 @@ public class LeaveManager {
         }
     }
 
-    public String plateInside(User loggedUser, String plate) {
+    public String isVehicleInside(User loggedUser, String plate) {
         UserSqlDao dao = new UserSqlDao();
 
         try {
-            return dao.plateInside(loggedUser, plate);
+            if (dao.isVehicleInside(plate)) {
+                return "success";
+            } else {
+                return "The vehicle is not in the parking lot.";
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             return "Error en la base de datos.";
         }
     }
 
-    public String updatePlate(User loggedUser, String plate) {
+    public String updatePlate(String plate) {
         UserSqlDao dao = new UserSqlDao();
 
         try {
-            return dao.updatePlate(loggedUser, plate);
+            return dao.updatePlate(plate);
         } catch (SQLException e) {
             e.printStackTrace();
             return "Error en la base de datos.";
