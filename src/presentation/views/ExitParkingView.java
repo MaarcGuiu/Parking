@@ -129,9 +129,9 @@ public class ExitParkingView extends JPanel {
             } else {
                 String userPlate = leaveController.userPlate(loggedUser, plate);
                 if ("success".equals(userPlate)) {
-                    String plateInside = leaveController.plateInside(loggedUser, plate);
+                    String plateInside = leaveController.isVehicleInside(loggedUser, plate);
                     if ("success".equals(plateInside)) {
-                        String updateSlot = leaveController.updateSlot(loggedUser, plate);
+                        String updateSlot = leaveController.updateSlot(plate);
                         if ("success".equals(updateSlot)) {
                             JOptionPane.showMessageDialog(this, "The vehicle is outside!", "Exit Parking", JOptionPane.INFORMATION_MESSAGE);
                         }
@@ -162,9 +162,5 @@ public class ExitParkingView extends JPanel {
                 parentFrame.repaint();
             }
         });
-    }
-
-    public JPanel getMainPanel() {
-        return mainPanel;
     }
 }

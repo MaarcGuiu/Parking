@@ -55,7 +55,8 @@ public class EntryParkingView extends JPanel {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(255, 255, 255, 0)); // Transparent
+                GradientPaint gp = new GradientPaint(0, 0, new Color(190, 180, 230), getWidth(), getHeight(), new Color(140, 130, 180));
+                g2.setPaint(gp);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30); // Bordes arrodonits
                 g2.setColor(new Color(255, 255, 255, 50)); // Color del borde (blanc translúcid)
                 g2.setStroke(new BasicStroke(2)); // Amplada del borde
@@ -139,22 +140,22 @@ public class EntryParkingView extends JPanel {
             if (plate.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Enter the license plate number", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                String registeredVehicle = enterController.registeredVehicle(loggedUser, plate);
+                String registeredVehicle = enterController.registeredVehicle(plate);
                 if ("success".equals(registeredVehicle)) {
-                    String isBooked = enterController.isBooked(loggedUser, plate);
+                    String isBooked = enterController.isBooked(plate);
                     if ("success".equals(isBooked)) {
                         JOptionPane.showMessageDialog(this, "The vehicle has been correctly entered into the parking lot thanks to the reservation made for this license plate.", "Enter Parking", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         if (!vehicle.equals(SELECT_VEHICLE_OPTION)) {
-                            if (enterController.sameTypeVehicle(loggedUser, plate, vehicle)) {
-                                String place = enterController.placesAvailable(loggedUser, plate, vehicle);
-                                if (place != null) {
-                                    JOptionPane.showMessageDialog(this, place, "Enter Parking", JOptionPane.INFORMATION_MESSAGE);
+                            String place = enterController.placesAvailable(plate, vehicle);
+                            if (place != null) {
+                                if ("notEqual".equals(place)) {
+                                    JOptionPane.showMessageDialog(this, "The vehicle registered does not match the vehicle type selected.", "Enter Parking", JOptionPane.ERROR_MESSAGE);
                                 } else {
-                                    JOptionPane.showMessageDialog(this, "No available space could be found due to the conditions of this vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
+                                    JOptionPane.showMessageDialog(this, place, "Enter Parking", JOptionPane.INFORMATION_MESSAGE);
                                 }
                             } else {
-                                JOptionPane.showMessageDialog(this, "The vehicle registered does not match the vehicle type selected.", "Error", JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(this, "No available space could be found due to the conditions of this vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
                             }
                         } else {
                             JOptionPane.showMessageDialog(this, "Enter the type of vehicle so we can assign you an available space.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -188,9 +189,5 @@ public class EntryParkingView extends JPanel {
                 parentFrame.repaint();
             }
         });
-    }
-
-    public JPanel getMainPanel() {
-        return mainPanel;
     }
 }

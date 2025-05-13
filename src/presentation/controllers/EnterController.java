@@ -11,23 +11,15 @@ public class EnterController {
         enterManager = new EnterManager();
     }
 
-    public String registeredVehicle(User loggedUser, String plate) {
-        return enterManager.registeredVehicle(loggedUser, plate);
+    public String registeredVehicle(String plate) {
+        return enterManager.registeredVehicle(plate);
     }
 
-    public String isBooked(User loggedUser, String plate) {
-        return enterManager.isBooked(loggedUser, plate);
+    public String isBooked(String plate) {
+        return enterManager.isBooked(plate);
     }
 
-//    public String typeVehicle(User loggedUser, String plate, String vehicle) {
-//        return enterManager.typeVehicle(loggedUser, plate, vehicle);
-//    }
-
-    public String placesAvailable(User loggedUser, String plate, String vehicle) {
-        return enterManager.placesAvailable(loggedUser, plate, vehicle);
-    }
-
-    public boolean sameTypeVehicle(User loggedUser, String plate, String vehicle) {
-        return enterManager.sameTypeVehicle(loggedUser, plate, vehicle);
+    public String placesAvailable(String plate, String vehicle) {
+        return enterManager.placesAvailable(plate, vehicle);
     }
 }

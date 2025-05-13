@@ -15,11 +15,11 @@ public class LeaveController {
         return leaveManager.userPlate(loggedUser, plate);
     }
 
-    public String plateInside(User loggedUser, String plate) {
-        return leaveManager.plateInside(loggedUser, plate);
+    public String isVehicleInside(User loggedUser, String plate) {
+        return leaveManager.isVehicleInside(loggedUser, plate);
     }
 
-    public String updateSlot(User loggedUser, String plate) {
-        return leaveManager.updatePlate(loggedUser, plate);
+    public String updateSlot(String plate) {
+        return leaveManager.updatePlate(plate);
     }
 }

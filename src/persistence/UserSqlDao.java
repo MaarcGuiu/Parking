@@ -186,36 +186,17 @@ public class UserSqlDao {
         }
     }
 
-    public String plateInside(User loggedUser, String plate) throws SQLException {
-        //Verificar si el vehicle està opcupant una plaça
-        String checkSlotQuery = "SELECT * FROM slots WHERE vehicle_plate = ? AND is_occupied = 1";
-
-        try (PreparedStatement slotStmt = connection.prepareStatement(checkSlotQuery)) {
-            slotStmt.setString(1, plate);
-
-            try (ResultSet rs = slotStmt.executeQuery()) {
-                if (!rs.next()) {
-                    return "The vehicle is not in the parking lot.";
-                }
+    public boolean isVehicleInside(String plate) throws SQLException {
+        String query = "SELECT 1 FROM slots WHERE vehicle_plate = ? AND is_occupied = 1";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, plate);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next(); // true si està dins
             }
         }
-
-        return "success";
     }
 
-    public String updatePlate(User loggedUser, String plate) throws SQLException {
-        //Alliberem l'slot que l'usuari ha deixat lliure.
-        String updateSlotQuery = "UPDATE slots SET is_occupied = 0, booked = 0, vehicle_plate = NULL WHERE vehicle_plate = ?";
-
-        try (PreparedStatement updateStmt = connection.prepareStatement(updateSlotQuery)) {
-            updateStmt.setString(1, plate);
-            updateStmt.executeUpdate();
-        }
-
-        return "success";
-    }
-
-    public String registeredVehicle(User loggedUser, String plate) throws SQLException {
+    public String registeredVehicle(String plate) throws SQLException {
         //Mirem si el vehicle està registrat
         String vehicleRegisteredQuery = "SELECT * FROM vehicles WHERE plate = ?";
         try (PreparedStatement checkVehicleStmt = connection.prepareStatement(vehicleRegisteredQuery)) {
@@ -244,7 +225,19 @@ public class UserSqlDao {
         }
     }
 
-    public String isBooked(User loggedUser, String plate) throws SQLException {
+    public String updatePlate(String plate) throws SQLException {
+        //Alliberem l'slot que l'usuari ha deixat lliure.
+        String updateSlotQuery = "UPDATE slots SET is_occupied = 0, booked = 0, vehicle_plate = NULL WHERE vehicle_plate = ?";
+
+        try (PreparedStatement updateStmt = connection.prepareStatement(updateSlotQuery)) {
+            updateStmt.setString(1, plate);
+            updateStmt.executeUpdate();
+        }
+
+        return "success";
+    }
+
+    public String isBooked(String plate) throws SQLException {
         //Mirem si el vehicle té reservada una plaça o no
         String isBookedQuery = "SELECT * FROM slots WHERE vehicle_plate = ? AND booked = 1";
         String updateSlotQuery = "UPDATE slots SET is_occupied = 1, vehicle_plate = ? WHERE id = ?";
@@ -267,7 +260,7 @@ public class UserSqlDao {
         }
     }
 
-    public String placesAvailable(User loggedUser, String plate, String vehicleType) throws SQLException {
+    public String placesAvailable(String plate, String vehicleType) throws SQLException {
         //Mirem si hi ha places disponibles, és a dir, que no estiguin ocupades ni reservades i que coincideixin amb el vehicle introduït.
         String placesAvailableQuery = "SELECT id, plant, slot_number, is_occupied, vehicle_plate, booked, vehicle_type " +
                 "FROM slots WHERE is_occupied = 0 AND booked = 0 AND vehicle_type = ? LIMIT 1";
@@ -295,13 +288,24 @@ public class UserSqlDao {
         }
     }
 
-    public boolean sameTypeVehicle(User loggedUser, String plate, String vehicle) throws SQLException {
+    public boolean sameTypeVehicle(String plate, String vehicle) throws SQLException {
         //Comprovem que el tipus de vehicle que ens han introduït sigui el mateix tipus que el que tenim registrat, utilitzant la matrícula per comprovar-ho
         String sameVehicleQuery = "SELECT * FROM vehicles WHERE plate = ? AND type_vehicle = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sameVehicleQuery)) {
             stmt.setString(1, plate);
             stmt.setString(2, vehicle);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    public boolean vehicleExists(String plate) throws SQLException {
+        String query = "SELECT 1 FROM vehicles WHERE plate = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, plate);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
