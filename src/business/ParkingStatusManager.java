@@ -2,7 +2,9 @@ package business;
 
 import business.model.CancelledReservation;
 import business.model.Slot;
+import business.model.Vehicle;
 import persistence.CancelledReservationSqlDao;
+import persistence.ConfigDao.ConfigJsonDao;
 import persistence.SlotSqlDao;
 import persistence.UserSqlDao;
 import persistence.VehicleSqlDao;
@@ -16,9 +18,11 @@ import java.util.Random;
 
 public class ParkingStatusManager {
     private Config config;
+    private ConfigJsonDao configJsonDao;
     private SlotSqlDao slotSqlDao;
+    private VehicleSqlDao vehicleSqlDao;
     public ParkingStatusManager () {
-
+        slotSqlDao = new SlotSqlDao();
     }
     public List<Slot> getAllSlots() {
         SlotSqlDao dao = new SlotSqlDao();
@@ -98,39 +102,63 @@ public class ParkingStatusManager {
     // TRAFFIC SIMULATION:
     public int calculateFrequency () {
         int freq = 1;
+        configJsonDao = new ConfigJsonDao();
+        Config config = configJsonDao.loadAllConfig();
         int vehicleTime = config.getVehicleTime();
-            freq = ThreadLocalRandom.current().nextInt(1, vehicleTime + 1);
+            System.out.println("vehTime: "+vehicleTime);
+            freq = ThreadLocalRandom.current().nextInt(1, vehicleTime);
         return freq;
-    }
-    public void executeTimeFrequency(int freqInSeconds) {
-        try {
-            Thread.sleep(freqInSeconds * 1000L);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
     public boolean calculateEntryOrExit() throws SQLException { // True un vehiculo entrará, false saldrá.
         float probabilityEntry;
-        probabilityEntry = slotSqlDao.getTotalSlotsFreeAndNotBooked() / slotSqlDao.getTotalSlotsNotBooked();
-        if (probabilityEntry > 0.5) {
+        System.out.println("\nNumerador: "+slotSqlDao.getTotalSlotsFreeAndNotBooked()+"/");System.out.println("Denominador: "+slotSqlDao.getTotalSlotsNotBooked());
+        probabilityEntry = (float) slotSqlDao.getTotalSlotsFreeAndNotBooked() / slotSqlDao.getTotalSlotsNotBooked();
+        System.out.println("\nCalcul: "+probabilityEntry);
+        if (probabilityEntry > 0.49) { //Entry
             return true;
-        } else {
+        } else {                      //Exit
             return false;
         }
     }
     public void simulateEntry () throws SQLException { //Update de una plaza libre, genere aleatoriamente plate+tipo vehiculo
         String vehicle_type = "Car";
+        //String randomPlate = randomVehicle().getPlate();
         switch (ThreadLocalRandom.current().nextInt(1, 3)) {
             case 1: vehicle_type = "Motorbike"; break;
             case 2: vehicle_type = "Car"; break;
             case 3: vehicle_type = "Truck"; break;
         }
-        slotSqlDao.userEntryNotBooked(generateRandomVehiclePlate(),vehicle_type);
+        String randomPlate = generateRandomVehiclePlate();
+        System.out.println("plateEntry: \n"+ randomPlate);
+        slotSqlDao.userEntryNotBooked(randomPlate,vehicle_type);
+    }
+    public Vehicle randomVehicle () throws SQLException {
+        vehicleSqlDao = new VehicleSqlDao();
+        ArrayList<Vehicle> allVehicles = vehicleSqlDao.getAllVehicle();
+        ArrayList<Slot> allSlots = slotSqlDao.getAllSlots();
+        boolean flag;
+        Vehicle vv;
+        do {
+            flag = true;
+            vv = allVehicles.get(ThreadLocalRandom.current().nextInt(allVehicles.size()));
+            for (Slot s : allSlots) {
+                if (s.getAvailabilityState() == 1 && s.getVehicle().equals(vv)) {  // is_occupied = 1 falta && not booked
+                    flag = false;
+                }
+            }
+        } while (!flag);
+        return vv;
     }
     public Slot simulateExit () throws SQLException { // Despues de esta funcion queda hacer update de que queda libre
         ArrayList<Slot> slotsOccupied = new ArrayList<>();
         slotsOccupied = slotSqlDao.getOccupiedSlots();
-        Slot slot = slotsOccupied.get(ThreadLocalRandom.current().nextInt(1, slotsOccupied.size()));
+        if (slotsOccupied.isEmpty()) {
+            throw new IllegalStateException("No occupied slots.");
+        }
+        Slot slot = slotsOccupied.get(ThreadLocalRandom.current().nextInt(slotsOccupied.size()));
+        String randomPlate = slot.getVehiclePlate();
+        slotSqlDao.updateTheSlotUnbooked(randomPlate); // Aqui hago el update
+        System.out.println("plateExit: \n"+ randomPlate);
         return slot;
     }
     public String generateRandomVehiclePlate() {
@@ -149,7 +177,5 @@ public class ParkingStatusManager {
         Random random = new Random();
         return (char) ('A' + random.nextInt(26));
     }
-
-
 
 }

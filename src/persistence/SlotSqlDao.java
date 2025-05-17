@@ -185,7 +185,27 @@ public class SlotSqlDao {
                 slots.add(slot);
             }
         }
+        return slots;
+    }
+    public ArrayList<Slot> getAllSlotsBooked() throws SQLException {
+        ArrayList<Slot> slots = new ArrayList<>();
+        String query = "SELECT vehicle_plate, plant, is_occupied, id, booked, vehicle_type FROM slots WHERE booked = 1";
 
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Slot slot = new Slot(
+                        rs.getString("vehicle_plate"),
+                        rs.getInt("id"),
+                        rs.getInt("is_occupied"),
+                        rs.getInt("plant"),
+                        rs.getInt("booked") != 0,
+                        rs.getString("vehicle_type")
+                );
+                slots.add(slot);
+            }
+        }
         return slots;
     }
 
@@ -325,11 +345,12 @@ public class SlotSqlDao {
         }
     }
     // Cancelar booked
-    private void updateTheSlotUnbooked(String plate) throws SQLException {
-        String query = "UPDATE slots SET booked = 0, is_occupied = 0 WHERE vehicle_plate = ?";
+    public void updateTheSlotUnbooked(String plate) throws SQLException {
+        String query = "UPDATE slots SET booked = 0, is_occupied = 0, vehicle_plate = ? WHERE vehicle_plate = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, plate);
+            stmt.setString(1, null);
+            stmt.setString(2, plate);
             stmt.executeUpdate();
         }
     }
@@ -350,14 +371,26 @@ public class SlotSqlDao {
     //Update del slot; de estar reservado para estar ocupado porque entra al parking
     public void userEntryNotBooked(String plate,String vehicle_type) throws SQLException {
         Slot slot = findASlotToPark(vehicle_type);
+        insertVehicleIfNotExists(plate, vehicle_type);
         String query = "UPDATE slots SET vehicle_plate = ?,booked = 0, is_occupied = 1 WHERE id = ?";
+        if (slot != null) {
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setString(1, plate);
+                stmt.setInt(2, slot.getIdSlot());
+                stmt.executeUpdate();
+            }
+        }
+    }
+    public void insertVehicleIfNotExists(String plate, String typeVehicle) throws SQLException {
+        String query = "INSERT IGNORE INTO vehicles (plate, brand, model, color, owner_id, type_vehicle) VALUES (?, 'SimBrand', 'SimModel', 'Gray', 1, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, plate);
-            stmt.setInt(2, slot.getIdSlot());
+            stmt.setString(2, typeVehicle);
             stmt.executeUpdate();
         }
     }
+
     //Te busca una plaza libre, con el criterio de que te de la que tiene el id mas bajo
     public Slot findASlotToPark (String vehicle_type) throws SQLException {
         ArrayList<Slot> slots = getFreeUnbookedSlots();

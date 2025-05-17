@@ -1,13 +1,21 @@
 package presentation.controllers;
 
+import business.SimulationManager;
 import presentation.views.MainView;
 
 import javax.swing.*;
 
 public class MainController {
 
+
     public void run() {
         SwingUtilities.invokeLater(() -> {
+            SimulationManager simulationManager = new SimulationManager();
+
+            Thread simulationThread = new Thread(simulationManager);
+
+            simulationThread.start();
+
             // Crear el JFrame principal
             JFrame mainFrame = new JFrame("THE PARKING LS");
             mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

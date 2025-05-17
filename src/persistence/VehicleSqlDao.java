@@ -1,12 +1,11 @@
 package persistence;
 
+import business.model.Slot;
 import business.model.User;
 import business.model.Vehicle;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 
 public class VehicleSqlDao {
     static Connection connection;
@@ -63,5 +62,29 @@ public class VehicleSqlDao {
                 }
             }
         }
+    }
+    public ArrayList<Vehicle> getAllVehicle() {
+        ArrayList<Vehicle> vehicles = new ArrayList<>();
+        String query = "SELECT * FROM vehicles";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Vehicle vehicle = new Vehicle(
+                        rs.getString("plate"),
+                        rs.getString("brand"),
+                        rs.getString("model"),
+                        rs.getString("color"),
+                        rs.getString("owner_id")
+                );
+                vehicles.add(vehicle);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Or better error handling/logging
+        }
+
+        return vehicles;
     }
 }
