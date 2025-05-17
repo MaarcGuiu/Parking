@@ -23,16 +23,21 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class AdminMenuView extends JPanel {
+public class AdminMenuView extends JPanel implements OccupancyChangeListener{
     private JPanel mainPanel;
+    private JPanel menuPanel;
     private final AdminController adminController = new AdminController();
     private persistence.LogsSqlDao LogsSqlDao = new LogsSqlDao();
     private business.ParkingOccupancyManager ParkingOccupancyManager = new ParkingOccupancyManager(LogsSqlDao);
     private final ParkingOccupancyController parkingOccupancyService = new ParkingOccupancyController(ParkingOccupancyManager);
+    private AtomicReference<int[]> occupancyDataRef = new AtomicReference<>(new int[60]);
+
+    private JPanel timeBarChartPanel;
 
     public AdminMenuView() {
         // Permitir posicionamiento absoluto
         setLayout(null);
+        parkingOccupancyService.addOccupancyChangeListener(this);
 
         // Panel principal con degradado
         mainPanel = new JPanel() {
@@ -49,7 +54,10 @@ public class AdminMenuView extends JPanel {
         mainPanel.setBounds(0, 0, 900, 500);
 
         // Menú lateral
-        JPanel menuPanel = new JPanel();
+        menuPanel = new JPanel();
+        menuPanel.setLayout(null);
+        menuPanel.setBackground(new Color(70, 60, 130));
+        menuPanel.setBounds(0, 0, 200, 500);
         menuPanel.setLayout(null);
         menuPanel.setBackground(new Color(70, 60, 130));
         menuPanel.setBounds(0, 0, 200, 500);
@@ -102,6 +110,15 @@ public class AdminMenuView extends JPanel {
         parkingStatusButton.setFocusPainted(false);
         menuPanel.add(parkingStatusButton);
 
+
+        // Botón 5 de Log out (Ajustes)
+        JButton settingsButton = new RoundButton("Log out");
+        settingsButton.setBounds(20, 370, 160, 40);
+        settingsButton.setBackground(new Color(150, 130, 200));
+        settingsButton.setForeground(Color.BLACK);
+        settingsButton.setFocusPainted(false);
+        menuPanel.add(settingsButton);
+
         // MODIFICAR EL COLOR DE LOS BOTONES DEL MENU
         List<JButton> menuButtons = new ArrayList<>();
         menuButtons.add(createButton);
@@ -109,6 +126,7 @@ public class AdminMenuView extends JPanel {
         menuButtons.add(deleteButton);
         menuButtons.add(statisticsButton);
         menuButtons.add(parkingStatusButton);
+        menuButtons.add(settingsButton);
 
         Color defaultButtonColor = new Color(150, 130, 200);
 
@@ -315,6 +333,7 @@ public class AdminMenuView extends JPanel {
             mainPanel.repaint();
         });
 
+
         deleteButton.addActionListener(e -> {
             resetMainPanel.run();
             deleteButton.setBackground(Color.YELLOW);
@@ -382,205 +401,22 @@ public class AdminMenuView extends JPanel {
         });
 
 
+        settingsButton.addActionListener(e -> {
+            settingsButton.setBackground(Color.YELLOW);
+
+            setVisible(true);
+            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            handleLogout();
+            parentFrame.revalidate();
+            parentFrame.repaint();
+        });
+
+
+
         statisticsButton.addActionListener(e -> {
             resetMainPanel.run();
             statisticsButton.setBackground(Color.YELLOW);
-
-            JLabel titleLabel = new JLabel("PARKING STATISTICS");
-            titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
-            titleLabel.setForeground(Color.BLACK);
-            titleLabel.setBounds(400, 30, 300, 30);
-            mainPanel.add(titleLabel);
-
-            // Create chart panel container
-            JPanel chartContainer = new JPanel() {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    Graphics2D g2d = (Graphics2D) g;
-                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    GradientPaint gp = new GradientPaint(0, 0, new Color(190, 180, 230), getWidth(), getHeight(), new Color(140, 130, 180));
-                    g2d.setPaint(gp);
-                    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
-                }
-            };
-            chartContainer.setLayout(null);
-            chartContainer.setBounds(230, 80, 640, 380);
-            chartContainer.setOpaque(false);
-
-            // Title for the chart
-            JLabel chartTitle = new JLabel("Vehicles per Minute (Last 60 Minutes)", SwingConstants.CENTER);
-            chartTitle.setFont(new Font("Arial", Font.BOLD, 18));
-            chartTitle.setBounds(0, 10, 640, 30);
-            chartContainer.add(chartTitle);
-
-            // Obtener los datos reales del servicio
-            parkingOccupancyService.updateOccupancyData();
-            AtomicReference<int[]> occupancyDataRef = new AtomicReference<>(parkingOccupancyService.getCurrentOccupancy());
-
-            //int[] occupancyData = parkingOccupancyService.getCurrentOccupancy();
-
-            // Llama directamente al metodo para verificar que funciona
-            //System.out.println("Datos: " + Arrays.toString(parkingOccupancyService.getCurrentOccupancy()));
-
-            // Last 60 minutes bar chart
-            JPanel timeBarChartPanel = new JPanel() {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    Graphics2D g2d = (Graphics2D) g;
-                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                    // Set margins and dimensions
-                    int leftMargin = 60;
-                    int rightMargin = 20;
-                    int topMargin = 40;
-                    int bottomMargin = 60;
-
-                    int chartWidth = getWidth() - leftMargin - rightMargin;
-                    int chartHeight = getHeight() - topMargin - bottomMargin;
-
-                    // Draw axes
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawLine(leftMargin, getHeight() - bottomMargin, getWidth() - rightMargin, getHeight() - bottomMargin); // X-axis
-                    g2d.drawLine(leftMargin, topMargin, leftMargin, getHeight() - bottomMargin); // Y-axis
-
-                    // Draw Y-axis labels
-                    g2d.setFont(new Font("Arial", Font.PLAIN, 12));
-
-
-                    // Calcular el máximo para escalar el gráfico
-                    //int maxOccupancy = Arrays.stream(occupancyData).max().orElse(50);
-                    int maxOccupancy = 60;
-                    //int yStep = Math.max(5, (int) Math.ceil(maxOccupancy / 5.0));
-                    int yStep = 10;
-
-                    // Escala Y (asegurando que maxOccupancy nunca sea 0)
-                    if (maxOccupancy == 0) {
-                        maxOccupancy = 1; // Prevenir división por cero
-                        g2d.drawString("No hay vehículos", leftMargin + 10, topMargin + 20);
-                        return;
-                    }
-
-                    for (int i = 0; i <= 5; i++) {
-                        int value = i * yStep;
-                        int y = getHeight() - bottomMargin - (i * chartHeight / 5);
-                        g2d.drawString(String.valueOf(value), leftMargin - 30, y + 5);
-                        g2d.drawLine(leftMargin - 5, y, leftMargin, y); // Tick mark
-                    }
-
-                    // Y-axis title
-                    g2d.setFont(new Font("Arial", Font.BOLD, 12));
-                    Graphics2D g2d2 = (Graphics2D) g.create();
-                    g2d2.translate(20, getHeight() / 2);
-                    g2d2.rotate(-Math.PI / 2);
-                    g2d2.drawString("Number of Vehicles", 0, 0);
-                    g2d2.dispose();
-
-                    // Draw X-axis labels (minutes)
-                    g2d.setFont(new Font("Arial", Font.PLAIN, 10));
-                    for (int i = 0; i < 60; i += 10) {
-                        int x = leftMargin + (i * chartWidth / 60);
-                        g2d.drawString(i + " min ago", x - 15, getHeight() - bottomMargin + 20);
-                        g2d.drawLine(x, getHeight() - bottomMargin, x, getHeight() - bottomMargin + 5); // Tick mark
-                    }
-                    g2d.drawString("now", getWidth() - rightMargin - 15, getHeight() - bottomMargin + 20);
-
-                    // X-axis title
-                    g2d.setFont(new Font("Arial", Font.BOLD, 12));
-                    g2d.drawString("Time (minutes ago)", getWidth() / 2 - 200, getHeight() - 15);
-
-                    // Draw bars for each minute using real data
-                    int barWidth = chartWidth / 65; // Smaller to leave gaps
-
-                    for (int i = 0; i < 60; i++) {
-//                        int totalVehicles = occupancyData[i];
-                        int totalVehicles = occupancyDataRef.get()[i];
-
-
-                        // Position the bar
-                        int x = leftMargin + (i * chartWidth / 60);
-                        int y = getHeight() - bottomMargin - (totalVehicles * chartHeight / maxOccupancy);
-                        int height = (totalVehicles * chartHeight / maxOccupancy);
-
-                        // Draw solid bar with gradient
-                        GradientPaint barGradient = new GradientPaint(
-                                x, y, new Color(65, 105, 225),
-                                x, y + height, new Color(30, 70, 180)
-                        );
-                        g2d.setPaint(barGradient);
-                        g2d.fillRect(x, y, barWidth, height);
-
-                        // Outline for each bar
-                        g2d.setColor(new Color(40, 40, 40, 120));
-                        g2d.drawRect(x, y, barWidth, height);
-
-                        // Show value on top of bar if there's space
-                        if (height > 20) {
-                            g2d.setColor(Color.BLACK);
-                            g2d.setFont(new Font("Arial", Font.PLAIN, 8));
-                            String valueText = String.valueOf(totalVehicles);
-                            int textWidth = g2d.getFontMetrics().stringWidth(valueText);
-                            g2d.drawString(valueText, x + (barWidth - textWidth)/2, y + 10);
-                        }
-                    }
-
-                    // Draw legend
-                    int legendX = leftMargin + 170;
-                    int legendY = topMargin + 225;
-
-                    // Vehicles legend
-                    g2d.setColor(new Color(65, 105, 225));
-                    g2d.fillRect(legendX, legendY, 15, 15);
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawString("Vehicles", legendX + 20, legendY + 12);
-
-                    // Current time label
-                    g2d.setFont(new Font("Arial", Font.ITALIC, 10));
-                    g2d.drawString("Last updated: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),
-                            leftMargin + 350, topMargin + 20);
-                }
-            };
-
-            timeBarChartPanel.setBounds(10, 50, 620, 300);
-            chartContainer.add(timeBarChartPanel);
-
-            Timer updateTimer = new Timer(60_000, ev -> {
-                parkingOccupancyService.updateOccupancyData();
-                occupancyDataRef.set(parkingOccupancyService.getCurrentOccupancy());
-                timeBarChartPanel.repaint();
-                //mainPanel.repaint();
-                chartContainer.repaint();
-                System.out.println("REPAINT!");
-
-            });
-            updateTimer.start();
-
-
-            // Refresh button to update the chart
-//            JButton refreshButton = new JButton("Refresh Data");
-//            refreshButton.setBounds(520, 10, 100, 30);
-//            refreshButton.addActionListener(ev -> timeBarChartPanel.repaint());
-//            chartContainer.add(refreshButton);
-
-            mainPanel.add(chartContainer);
-            mainPanel.revalidate();
-            mainPanel.repaint();
-
-            timeBarChartPanel.setOpaque(false);
-            timeBarChartPanel.setBounds(20, 50, 600, 300);
-            chartContainer.add(timeBarChartPanel);
-
-            // Additional statistics panel
-            JPanel statsPanel = new JPanel();
-            statsPanel.setLayout(new GridLayout(4, 2, 10, 10));
-            statsPanel.setBackground(new Color(190, 180, 230));
-            statsPanel.setBounds(230, 470, 640, 100);
-
-            // Add containers to main panel
-            mainPanel.add(chartContainer);
-            mainPanel.revalidate();
-            mainPanel.repaint();
+            initializeStatisticsView(); // Llamamos a la nueva función
         });
 
         mainPanel.add(menuPanel);
@@ -588,9 +424,21 @@ public class AdminMenuView extends JPanel {
     }
 
 
+    @Override
+    public void onOccupancyChanged(int[] newData) {
+        // Actualizar los datos y repintar en el hilo de eventos de Swing
+        SwingUtilities.invokeLater(() -> {
+            occupancyDataRef.set(newData);
+            if (timeBarChartPanel != null) {
+                timeBarChartPanel.repaint();
+            }
+        });
+    }
+
     public JPanel getMainPanel() {
         return mainPanel;
     }
+
     private void showReservationPopUp() {
 
         JDialog dialog = new JDialog((Frame) null, "Reservation Details", true);
@@ -627,5 +475,158 @@ public class AdminMenuView extends JPanel {
 
         // Show the dialog
         dialog.setVisible(true);
+    }
+
+    private void initializeStatisticsView() {
+        // Limpiar el panel principal
+        mainPanel.removeAll();
+        mainPanel.add(menuPanel);
+
+        // Título
+        JLabel titleLabel = new JLabel("PARKING STATISTICS");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
+        titleLabel.setForeground(Color.BLACK);
+        titleLabel.setBounds(400, 30, 300, 30);
+        mainPanel.add(titleLabel);
+
+        // Contenedor del gráfico
+        JPanel chartContainer = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                GradientPaint gp = new GradientPaint(0, 0, new Color(190, 180, 230), getWidth(), getHeight(), new Color(140, 130, 180));
+                g2d.setPaint(gp);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+            }
+        };
+        chartContainer.setLayout(null);
+        chartContainer.setBounds(230, 80, 640, 380);
+        chartContainer.setOpaque(false);
+
+        // Título del gráfico
+        JLabel chartTitle = new JLabel("Vehicles per Minute (Last 60 Minutes)", SwingConstants.CENTER);
+        chartTitle.setFont(new Font("Arial", Font.BOLD, 18));
+        chartTitle.setBounds(0, 10, 640, 30);
+        chartContainer.add(chartTitle);
+
+        // Obtener datos actuales
+        parkingOccupancyService.updateOccupancyData();
+        occupancyDataRef.set(parkingOccupancyService.getCurrentOccupancy());
+
+        // Panel del gráfico de barras
+        timeBarChartPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Configuración de márgenes y dimensiones
+                int leftMargin = 60;
+                int rightMargin = 20;
+                int topMargin = 40;
+                int bottomMargin = 60;
+                int chartWidth = getWidth() - leftMargin - rightMargin;
+                int chartHeight = getHeight() - topMargin - bottomMargin;
+
+                // Dibujar ejes
+                g2d.setColor(Color.BLACK);
+                g2d.drawLine(leftMargin, getHeight() - bottomMargin, getWidth() - rightMargin, getHeight() - bottomMargin); // Eje X
+                g2d.drawLine(leftMargin, topMargin, leftMargin, getHeight() - bottomMargin); // Eje Y
+
+                // Etiquetas del eje Y
+                g2d.setFont(new Font("Arial", Font.PLAIN, 12));
+                int maxOccupancy = 60;
+                int yStep = 10;
+
+                for (int i = 0; i <= 5; i++) {
+                    int value = i * yStep;
+                    int y = getHeight() - bottomMargin - (i * chartHeight / 5);
+                    g2d.drawString(String.valueOf(value), leftMargin - 30, y + 5);
+                    g2d.drawLine(leftMargin - 5, y, leftMargin, y); // Marcas
+                }
+
+                // Título del eje Y
+                g2d.setFont(new Font("Arial", Font.BOLD, 12));
+                Graphics2D g2d2 = (Graphics2D) g.create();
+                g2d2.translate(20, getHeight() / 2);
+                g2d2.rotate(-Math.PI / 2);
+                g2d2.drawString("Number of Vehicles", 0, 0);
+                g2d2.dispose();
+
+                // Etiquetas del eje X (minutos)
+                g2d.setFont(new Font("Arial", Font.PLAIN, 10));
+                for (int i = 0; i < 60; i += 10) {
+                    int x = leftMargin + (i * chartWidth / 60);
+                    g2d.drawString(i + " min ago", x - 15, getHeight() - bottomMargin + 20);
+                    g2d.drawLine(x, getHeight() - bottomMargin, x, getHeight() - bottomMargin + 5);
+                }
+                g2d.drawString("now", getWidth() - rightMargin - 15, getHeight() - bottomMargin + 20);
+
+                // Título del eje X
+                g2d.setFont(new Font("Arial", Font.BOLD, 12));
+                g2d.drawString("Time (minutes ago)", getWidth() / 2 - 200, getHeight() - 15);
+
+                // Dibujar barras
+                int barWidth = chartWidth / 65;
+                int[] currentData = occupancyDataRef.get();
+
+                for (int i = 0; i < 60; i++) {
+                    int totalVehicles = currentData[i];
+                    int x = leftMargin + (i * chartWidth / 60);
+                    int y = getHeight() - bottomMargin - (totalVehicles * chartHeight / maxOccupancy);
+                    int height = (totalVehicles * chartHeight / maxOccupancy);
+
+                    // Gradiente para las barras
+                    GradientPaint barGradient = new GradientPaint(
+                            x, y, new Color(65, 105, 225),
+                            x, y + height, new Color(30, 70, 180)
+                    );
+                    g2d.setPaint(barGradient);
+                    g2d.fillRect(x, y, barWidth, height);
+
+                    // Contorno de las barras
+                    g2d.setColor(new Color(40, 40, 40, 120));
+                    g2d.drawRect(x, y, barWidth, height);
+
+                    // Mostrar valor si hay espacio
+                    if (height > 20) {
+                        g2d.setColor(Color.BLACK);
+                        g2d.setFont(new Font("Arial", Font.PLAIN, 8));
+                        String valueText = String.valueOf(totalVehicles);
+                        int textWidth = g2d.getFontMetrics().stringWidth(valueText);
+                        g2d.drawString(valueText, x + (barWidth - textWidth)/2, y + 10);
+                    }
+                }
+
+                // Leyenda
+                int legendX = leftMargin + 170;
+                int legendY = topMargin + 225;
+                g2d.setColor(new Color(65, 105, 225));
+                g2d.fillRect(legendX, legendY, 15, 15);
+                g2d.setColor(Color.BLACK);
+                g2d.drawString("Vehicles", legendX + 20, legendY + 12);
+
+                // Hora de actualización
+                g2d.setFont(new Font("Arial", Font.ITALIC, 10));
+                g2d.drawString("Last updated: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),
+                        leftMargin + 350, topMargin + 20);
+            }
+        };
+
+        timeBarChartPanel.setBounds(10, 50, 620, 300);
+        chartContainer.add(timeBarChartPanel);
+        mainPanel.add(chartContainer);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    private void handleLogout() {
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        parentFrame.setContentPane(new MainView());
+        parentFrame.revalidate();
+        parentFrame.repaint();
     }
 }

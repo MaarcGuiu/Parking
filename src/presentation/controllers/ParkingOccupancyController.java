@@ -1,10 +1,13 @@
 package presentation.controllers;
 
 import business.ParkingOccupancyManager;
+import presentation.views.AdminMenuView;
+import presentation.views.OccupancyChangeListener;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import javax.swing.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,19 +20,35 @@ public class ParkingOccupancyController {
 
     public ParkingOccupancyController(ParkingOccupancyManager occupancyManager) {
         this.occupancyManager = occupancyManager;
+        init();
     }
 
-    @PostConstruct
     public void init() {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         // Programa la actualización cada minuto con un retraso inicial de 0 segundos
         scheduler.scheduleAtFixedRate(this::updateOccupancyData, 0, 1, TimeUnit.MINUTES);
     }
 
-    @PreDestroy
+
     public void cleanup() {
         if (scheduler != null) {
             scheduler.shutdown();
+        }
+    }
+
+    private final List<OccupancyChangeListener> listeners = new ArrayList<>();
+
+    public void addOccupancyChangeListener(OccupancyChangeListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeOccupancyChangeListener(OccupancyChangeListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyOccupancyChanged() {
+        for (OccupancyChangeListener listener : listeners) {
+            listener.onOccupancyChanged(currentOccupancy);
         }
     }
 
@@ -37,6 +56,8 @@ public class ParkingOccupancyController {
         try {
             int[] newData = occupancyManager.calculateLast60MinutesOccupancy();
             this.currentOccupancy = newData;
+            notifyOccupancyChanged(); // Notificar a los listeners
+
             System.out.println("Datos de ocupación actualizados: " + LocalDateTime.now());
         } catch (Exception e) {
             System.err.println("Error actualizando datos: " + e.getMessage());
@@ -46,4 +67,5 @@ public class ParkingOccupancyController {
     public int[] getCurrentOccupancy() {
         return currentOccupancy.clone(); // Devuelve copia para evitar modificaciones externas
     }
+
 }

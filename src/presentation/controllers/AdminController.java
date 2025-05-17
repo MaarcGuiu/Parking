@@ -2,6 +2,7 @@ package presentation.controllers;
 
 import business.AdminManager;
 import business.model.Slot;
+import presentation.views.OccupancyChangeListener;
 
 import java.sql.SQLException;
 
@@ -44,5 +45,4 @@ public class AdminController {
     public int getTotalSlots() throws SQLException {
         return adminManager.getTotalSlots();
     }
-
 }

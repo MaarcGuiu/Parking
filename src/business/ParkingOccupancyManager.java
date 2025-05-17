@@ -1,12 +1,16 @@
 package business;
 import persistence.LogsSqlDao;
+import presentation.views.OccupancyChangeListener;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ParkingOccupancyManager {
     private final LogsSqlDao repository;
+    private static final List<OccupancyChangeListener> listeners = new ArrayList<>();
+
 
     public ParkingOccupancyManager(LogsSqlDao repository) {
         this.repository = repository;
@@ -52,6 +56,19 @@ public class ParkingOccupancyManager {
 
             occupancyPerMinute[i] = currentOccupancy;
         }
+
+
+//        public static void addListener(OccupancyChangeListener listener) {
+//            listeners.add(listener);
+//        }
+//
+//        private static void notifyListeners(int[] occupancy) {
+//            for (OccupancyChangeListener l : listeners) {
+//                l.onOccupancyChanged(occupancy);
+//            }
+//        }
+
+
 
         return occupancyPerMinute;
     }
