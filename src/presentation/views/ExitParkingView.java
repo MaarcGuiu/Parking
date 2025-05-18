@@ -7,6 +7,7 @@ import presentation.controllers.LeaveController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
 
 public class ExitParkingView extends JPanel {
     private JPanel mainPanel;
@@ -62,7 +63,6 @@ public class ExitParkingView extends JPanel {
                 g2.dispose();
             }
         };
-        //userInteractionPanel.setBounds(350, 120, 400, 200);
         userInteractionPanel.setBounds(335, 120, 425, 270);
 
         userInteractionPanel.setLayout(null);
@@ -87,21 +87,17 @@ public class ExitParkingView extends JPanel {
         leaveActionButton.setFont(new Font("Arial", Font.BOLD, 14));
         userInteractionPanel.add(leaveActionButton);
 
-        // Menú lateral
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(null);
         menuPanel.setBackground(new Color(70, 60, 130));
         menuPanel.setBounds(0, 0, 200, 500);
 
-        // Título centrado en el menú
         JLabel menuTitle = new JLabel("MENU", SwingConstants.CENTER);
         menuTitle.setForeground(Color.WHITE);
         menuTitle.setFont(new Font("Arial", Font.BOLD, 20));
         menuTitle.setBounds(0, 20, 200, 30); // Ancho igual al panel para centrar
         menuPanel.add(menuTitle);
 
-        // Botones del menú
-        // Botón 1: Enter Parking
         JButton enterParkingButton = new RoundButton("Enter Parking");
         enterParkingButton.setBounds(20, 150, 160, 40);
         enterParkingButton.setBackground(new Color(150, 130, 200));
@@ -109,7 +105,6 @@ public class ExitParkingView extends JPanel {
         enterParkingButton.setFocusPainted(false);
         menuPanel.add(enterParkingButton);
 
-        // Botón 2: Leave Parking
         JButton leaveParkingButton = new RoundButton("Leave Parking");
         leaveParkingButton.setBounds(20, 230, 160, 40);
         leaveParkingButton.setBackground(new Color(255, 200, 0));
@@ -124,23 +119,44 @@ public class ExitParkingView extends JPanel {
         leaveActionButton.addActionListener(e -> {
             String plate = plateField.getText();
 
-            if (plate.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Enter the license plate number", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String userPlate = leaveController.userPlate(loggedUser, plate);
-                if ("success".equals(userPlate)) {
-                    String plateInside = leaveController.isVehicleInside(loggedUser, plate);
-                    if ("success".equals(plateInside)) {
-                        String updateSlot = leaveController.updateSlot(plate);
-                        if ("success".equals(updateSlot)) {
-                            JOptionPane.showMessageDialog(this, "The vehicle is outside!", "Exit Parking", JOptionPane.INFORMATION_MESSAGE);
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(this, plateInside, "Error", JOptionPane.ERROR_MESSAGE);
-                    }
+            try {
+                if (plate.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Enter the license plate number", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
                 } else {
-                    JOptionPane.showMessageDialog(this, userPlate, "Error", JOptionPane.ERROR_MESSAGE);
+                    if (!leaveController.isValidPlateFormat(plate)) {
+                        JOptionPane.showMessageDialog(this, "Invalid plate format. Must be 3 uppercase letters followed by 3 digits.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                 }
+
+                String userPlate = leaveController.userPlate(loggedUser, plate);
+                if (!"success".equals(userPlate)) {
+                    JOptionPane.showMessageDialog(this, userPlate, "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                String plateInside = leaveController.isVehicleInside(plate);
+                if (!"success".equals(plateInside)) {
+                    JOptionPane.showMessageDialog(this, plateInside, "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                int slotId = leaveController.getSlotIdByPlate(plate);
+
+                String updateSlot = leaveController.updateSlot(plate);
+                if (!"success".equals(updateSlot)) {
+                    JOptionPane.showMessageDialog(this, updateSlot, "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                leaveController.registerExitLogs("leave", plate, slotId);
+
+                JOptionPane.showMessageDialog(this, "The vehicle is outside!", "Exit Parking", JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 

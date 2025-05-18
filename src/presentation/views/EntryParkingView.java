@@ -8,6 +8,7 @@ import presentation.controllers.LeaveController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
 
 public class EntryParkingView extends JPanel {
     private static final String SELECT_VEHICLE_OPTION = "--Select vehicle--";
@@ -86,7 +87,7 @@ public class EntryParkingView extends JPanel {
         vehicleLabel.setBounds(30, 100, 100, 30);
         userInteractionPanel.add(vehicleLabel);
 
-        String[] vehicleTypes = {"--Select vehicle--", "Car", "Truck", "Motorcycle"};
+        String[] vehicleTypes = {"--Select vehicle--", "Car", "Truck", "Motorbike"};
         JComboBox<String> vehicleComboBox = new JComboBox<>(vehicleTypes);
         vehicleComboBox.setSelectedIndex(0);
         vehicleComboBox.setBounds(120, 100, 200, 30);
@@ -99,21 +100,17 @@ public class EntryParkingView extends JPanel {
         enterActionButton.setFont(new Font("Arial", Font.BOLD, 14));
         userInteractionPanel.add(enterActionButton);
 
-        // Menú lateral
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(null);
         menuPanel.setBackground(new Color(70, 60, 130));
         menuPanel.setBounds(0, 0, 200, 500);
 
-        // Título centrado en el menú
         JLabel menuTitle = new JLabel("MENU", SwingConstants.CENTER);
         menuTitle.setForeground(Color.WHITE);
         menuTitle.setFont(new Font("Arial", Font.BOLD, 20));
         menuTitle.setBounds(0, 20, 200, 30); // Ancho igual al panel para centrar
         menuPanel.add(menuTitle);
 
-        // Botones del menú
-        // Botón 1: Enter Parking
         JButton enterParkingButton = new RoundButton("Enter Parking");
         enterParkingButton.setBounds(20, 150, 160, 40);
         enterParkingButton.setBackground(new Color(255, 200, 0));
@@ -121,7 +118,6 @@ public class EntryParkingView extends JPanel {
         enterParkingButton.setFocusPainted(false);
         menuPanel.add(enterParkingButton);
 
-        // Botón 2: Leave Parking
         JButton leaveParkingButton = new RoundButton("Leave Parking");
         leaveParkingButton.setBounds(20, 230, 160, 40);
         leaveParkingButton.setBackground(new Color(150, 130, 200));
@@ -134,40 +130,75 @@ public class EntryParkingView extends JPanel {
         add(mainPanel);
 
         enterActionButton.addActionListener(e -> {
-            String plate = plateField.getText();
+            String plate = plateField.getText().toUpperCase();
             String vehicle = vehicleComboBox.getSelectedItem().toString();
 
             if (plate.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Enter the license plate number", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             } else {
+                if (!enterController.isValidPlateFormat(plate)) {
+                    JOptionPane.showMessageDialog(this, "Invalid plate format. Must be 3 letters followed by 3 digits.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+
+            try {
+                if (!enterController.isUserPlate(loggedUser, plate) && enterController.vehicleExists(plate)) {
+                    JOptionPane.showMessageDialog(this, "This vehicle belongs to another user.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 String registeredVehicle = enterController.registeredVehicle(plate);
-                if ("success".equals(registeredVehicle)) {
-                    String isBooked = enterController.isBooked(plate);
-                    if ("success".equals(isBooked)) {
-                        JOptionPane.showMessageDialog(this, "The vehicle has been correctly entered into the parking lot thanks to the reservation made for this license plate.", "Enter Parking", JOptionPane.INFORMATION_MESSAGE);
+                if ("is_inside".equals(registeredVehicle)) {
+                    JOptionPane.showMessageDialog(this, "The vehicle entered is already inside the parking lot.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (!"success".equals(registeredVehicle)) {
+                    if (vehicle.equals(SELECT_VEHICLE_OPTION)) {
+                        JOptionPane.showMessageDialog(this, "Enter the type of vehicle so we can register it.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    String result = enterController.registerVehicle(loggedUser, plate, vehicle);
+                    if (!"success".equals(result)) {
+                        JOptionPane.showMessageDialog(this, result, "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    JOptionPane.showMessageDialog(this, "Vehicle registrat", "Enter Parking", JOptionPane.INFORMATION_MESSAGE);
+                }
+
+                String isBooked = enterController.isBooked(plate);
+                if ("success".equals(isBooked)) {
+                    int slotId = enterController.getSlotIdByPlate(plate);
+                    enterController.registerEntryLogs("entry", plate, slotId);
+                    JOptionPane.showMessageDialog(this, "The vehicle has been correctly entered into the parking lot thanks to the reservation made for this license plate.", "Enter Parking", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    if (vehicle.equals(SELECT_VEHICLE_OPTION)) {
+                        JOptionPane.showMessageDialog(this, "Enter the type of vehicle so we can assign you an available space.", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
-                        if (!vehicle.equals(SELECT_VEHICLE_OPTION)) {
-                            String place = enterController.placesAvailable(plate, vehicle);
-                            if (place != null) {
-                                if ("notEqual".equals(place)) {
-                                    JOptionPane.showMessageDialog(this, "The vehicle registered does not match the vehicle type selected.", "Enter Parking", JOptionPane.ERROR_MESSAGE);
-                                } else {
-                                    JOptionPane.showMessageDialog(this, place, "Enter Parking", JOptionPane.INFORMATION_MESSAGE);
-                                }
+                        String place = enterController.placesAvailable(plate, vehicle);
+                        if (place != null) {
+                            if ("notEqual".equals(place)) {
+                                JOptionPane.showMessageDialog(this, "The vehicle registered does not match the vehicle type selected.", "Error", JOptionPane.ERROR_MESSAGE);
                             } else {
-                                JOptionPane.showMessageDialog(this, "No available space could be found due to the conditions of this vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
+                                int slotId = enterController.getSlotIdByPlate(plate);
+                                enterController.registerEntryLogs("entry", plate, slotId);
+                                JOptionPane.showMessageDialog(this, place, "Enter Parking", JOptionPane.INFORMATION_MESSAGE);
                             }
                         } else {
-                            JOptionPane.showMessageDialog(this, "Enter the type of vehicle so we can assign you an available space.", "Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(this, "No available space could be found due to the conditions of this vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
                         }
                     }
-                } else {
-                    if ("is_inside".equals(registeredVehicle)) {
-                        JOptionPane.showMessageDialog(this, "The vehicle entered is already inside the parking lot.", "Error", JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(this, registeredVehicle, "Error", JOptionPane.ERROR_MESSAGE);
-                    }
                 }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "A database error occurred: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "An unexpected error occurred: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 

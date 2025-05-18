@@ -191,7 +191,7 @@ public class UserSqlDao {
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, plate);
             try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next(); // true si està dins
+                return rs.next();
             }
         }
     }
@@ -225,7 +225,7 @@ public class UserSqlDao {
         }
     }
 
-    public String updatePlate(String plate) throws SQLException {
+    public String updateSlot(String plate) throws SQLException {
         //Alliberem l'slot que l'usuari ha deixat lliure.
         String updateSlotQuery = "UPDATE slots SET is_occupied = 0, booked = 0, vehicle_plate = NULL WHERE vehicle_plate = ?";
 
@@ -308,6 +308,70 @@ public class UserSqlDao {
             stmt.setString(1, plate);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
+            }
+        }
+    }
+
+    public String registerVehicle(User loggedUser, String plate, String vehicleType) throws SQLException {
+        String insertVehicleQuery = "INSERT INTO vehicles (plate, brand, model, color, owner_id, type_vehicle) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement stmt = connection.prepareStatement(insertVehicleQuery)) {
+            stmt.setString(1, plate);
+            stmt.setString(2, "NA");
+            stmt.setString(3, "NA");
+            stmt.setString(4, "NA");
+            stmt.setInt(5, loggedUser.getId());
+            stmt.setString(6, vehicleType);
+
+            int rowsInserted = stmt.executeUpdate();
+
+            if (rowsInserted > 0) {
+                return "success";
+            } else {
+                return "Error al registrar el vehicle.";
+            }
+        }
+    }
+
+    public int getSlotIdByPlate(String plate) throws SQLException {
+        String selectSlotIdQuery = "SELECT id FROM slots WHERE vehicle_plate = ?";
+        int slotId = -1;
+
+        try (PreparedStatement selectStmt = connection.prepareStatement(selectSlotIdQuery)) {
+            selectStmt.setString(1, plate);
+            try (ResultSet rs = selectStmt.executeQuery()) {
+                if (rs.next()) {
+                    slotId = rs.getInt("id");
+                } else {
+                    throw new SQLException("No slot found for the given plate.");
+                }
+            }
+        }
+
+        return slotId;
+    }
+
+    public void registerEntryExitLogs(String action, String vehiclePlate, int slotId) throws SQLException {
+        String logQuery = "INSERT INTO entry_leave_logs (slot_id, vehicle_plate, action) VALUES (?, ?, ?)";
+
+        try (PreparedStatement stmt = connection.prepareStatement(logQuery)) {
+            stmt.setInt(1, slotId);
+            stmt.setString(2, vehiclePlate);
+            stmt.setString(3, action);
+            stmt.executeUpdate();
+        }
+    }
+
+    public boolean isUserPlate(User loggedUser, String plate) throws SQLException {
+        //Verificar si l'usuari té aquesta matrícula assignada.
+        String query = "SELECT * FROM vehicles WHERE plate = ? AND owner_id = ?;";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, plate);
+            stmt.setInt(2, loggedUser.getId());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return (rs.next());
             }
         }
     }
