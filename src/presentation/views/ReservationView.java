@@ -106,14 +106,18 @@ public class ReservationView extends JPanel {
         });
 
         removeBookButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(
-                this,
-                "Remove Book View not implemented yet.",
-                "Info",
-                JOptionPane.INFORMATION_MESSAGE
+            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(
+                this
             );
-            bookButton.setBackground(new Color(150, 130, 200));
-            removeBookButton.setBackground(new Color(255, 200, 0));
+            if (parentFrame != null) {
+                parentFrame.setContentPane(new RemoveBookMenuView(this.loggedUser));
+                parentFrame.revalidate();
+                parentFrame.repaint();
+            } else {
+                System.err.println(
+                    "Error: Could not find parent frame for ReservationView."
+                );
+            }
         });
 
         backButton.addActionListener(e -> {
