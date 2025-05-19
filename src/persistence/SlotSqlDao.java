@@ -392,7 +392,6 @@ public class SlotSqlDao {
         Slot slot = findASlotToPark(vehicle_type);
         userSqlDao = new UserSqlDao();
         insertVehicleIfNotExists(plate, vehicle_type);
-        userSqlDao.registerEntryExitLogs("entry", plate, slot.getIdSlot());
         String query = "UPDATE slots SET vehicle_plate = ?,booked = 0, is_occupied = 1 WHERE id = ?";
         if (slot != null) {
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -401,6 +400,7 @@ public class SlotSqlDao {
                 stmt.executeUpdate();
             }
         }
+        userSqlDao.registerEntryExitLogs("entry", plate, slot.getIdSlot());
     }
     public void insertVehicleIfNotExists(String plate, String typeVehicle) throws SQLException {
         String query = "INSERT IGNORE INTO vehicles (plate, brand, model, color, owner_id, type_vehicle) VALUES (?, 'SimBrand', 'SimModel', 'Gray', ?, ?)";
