@@ -3,7 +3,9 @@ package persistence;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 public class LogsSqlDao {
     static Connection connection;
@@ -36,7 +38,8 @@ public class LogsSqlDao {
 
             while (rs.next()) {
                 String plate = rs.getString("vehicle_plate");
-                LocalDateTime entryTime = rs.getTimestamp("timestamp").toLocalDateTime();
+                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Madrid"));
+                LocalDateTime entryTime = rs.getTimestamp("timestamp", cal).toLocalDateTime();
                 activeEntries.add(new VehicleEntry(plate, entryTime));
             }
         }
@@ -60,10 +63,12 @@ public class LogsSqlDao {
             while (rs.next()) {
                 String plate = rs.getString("vehicle_plate");
                 String action = rs.getString("action");
-                LocalDateTime timestamp = rs.getTimestamp("timestamp").toLocalDateTime();
+                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Madrid"));
+                LocalDateTime timestamp = rs.getTimestamp("timestamp", cal).toLocalDateTime();
                 events.add(new VehicleEvent(plate, action, timestamp));
             }
         }
+
 
         return events;
     }

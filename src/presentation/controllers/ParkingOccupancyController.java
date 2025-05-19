@@ -56,14 +56,7 @@ public class ParkingOccupancyController {
     public void updateOccupancyData() {
         try {
             int[] newData = occupancyManager.calculateLast60MinutesOccupancy();
-            String a = new String();
 
-            for (int i = 0; i < newData.length; i++) {
-                a += newData[i] + ", ";
-            }
-
-            System.out.println("aaaa:  "+ a);
-            this.currentOccupancy = newData;
             notifyOccupancyChanged(); // Notificar a los listeners
 
             System.out.println("Datos de ocupación actualizados: " + LocalDateTime.now());
