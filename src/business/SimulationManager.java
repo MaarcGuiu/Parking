@@ -13,7 +13,7 @@ public class SimulationManager implements Runnable {
     public void run() {
         running = true;
         parkingStatusManager = new ParkingStatusManager();
-        long frequency = parkingStatusManager.calculateFrequency() * 1000L;
+        long frequency = parkingStatusManager.calculateFrequency() * 10L;
         System.out.println("FREQ: "+frequency);
         while (running) {
             try {

@@ -9,10 +9,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SlotSqlDao {
     static Connection connection;
-
+    private UserSqlDao userSqlDao;
     public SlotSqlDao() {
         try {
             this.connection = ConnectionDB.getInstance();
@@ -351,9 +352,9 @@ public class SlotSqlDao {
         }
     }
     // Cancelar booked
-    public void updateTheSlotUnbooked(String plate) throws SQLException {
+    public void updateTheSlotUnbooked(String plate, int idSlot) throws SQLException {
         String query = "UPDATE slots SET booked = 0, is_occupied = 0, vehicle_plate = ? WHERE vehicle_plate = ?";
-
+        userSqlDao.registerEntryExitLogs("leave", plate, idSlot);
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, null);
             stmt.setString(2, plate);
@@ -389,7 +390,9 @@ public class SlotSqlDao {
     //Update del slot; de estar reservado para estar ocupado porque entra al parking
     public void userEntryNotBooked(String plate,String vehicle_type) throws SQLException {
         Slot slot = findASlotToPark(vehicle_type);
+        userSqlDao = new UserSqlDao();
         insertVehicleIfNotExists(plate, vehicle_type);
+        userSqlDao.registerEntryExitLogs("entry", plate, slot.getIdSlot());
         String query = "UPDATE slots SET vehicle_plate = ?,booked = 0, is_occupied = 1 WHERE id = ?";
         if (slot != null) {
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -400,11 +403,12 @@ public class SlotSqlDao {
         }
     }
     public void insertVehicleIfNotExists(String plate, String typeVehicle) throws SQLException {
-        String query = "INSERT IGNORE INTO vehicles (plate, brand, model, color, owner_id, type_vehicle) VALUES (?, 'SimBrand', 'SimModel', 'Gray', 1, ?)";
+        String query = "INSERT IGNORE INTO vehicles (plate, brand, model, color, owner_id, type_vehicle) VALUES (?, 'SimBrand', 'SimModel', 'Gray', ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, plate);
-            stmt.setString(2, typeVehicle);
+            stmt.setInt(2, ThreadLocalRandom.current().nextInt(1, 70));
+            stmt.setString(3, typeVehicle);
             stmt.executeUpdate();
         }
     }

@@ -157,7 +157,7 @@ public class ParkingStatusManager {
         }
         Slot slot = slotsOccupied.get(ThreadLocalRandom.current().nextInt(slotsOccupied.size()));
         String randomPlate = slot.getVehiclePlate();
-        slotSqlDao.updateTheSlotUnbooked(randomPlate); // Aqui hago el update
+        slotSqlDao.updateTheSlotUnbooked(randomPlate,slot.getIdSlot()); // Aqui hago el update
         System.out.println("plateExit: \n"+ randomPlate);
         return slot;
     }
