@@ -7,7 +7,7 @@ import business.model.Slot;
 import java.util.List;
 
 public class ParkingStatusController {
-    private ParkingStatusManager parkingStatusManager;
+    private static ParkingStatusManager parkingStatusManager;
 
     public ParkingStatusController() {
         parkingStatusManager = new ParkingStatusManager();
@@ -29,7 +29,7 @@ public class ParkingStatusController {
         return parkingStatusManager.setUserNewReservationSlot(slotId, vehiclePlate);
     }
 
-    public boolean getFreeUnbookedSlots() {
+    public static boolean getFreeUnbookedSlots() {
         return parkingStatusManager.getFreeUnbookedSlots();
     }
 

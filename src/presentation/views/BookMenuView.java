@@ -1,8 +1,15 @@
 package presentation.views;
 
 import business.model.User;
+import business.model.Vehicle;
+import business.model.Slot;
+import presentation.controllers.UserController;
+import presentation.controllers.EnterController;
+import presentation.controllers.ParkingStatusController;
 import java.awt.*;
 import javax.swing.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import presentation.components.RoundButton;
 import presentation.components.RoundTextField;
 
@@ -15,11 +22,17 @@ public class BookMenuView extends JPanel {
     private RoundButton createButton;
     private RoundButton backButton;
     private JLabel closeButton;
-    private RoundButton bookMenuButton; // This view's button
+    private RoundButton bookMenuButton;
     private RoundButton removeBookMenuButton;
+    private UserController userController;
+    private EnterController enterController;
+    private ParkingStatusController parkingStatusController;
 
     public BookMenuView(User loggedUser) {
         this.loggedUser = loggedUser;
+        this.userController = new UserController();
+        this.enterController = new EnterController(loggedUser);
+        this.parkingStatusController = new ParkingStatusController();
         setLayout(null);
 
         // Panel principal
@@ -57,7 +70,6 @@ public class BookMenuView extends JPanel {
         menuTitle.setBounds(0, 20, 200, 30);
         menuPanel.add(menuTitle);
 
-
         bookMenuButton = new RoundButton("Book");
         bookMenuButton.setBounds(20, 210, 160, 40);
         bookMenuButton.setFont(new Font("Arial", Font.BOLD, 16));
@@ -90,7 +102,6 @@ public class BookMenuView extends JPanel {
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(null);
         inputPanel.setOpaque(false);
-
         inputPanel.setBounds(350, 120, 400, 200);
         mainPanel.add(inputPanel);
 
@@ -110,13 +121,13 @@ public class BookMenuView extends JPanel {
         vehicleLabel.setBounds(50, 70, 120, 25);
         inputPanel.add(vehicleLabel);
 
-        String[] vehicles = { "Car", "Motorcycle", "Truck" };
+        String[] vehicles = { "Car", "Motorbike", "Truck" };
         vehicleCombo = new JComboBox<>(vehicles);
         vehicleCombo.setBounds(180, 70, 200, 30);
         inputPanel.add(vehicleCombo);
 
         createButton = new RoundButton("CREATE BOOKING");
-        createButton.setFont(new Font("Arial", Font.BOLD, 10));
+        createButton.setFont(new Font("Arial", Font.BOLD, 14));
         createButton.setBounds(125, 140, 150, 40);
         createButton.setBackground(new Color(204, 140, 0));
         createButton.setForeground(Color.WHITE);
@@ -127,9 +138,11 @@ public class BookMenuView extends JPanel {
         backButton.setFont(new Font("Arial", Font.PLAIN, 14));
         mainPanel.add(backButton);
 
+        // ACCIÓN DE RESERVA
         createButton.addActionListener(e -> {
-            String plate = plateField.getText();
+            String plate = plateField.getText().trim();
             String vehicleType = (String) vehicleCombo.getSelectedItem();
+            
             if (plate.isEmpty()) {
                 JOptionPane.showMessageDialog(
                     this,
@@ -137,28 +150,117 @@ public class BookMenuView extends JPanel {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 );
-            } else {
-                System.out.println(
-                    "Attempting to book Plate: " +
-                    plate +
-                    ", Type: " +
-                    vehicleType
-                );
+                return;
+            }
+
+            try {
+                if (!enterController.isValidPlateFormat(plate)) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Invalid plate format. It should be 3 letters followed by 3 numbers (e.g., ABC123).",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+                
+                // Verificar si ya hay una reserva para este vehículo
+                if (userController.checkUserBooking(plate)) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "This vehicle already has a reservation.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                // Verificar disponibilidad general de plazas
+                ArrayList<Slot> freeSlots = userController.getFreeUnbookedSlots();
+                
+                if (freeSlots == null || freeSlots.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "No parking slots available.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                // Registrar el vehículo si no existe
+                if (!enterController.vehicleExists(plate)) {
+                    String registerResult = enterController.registerVehicle(loggedUser, plate, vehicleType);
+                    if (!"success".equals(registerResult)) {
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Error registering vehicle: " + registerResult,
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                        return;
+                    }
+                }
+
+                // Buscar un slot libre para ese tipo de vehículo
+                Slot selectedSlot = null;
+                
+                // El método getVehicle() devuelve el TIPO de vehículo compatible con el slot
+                for (Slot slot : freeSlots) {
+                    String slotType = slot.getVehicle();
+                    
+                    // Comparar usando el formato de la base de datos
+                    if (slotType != null && slotType.equalsIgnoreCase(vehicleType)) {
+                        selectedSlot = slot;
+                        break;
+                    }
+                }
+
+                // Si no encontramos slot compatible, mostrar mensaje de error
+                if (selectedSlot == null) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "No available spaces for the selected vehicle type: " + vehicleType,
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                // Realizar la reserva
+                userController.updateTheSlotBooked(plate, selectedSlot.getIdSlot());
+
                 JOptionPane.showMessageDialog(
                     this,
-                    "Booking created for " + plate + "!",
+                    "Reservation created successfully!\n" +
+                    "Vehicle: " + plate + "\n" +
+                    "Slot ID: " + selectedSlot.getIdSlot() + "\n" +
+                    "Floor: " + selectedSlot.getFloor(),
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE
                 );
-                // Logica de reserva
+
                 plateField.setText("");
                 vehicleCombo.setSelectedIndex(0);
+
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Database error: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Unexpected error: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
             }
         });
 
-        backButton.addActionListener(e -> {
-            goBackToReservationMenu();
-        });
+        backButton.addActionListener(e -> goBackToReservationMenu());
 
         closeButton.addMouseListener(
             new java.awt.event.MouseAdapter() {
@@ -169,29 +271,30 @@ public class BookMenuView extends JPanel {
 
                 @Override
                 public void mouseEntered(java.awt.event.MouseEvent e) {
-                    closeButton.setForeground(Color.RED); // Highlight on hover
+                    closeButton.setForeground(Color.RED);
                 }
 
                 @Override
                 public void mouseExited(java.awt.event.MouseEvent e) {
-                    closeButton.setForeground(Color.WHITE); // Restore color
+                    closeButton.setForeground(Color.WHITE);
                 }
             }
         );
 
         bookMenuButton.addActionListener(e -> {
-            System.out.println("Already in Book View.");
         });
 
         removeBookMenuButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(
-                this,
-                "Remove Book View not implemented yet.",
-                "Info",
-                JOptionPane.INFORMATION_MESSAGE
-            );
+            setVisible(false);
+            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            if (parentFrame != null) {
+                parentFrame.setContentPane(new RemoveBookMenuView(loggedUser));
+                parentFrame.revalidate();
+                parentFrame.repaint();
+            }
         });
     }
+    
     private void goBackToReservationMenu() {
         setVisible(false);
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -201,11 +304,12 @@ public class BookMenuView extends JPanel {
             parentFrame.repaint();
         }
     }
+    
     private void goBackToUserMenu() {
         setVisible(false);
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         if (parentFrame != null) {
-            parentFrame.setContentPane(new UserMenuView(loggedUser)); // Navigate back to User Menu
+            parentFrame.setContentPane(new UserMenuView(loggedUser));
             parentFrame.revalidate();
             parentFrame.repaint();
         }

@@ -15,6 +15,9 @@ public class UserManager {
     UserSqlDao userSqlDao;
     VehicleSqlDao vehicleSqlDao;
     public UserManager () {
+        this.slotSqlDao = new SlotSqlDao();
+        this.userSqlDao = new UserSqlDao();
+        this.vehicleSqlDao = new VehicleSqlDao();
     }
 
     public boolean userBooking (Slot slot) {
@@ -73,14 +76,23 @@ public class UserManager {
         ArrayList<Vehicle> bookedVehicles = new ArrayList<>();
 
         if (vehicles.isEmpty()) {
-            return null;
+            return new ArrayList<>();
         } else {
             for (Vehicle v : vehicles) {
-                if (!slotSqlDao.checkUserBooking(v.getPlate())) {
+                if (slotSqlDao.checkUserBooking(v.getPlate())) {
                     bookedVehicles.add(v);
                 }
             }
             return bookedVehicles;
         }
+    }
+    
+    /**
+     * Obtiene todas las plazas reservadas del parking
+     * @return Lista de slots reservados
+     * @throws SQLException si hay un error en la base de datos
+     */
+    public ArrayList<Slot> getAllSlotsReserved() throws SQLException {
+        return slotSqlDao.getAllSlotsReserved();
     }
 }

@@ -209,7 +209,7 @@ public class SlotSqlDao {
         return slots;
     }
 
-    public void cancelSlot(int slotId) throws SQLException {
+    public boolean cancelSlot(int slotId) throws SQLException {
         String query = "UPDATE slots SET vehicle_plate = ?, booked = ? WHERE id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -217,7 +217,11 @@ public class SlotSqlDao {
             stmt.setInt(2, 0);
             stmt.setInt(3, slotId);
 
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -316,18 +320,20 @@ public class SlotSqlDao {
     }
 
     public Slot getSlotBooked(String vehiclePlate) throws SQLException {
-        String query = "SELECT id, plant, slot_number,is_occupied FROM slots WHERE vehicle_plate = ? AND booked = 1";
+        String query = "SELECT id, plant, slot_number, is_occupied, vehicle_type FROM slots WHERE vehicle_plate = ? AND booked = 1";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, vehiclePlate);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    updateTheSlotUnbooked(vehiclePlate);
+                    // No cancelar la reserva aquí, solo devolver el slot
                     return new Slot(
-                            getVehicleTypeFromSlotNumber(rs.getInt("slot_number")),
+                            rs.getString("vehicle_type") != null ? rs.getString("vehicle_type") : getVehicleTypeFromSlotNumber(rs.getInt("slot_number")),
                             rs.getInt("id"),
+                            rs.getInt("is_occupied"),
                             rs.getInt("plant"),
-                            1
+                            true, // está reservado
+                            rs.getString("vehicle_type")
                     );
                 }
             }
@@ -357,14 +363,26 @@ public class SlotSqlDao {
     // USER CON RESERVA ENTRA AL SLOT
     //Update del slot; de estar reservado para estar ocupado porque entra al parking
     public void userEntryIfBooked(String plate) throws SQLException {
-        Slot slot = getSlotBooked(plate);
-
-        String query = "UPDATE slots SET vehicle_plate = ?,booked = 0, is_occupied = 1 WHERE id = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        // Buscar el slot sin cancelar la reserva primero
+        String queryFind = "SELECT id FROM slots WHERE vehicle_plate = ? AND booked = 1";
+        int slotId = -1;
+        
+        try (PreparedStatement stmt = connection.prepareStatement(queryFind)) {
             stmt.setString(1, plate);
-            stmt.setInt(2, slot.getIdSlot());
-            stmt.executeUpdate();
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    slotId = rs.getInt("id");
+                }
+            }
+        }
+        
+        if (slotId > 0) {
+            // Ahora actualizar el slot para marcarlo como ocupado y no reservado
+            String query = "UPDATE slots SET booked = 0, is_occupied = 1 WHERE id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, slotId);
+                stmt.executeUpdate();
+            }
         }
     }
     // USER SIN RESERVA ENTRA AL SLOT
@@ -476,5 +494,26 @@ public class SlotSqlDao {
             }
         }
         return vehicles;
+    }
+    public ArrayList<Slot> getAllSlotsReserved() throws SQLException {
+        ArrayList<Slot> slots = new ArrayList<>();
+        String query = "SELECT vehicle_plate, plant, is_occupied, id, booked, vehicle_type FROM slots WHERE booked = 1";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Slot slot = new Slot(
+                        rs.getString("vehicle_plate"),
+                        rs.getInt("id"),
+                        rs.getInt("is_occupied"),
+                        rs.getInt("plant"),
+                        rs.getInt("booked") != 0,
+                        rs.getString("vehicle_type")
+                );
+                slots.add(slot);
+            }
+        }
+        return slots;
     }
 }
