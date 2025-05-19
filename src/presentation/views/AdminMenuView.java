@@ -572,6 +572,13 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                 // Dibujar barras
                 int barWidth = chartWidth / 65;
                 int[] currentData = occupancyDataRef.get();
+                String a = new String();
+
+                for (int i = 0; i < currentData.length; i++) {
+                    a += currentData[i] + ", ";
+                }
+
+                System.out.println(a);
 
                 for (int i = 0; i < 60; i++) {
                     int totalVehicles = currentData[i];

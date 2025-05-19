@@ -24,6 +24,7 @@ public class ParkingOccupancyController {
     }
 
     public void init() {
+        cleanup();
         scheduler = Executors.newSingleThreadScheduledExecutor();
         // Programa la actualización cada minuto con un retraso inicial de 0 segundos
         scheduler.scheduleAtFixedRate(this::updateOccupancyData, 0, 1, TimeUnit.MINUTES);
@@ -55,6 +56,13 @@ public class ParkingOccupancyController {
     public void updateOccupancyData() {
         try {
             int[] newData = occupancyManager.calculateLast60MinutesOccupancy();
+            String a = new String();
+
+            for (int i = 0; i < newData.length; i++) {
+                a += newData[i] + ", ";
+            }
+
+            System.out.println("aaaa:  "+ a);
             this.currentOccupancy = newData;
             notifyOccupancyChanged(); // Notificar a los listeners
 
