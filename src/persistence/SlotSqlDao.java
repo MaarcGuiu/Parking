@@ -353,6 +353,7 @@ public class SlotSqlDao {
     }
     // Cancelar booked
     public void updateTheSlotUnbooked(String plate, int idSlot) throws SQLException {
+        userSqlDao = new UserSqlDao();
         String query = "UPDATE slots SET booked = 0, is_occupied = 0, vehicle_plate = ? WHERE vehicle_plate = ?";
         userSqlDao.registerEntryExitLogs("leave", plate, idSlot);
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -388,9 +389,8 @@ public class SlotSqlDao {
     }
     // USER SIN RESERVA ENTRA AL SLOT
     //Update del slot; de estar reservado para estar ocupado porque entra al parking
-    public void userEntryNotBooked(String plate,String  vehicle_type) throws SQLException {
+    public void userEntryNotBooked(String plate,String vehicle_type) throws SQLException {
         Slot slot = findASlotToPark(vehicle_type);
-        userSqlDao = new UserSqlDao();
         insertVehicleIfNotExists(plate, vehicle_type);
         String query = "UPDATE slots SET vehicle_plate = ?,booked = 0, is_occupied = 1 WHERE id = ?";
         if (slot != null) {
@@ -400,6 +400,7 @@ public class SlotSqlDao {
                 stmt.executeUpdate();
             }
         }
+        userSqlDao = new UserSqlDao();
         userSqlDao.registerEntryExitLogs("entry", plate, slot.getIdSlot());
     }
     public void insertVehicleIfNotExists(String plate, String typeVehicle) throws SQLException {
@@ -407,10 +408,22 @@ public class SlotSqlDao {
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, plate);
-            stmt.setInt(2, ThreadLocalRandom.current().nextInt(1, 70));
+            stmt.setInt(2, ThreadLocalRandom.current().nextInt(1, userSqlDao.getUserCount()));
             stmt.setString(3, typeVehicle);
             stmt.executeUpdate();
-        }
+        }/*
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, plate);
+            stmt.setInt(2, ThreadLocalRandom.current().nextInt(1, userSqlDao.getUserCount()));
+            stmt.setString(3, typeVehicle);
+            int rowsInserted = stmt.executeUpdate();
+            if (rowsInserted == 0) {
+                System.out.println("⚠️ Vehicle was NOT inserted — possible constraint failure or vehicle already exists");
+            } else {
+                System.out.println("✅ Vehicle inserted");
+            }
+        }*/
+
     }
 
     //Te busca una plaza libre, con el criterio de que te de la que tiene el id mas bajo

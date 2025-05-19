@@ -361,6 +361,16 @@ public class UserSqlDao {
             stmt.executeUpdate();
         }
     }
+    public int getUserCount() throws SQLException {
+        String query = "SELECT COUNT(users.id) FROM users";
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
 
     public boolean isUserPlate(User loggedUser, String plate) throws SQLException {
         //Verificar si l'usuari té aquesta matrícula assignada.
