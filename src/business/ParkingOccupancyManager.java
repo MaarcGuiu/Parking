@@ -68,13 +68,6 @@ public class ParkingOccupancyManager {
 //            }
 //        }
 
-        String a = new String();
-
-        for (int i = 0; i < occupancyPerMinute.length; i++) {
-            a += occupancyPerMinute[i] + ", ";
-        }
-
-        System.out.println("bbbb:  "+ a);
 
 
 
