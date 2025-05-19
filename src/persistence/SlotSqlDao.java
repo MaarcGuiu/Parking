@@ -388,7 +388,7 @@ public class SlotSqlDao {
     }
     // USER SIN RESERVA ENTRA AL SLOT
     //Update del slot; de estar reservado para estar ocupado porque entra al parking
-    public void userEntryNotBooked(String plate,String vehicle_type) throws SQLException {
+    public void userEntryNotBooked(String plate,String  vehicle_type) throws SQLException {
         Slot slot = findASlotToPark(vehicle_type);
         userSqlDao = new UserSqlDao();
         insertVehicleIfNotExists(plate, vehicle_type);
