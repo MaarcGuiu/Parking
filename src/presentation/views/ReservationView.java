@@ -11,7 +11,7 @@ public class ReservationView extends JPanel {
     private User loggedUser;
     private RoundButton bookButton;
     private RoundButton removeBookButton;
-    private RoundButton backButton; // Changed to RoundButton for consistency
+    private RoundButton backButton;
     private JLabel closeButton;
 
     public ReservationView(User loggedUser) {
@@ -38,7 +38,7 @@ public class ReservationView extends JPanel {
         };
         mainPanel.setLayout(null);
         mainPanel.setBounds(0, 0, 900, 500);
-        add(mainPanel); // Add mainPanel to the ReservationView itself
+        add(mainPanel);
 
         JLabel titleLabel = new JLabel(
             "RESERVATION MENU",

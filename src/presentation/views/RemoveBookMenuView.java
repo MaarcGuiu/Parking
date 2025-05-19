@@ -60,7 +60,7 @@ public class RemoveBookMenuView extends JPanel {
                 }
             }
             
-            // Si no tenemos userBookings o está vacío, intentamos construirlo basándonos en los slots
+            // Si no tenemos userBookings o está vacío, inicializarlo
             if (userBookings == null || userBookings.isEmpty()) {
                 userBookings = new ArrayList<>();
             }
@@ -69,7 +69,7 @@ public class RemoveBookMenuView extends JPanel {
             JOptionPane.showMessageDialog(this, "Error loading reservations: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
 
-        // Main panel with gradient background
+        // Panel principal
         mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -91,7 +91,7 @@ public class RemoveBookMenuView extends JPanel {
         mainPanel.setBounds(0, 0, 900, 500);
         add(mainPanel);
 
-        // Side menu panel
+        // Menu lateral
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(null);
         menuPanel.setBackground(new Color(70, 60, 130));
@@ -133,7 +133,7 @@ public class RemoveBookMenuView extends JPanel {
         closeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         mainPanel.add(closeButton);
 
-        // Reservations table
+        // Tabla de reservas
         String[] columns = {"License Plate", "Vehicle Type", "Slot ID"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
@@ -163,7 +163,7 @@ public class RemoveBookMenuView extends JPanel {
         scrollPane.setBounds(250, 90, 550, 200);
         mainPanel.add(scrollPane);
 
-        // Confirmation panel
+        // Confirmacion
         JPanel confirmPanel = new JPanel();
         confirmPanel.setLayout(null);
         confirmPanel.setOpaque(false);
@@ -193,7 +193,7 @@ public class RemoveBookMenuView extends JPanel {
         backButton.setFont(new Font("Arial", Font.PLAIN, 14));
         mainPanel.add(backButton);
 
-        // Event handlers
+        // Listeners
         cancelReservationButton.addActionListener(e -> {
             int selectedRow = reservationsTable.getSelectedRow();
             String enteredPlate = licensePlateField.getText().trim();
@@ -225,8 +225,11 @@ public class RemoveBookMenuView extends JPanel {
                         parkingStatusController.createCancelledReservation(slotId, loggedUser.getId(), selectedPlate);
                         JOptionPane.showMessageDialog(this, "Reservation for " + selectedPlate + " has been successfully cancelled.", "Success", JOptionPane.INFORMATION_MESSAGE);
                         
-                        // Refresh the view
-                        goBackToReservationMenu();
+                        // Actualizar la vista actual en lugar de navegar
+                        refreshReservations();
+                        
+                        // Limpiar el campo de texto
+                        licensePlateField.setText("");
                     } else {
                         JOptionPane.showMessageDialog(this, "Failed to cancel the reservation.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -251,7 +254,7 @@ public class RemoveBookMenuView extends JPanel {
 
                 @Override
                 public void mouseEntered(java.awt.event.MouseEvent e) {
-                    closeButton.setForeground(Color.RED);
+                    closeButton.setForeground(new Color(255, 80, 80));
                 }
 
                 @Override
@@ -270,10 +273,6 @@ public class RemoveBookMenuView extends JPanel {
                 parentFrame.repaint();
             }
         });
-
-        removeBookMenuButton.addActionListener(e -> {
-            // Already in this view, do nothing
-        });
     }
     
     private void goBackToReservationMenu() {
@@ -285,12 +284,12 @@ public class RemoveBookMenuView extends JPanel {
             parentFrame.repaint();
         }
     }
-    
+
     private void goBackToUserMenu() {
         setVisible(false);
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         if (parentFrame != null) {
-            parentFrame.setContentPane(new UserMenuView(loggedUser));
+            parentFrame.setContentPane(new UserMenuView(loggedUser)); // Navigate back to User Menu
             parentFrame.revalidate();
             parentFrame.repaint();
         }
@@ -298,5 +297,49 @@ public class RemoveBookMenuView extends JPanel {
 
     public JPanel getMainPanel() {
         return mainPanel;
+    }
+
+    /**
+     * Actualiza la lista de reservas y la tabla después de una cancelación
+     */
+    private void refreshReservations() {
+        try {
+            // Recargar los vehículos del usuario
+            userBookings = userController.getPanelBookings(loggedUser.getId());
+            
+            // Recargar los slots reservados
+            List<Slot> allSlots = userController.getAllSlotsReserved();
+            plateToSlotMap = new HashMap<>();
+
+            // Actualizar el mapa de matrículas a IDs
+            if (allSlots != null && !allSlots.isEmpty()) {
+                for (Slot slot : allSlots) {
+                    if (slot.getVehiclePlate() != null && slot.getBooked()) {
+                        plateToSlotMap.put(slot.getVehiclePlate(), slot.getIdSlot());
+                    }
+                }
+            }
+            
+            // Actualizar la tabla
+            DefaultTableModel model = (DefaultTableModel) reservationsTable.getModel();
+            model.setRowCount(0); // Limpiar la tabla
+            
+            if (userBookings != null && !userBookings.isEmpty()) {
+                for (Vehicle vehicle : userBookings) {
+                    Integer slotId = plateToSlotMap.get(vehicle.getPlate());
+                    model.addRow(new Object[]{
+                        vehicle.getPlate(),
+                        vehicle.getType(),
+                        slotId != null ? slotId.toString() : "N/A"
+                    });
+                }
+            }
+            
+            // Repintar la tabla
+            reservationsTable.repaint();
+            
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error refreshing reservations: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 } 
