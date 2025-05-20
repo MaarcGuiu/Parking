@@ -9,9 +9,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SlotSqlDao {
     static Connection connection;
+    private UserSqlDao userSqlDao;
 
     public SlotSqlDao() {
         try {
@@ -351,9 +353,10 @@ public class SlotSqlDao {
         }
     }
     // Cancelar booked
-    public void updateTheSlotUnbooked(String plate) throws SQLException {
+    public void updateTheSlotUnbooked(String plate,int idSlot) throws SQLException {
+        userSqlDao = new UserSqlDao();
         String query = "UPDATE slots SET booked = 0, is_occupied = 0, vehicle_plate = ? WHERE vehicle_plate = ?";
-
+        userSqlDao.registerEntryExitLogs("leave", plate, idSlot);
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, null);
             stmt.setString(2, plate);
@@ -398,15 +401,19 @@ public class SlotSqlDao {
                 stmt.executeUpdate();
             }
         }
+        UserSqlDao userSqlDao = new UserSqlDao();
+        userSqlDao.registerEntryExitLogs("entry", plate, slot.getIdSlot());
     }
     public void insertVehicleIfNotExists(String plate, String typeVehicle) throws SQLException {
-        String query = "INSERT IGNORE INTO vehicles (plate, brand, model, color, owner_id, type_vehicle) VALUES (?, 'SimBrand', 'SimModel', 'Gray', 1, ?)";
-
+        String query = "INSERT IGNORE INTO vehicles (plate, brand, model, color, owner_id, type_vehicle) VALUES (?, 'SimBrand', 'SimModel', 'Gray', ?, ?)";
+        userSqlDao = new UserSqlDao();
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, plate);
-            stmt.setString(2, typeVehicle);
+            stmt.setInt(2, ThreadLocalRandom.current().nextInt(1, userSqlDao.getUserCount()));
+            stmt.setString(3, typeVehicle);
             stmt.executeUpdate();
         }
+
     }
 
     //Te busca una plaza libre, con el criterio de que te de la que tiene el id mas bajo
