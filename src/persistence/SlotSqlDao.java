@@ -30,7 +30,6 @@ public class SlotSqlDao {
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, idSlot);
-
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
 
@@ -162,6 +161,9 @@ public class SlotSqlDao {
         return slots;
     }
     public void editSlot(Slot slot) throws SQLException {
+        if (slot.getAvailabilityState() == 1 || slot.getBooked() == true) {
+            return;
+        }
         String query = "UPDATE slots SET slot_number = ?, plant = ?, is_occupied = ?, vehicle_type = ? WHERE id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {

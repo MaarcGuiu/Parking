@@ -10,22 +10,29 @@ public class AdminManager {
     public AdminManager() {
         totalSlots = 60;                       // Creamos unas 60 plazas, y a partir de ahi las que creemos se irá sumando a ese numero
     }
-    public boolean createSlot(Slot newSlot) throws SQLException {
+    public String createSlot(Slot newSlot) throws SQLException {
+        Slot slot = slotSqlDao.getSlot(newSlot.getIdSlot());
+        if (slot != null) {
+            return "Slot with id " + slot.getIdSlot() + " already exists";
+        }
         if (!isValidVehicleType(newSlot.getVehicle())) {
             throw new IllegalArgumentException("Invalid vehicle type.");
         }
         if (newSlot.getFloor() < 0 || newSlot.getFloor() > 3) {
-            throw new IllegalArgumentException("Invalid floor number.");
+            return "Invalid floor.";
         }
         totalSlots++;                           // Ester será el id de las plazas.
         slotSqlDao.createSlot(newSlot,newSlot.getIdSlot());
 
-        return true;
+        return "Slot with id " + newSlot.getIdSlot() + " created";
     }
     public boolean editSlot(Slot editSlot) throws SQLException {
-        Slot existingSlot = slotSqlDao.getSlot(editSlot.getIdSlot());
+        Slot existingSlot = slotSqlDao.getSlot2(editSlot.getIdSlot());
         if (existingSlot == null) {
-            throw new IllegalArgumentException("Slot does not exist.");
+            return false;
+        }
+        if (existingSlot.getAvailabilityState() == 1 || existingSlot.getBooked() == true ) {
+            return false;
         }
         if (!isValidVehicleType(editSlot.getVehicle())) {
             throw new IllegalArgumentException("Invalid vehicle type.");

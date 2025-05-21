@@ -217,11 +217,19 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                     String vehicle = (String) vehicleCombo.getSelectedItem();
 
                     Slot slot = new Slot(vehicle, id, floor);
-                    adminController.createSlot(slot);
+                    String text = "";
+                    text = adminController.createSlot(slot);
 
                     JOptionPane.showMessageDialog(mainPanel,
-                            "Slot creado:\nID: " + id + "\nFloor: " + floor + "\nVehicle: " + vehicle,
-                            "Success", JOptionPane.INFORMATION_MESSAGE);
+                            text,
+                            "Create", JOptionPane.INFORMATION_MESSAGE);
+                    if (text.contains("created")) {
+                        boolean isAdmin = true;
+                        if (parkingStatusButton != null) {
+                            parkingStatusButton.setBackground(Color.YELLOW);
+                        }
+                        ParkingStatusView.show(mainPanel, menuPanel, resetMainPanel, isAdmin);
+                    }
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(mainPanel,
                             "ID y Floor deben ser números válidos.",
@@ -268,15 +276,6 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
             idField.setBounds(140, 30, 200, 30);
             formPanel.add(idField);
 
-            JLabel occupiedLabel = new JLabel("Is Occupied:");
-            occupiedLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            occupiedLabel.setBounds(40, 80, 100, 25);
-            formPanel.add(occupiedLabel);
-
-            JComboBox<String> occupiedCombo = new JComboBox<>(new String[]{"Yes", "No"});
-            occupiedCombo.setBounds(140, 80, 200, 30);
-            formPanel.add(occupiedCombo);
-
             JLabel floorLabel = new JLabel("FLOOR:");
             floorLabel.setFont(new Font("Arial", Font.BOLD, 14));
             floorLabel.setBounds(40, 130, 100, 25);
@@ -305,11 +304,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
             editConfirmButton.addActionListener(ev -> {
                 try {
                     int id = Integer.parseInt(idField.getText());
-                    int occupied = occupiedCombo.getSelectedItem().equals("Yes") ? 1 : 0;
                     int floor = (Integer) floorCombo.getSelectedItem();
                     String vehicle = (String) vehicleCombo.getSelectedItem();
 
-                    Slot updatedSlot = new Slot(vehicle, id, floor, occupied); // Crear objeto Slot actualizado
+                    Slot updatedSlot = new Slot(vehicle, id, floor, 0); // Crear objeto Slot actualizado
                     boolean updated = adminController.editSlot(updatedSlot); // Usar el método correcto
 
                     if (updated) {
@@ -318,7 +316,7 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                                 "Edited", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(mainPanel,
-                                "No se encontró un slot con ese ID.",
+                                "Error the id of the slot may don t exsists or this slot is occupied rhight now.",
                                 "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (NumberFormatException ex) {

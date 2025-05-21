@@ -13,12 +13,12 @@ public class AdminController {
         adminManager = new AdminManager();
     }
 
-    public boolean createSlot(Slot newSlot) {
+    public String createSlot(Slot newSlot) {
         try {
             return adminManager.createSlot(newSlot);
         } catch (IllegalArgumentException | SQLException e) {
             System.out.println("Error creating slot: " + e.getMessage());
-            return false;
+            return "Error creating slot: " + e.getMessage();
         }
     }
 
