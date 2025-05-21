@@ -99,6 +99,7 @@ public class LoginView extends JPanel {
                 if ("success".equals(result)) {
                     User loggedUser = loginController.getUser(user);
                     JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso", "Bienvenido " + loggedUser.getUserName(), JOptionPane.INFORMATION_MESSAGE);
+                    mostrarReservasCanceladas(loggedUser.getId());
 
                     // Reemplazar la vista en lugar de abrir una nueva ventana
                     // Aquí pasamos el panel de usuario después de login
