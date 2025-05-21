@@ -34,6 +34,16 @@ public class Slot {
         this.booked = false;
     }
 
+    public Slot(String slotNumber, int id, int isOccupied, int plant, boolean booked, String vehicleType, String vehiclePlate) {
+        this.idSlot = id;
+        this.availabilityState = isOccupied;
+        this.booked = booked;
+        this.vehiclePlate = vehiclePlate;
+        this.vehicle = vehicleType;
+        this.vehicleObject = null;
+        this.floor = plant;
+    }
+
     public int getIdSlot() {
         return idSlot;
     }
@@ -77,5 +87,9 @@ public class Slot {
 
     public void setVehicleObject(Vehicle vehicleObject) {
         this.vehicleObject = vehicleObject;
+    }
+
+    public void setId(int idSlot) {
+        this.idSlot = idSlot;
     }
 }

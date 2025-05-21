@@ -31,12 +31,12 @@ public class AdminController {
         }
     }
 
-    public boolean deleteSlot(int idSlot) {
+    public String deleteSlot(int idSlot) {
         try {
             return adminManager.deleteSlot(idSlot);
         } catch (IllegalArgumentException | SQLException e) {
             System.out.println("Error deleting slot: " + e.getMessage());
-            return false;
+            return "Error deleting slot";
         }
     }
     public int getNumByFloor (int floor) throws SQLException {

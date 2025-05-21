@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -43,6 +44,32 @@ public class SlotSqlDao {
         }
         return null;
     }
+
+    //String vehiclePlate, int idSlot, int isOccupeid , int floor, boolean booked, String vehicleType
+    public Slot getSlot2(int idSlot) throws SQLException {
+        String query = "SELECT id, plant, is_occupied, slot_number, booked, vehicle_type, vehicle_plate FROM slots WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, idSlot);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+
+                    return new Slot(
+                            getVehicleTypeFromSlotNumber(rs.getInt("slot_number")),
+                            rs.getInt("id"),
+                            rs.getInt("is_occupied"),
+                            rs.getInt("plant"),
+                            rs.getBoolean("booked"),
+                            rs.getString("vehicle_type"),
+                            rs.getString("vehicle_plate")
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
     public int getTotalSlots() throws SQLException {
         String query = "SELECT COUNT(slots.id) FROM slots ";
 
@@ -164,6 +191,33 @@ public class SlotSqlDao {
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, idSlot);
+            stmt.executeUpdate();
+        }
+    }
+
+    public boolean giveNewSlotToTheUser(Slot slot) throws SQLException {
+        List<Slot> slots = getAllSlots();
+
+        for (int i = 0; i < slots.size(); i++) {
+            if (slots.get(i).getAvailabilityState() == 0 && slots.get(i).getBooked() == false) {
+                slots.get(i).setVehiclePlate(slot.getVehiclePlate());
+                slots.get(i).setBooked(true);
+                editSlot2(slots.get(i));
+                return true;
+            }
+        }
+        return false;
+        //return "The slot can't be deleted becouse it isn't a free slot to change for this one to the user.";
+    }
+
+    public void editSlot2(Slot slot) throws SQLException {
+        String query = "UPDATE slots SET booked = ?, vehicle_plate = ? WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setBoolean(1, slot.getBooked());
+            stmt.setString(2, slot.getVehiclePlate());
+            stmt.setInt(3, slot.getIdSlot());
+
             stmt.executeUpdate();
         }
     }

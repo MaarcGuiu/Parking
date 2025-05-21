@@ -37,19 +37,32 @@ public class AdminManager {
 
         return true;
     }
-    public boolean deleteSlot(int idSlot) throws SQLException {
-        Slot slot = slotSqlDao.getSlot(idSlot);
+    public String deleteSlot(int idSlot) throws SQLException {
+        Slot slot = slotSqlDao.getSlot2(idSlot);
 
         if (slot == null) {
-            throw new IllegalArgumentException("Slot doesn't exist.");
+            return "Slot doesn't exist.";
         }
-        if (slot.getAvailabilityState() == 1 || slot.getBooked() == true) {
-            throw new IllegalArgumentException("Slot is occupied, cannot be delete.");
-        }
-        slotSqlDao.deleteSlot(idSlot);
 
-        return true;
+        if (slot.getAvailabilityState() == 1 && slot.getBooked() == true) {
+            return "Slot is occupied, cannot be delete.";
+        }
+
+        if (slot.getAvailabilityState() == 0 && slot.getBooked() == true) {
+            if (slotSqlDao.giveNewSlotToTheUser(slot)) {
+                slotSqlDao.deleteSlot(idSlot);
+                return "The Slot has been deleted, the user book was changed";
+            }
+            return "The slot can't be deleted becouse it isn't a free slot to change for this one to the user.";
+        }
+
+        if (slot.getAvailabilityState() == 0 || slot.getBooked() == false) {
+            slotSqlDao.deleteSlot(idSlot);
+        }
+
+        return "Slot deleted.";
     }
+
     private boolean isValidVehicleType(String vehicle) {
         switch (vehicle) {
             case "Car", "Motorbike", "Truck":return true;

@@ -378,16 +378,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
             deleteConfirmButton.addActionListener(ev -> {
                 try {
                     int id = Integer.parseInt(idField.getText());
-                    boolean deleted = adminController.deleteSlot(id);
-                    if (deleted) {
+                    String deleted = adminController.deleteSlot(id);
                         JOptionPane.showMessageDialog(mainPanel,
-                                "Slot eliminado: ID " + id,
+                                deleted + " " + id,
                                 "Deleted", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(mainPanel,
-                                "No se encontró un slot con ese ID.",
-                                "Error", JOptionPane.ERROR_MESSAGE);
-                    }
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(mainPanel,
                             "ID debe ser un número válido.",
