@@ -1,5 +1,7 @@
 package persistence;
 
+import business.model.VehicleEntry;
+
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -73,7 +75,8 @@ public class LogsSqlDao {
         return events;
     }
 
-    public static class VehicleEvent {
+
+    public class VehicleEvent {
         private final String plate;
         private final String action; // "entry" or "leave"
         private final LocalDateTime timestamp;
@@ -96,21 +99,6 @@ public class LogsSqlDao {
         }
     }
 
-    public static class VehicleEntry {
-        private final String plate;
-        private final LocalDateTime entryTime;
 
-        public VehicleEntry(String plate, LocalDateTime entryTime) {
-            this.plate = plate;
-            this.entryTime = entryTime;
-        }
 
-        public String getPlate() {
-            return plate;
-        }
-
-        public LocalDateTime getEntryTime() {
-            return entryTime;
-        }
-    }
 }

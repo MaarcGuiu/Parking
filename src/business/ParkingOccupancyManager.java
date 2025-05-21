@@ -1,4 +1,5 @@
 package business;
+import business.model.VehicleEntry;
 import persistence.LogsSqlDao;
 import presentation.views.OccupancyChangeListener;
 
@@ -29,7 +30,7 @@ public class ParkingOccupancyManager {
         List<LogsSqlDao.VehicleEvent> events = repository.getVehicleEventsLast60Minutes();
 
         // También necesitamos los vehículos que entraron antes pero aún no han salido
-        List<LogsSqlDao.VehicleEntry> activeBefore = repository.getActiveVehicleEntries();
+        List<VehicleEntry> activeBefore = repository.getActiveVehicleEntries();
 
         // Inicializar con los vehículos que ya estaban dentro
         int currentOccupancy = (int) activeBefore.stream()

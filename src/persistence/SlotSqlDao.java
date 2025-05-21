@@ -400,9 +400,9 @@ public class SlotSqlDao {
                 stmt.setInt(2, slot.getIdSlot());
                 stmt.executeUpdate();
             }
+            UserSqlDao userSqlDao = new UserSqlDao();
+            userSqlDao.registerEntryExitLogs("entry", plate, slot.getIdSlot());
         }
-        UserSqlDao userSqlDao = new UserSqlDao();
-        userSqlDao.registerEntryExitLogs("entry", plate, slot.getIdSlot());
     }
     public void insertVehicleIfNotExists(String plate, String typeVehicle) throws SQLException {
         String query = "INSERT IGNORE INTO vehicles (plate, brand, model, color, owner_id, type_vehicle) VALUES (?, 'SimBrand', 'SimModel', 'Gray', ?, ?)";
