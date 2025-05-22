@@ -225,6 +225,37 @@ public class UserSqlDao {
         }
     }
 
+
+    public String freeSlotsByOwnerId(int ownerId) throws SQLException {
+        String updateQuery = """
+        UPDATE slots 
+        SET is_occupied = 0, vehicle_plate = NULL 
+        WHERE vehicle_plate IN (
+            SELECT plate FROM vehicles WHERE owner_id = ?
+        )
+    """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
+            stmt.setInt(1, ownerId);
+            stmt.executeUpdate();
+        }
+
+        return "success";
+    }
+
+
+    public String deleteVehiclesByOwnerId(int ownerId) throws SQLException {
+        String deleteQuery = "DELETE FROM vehicles WHERE owner_id = ?";
+
+        try (PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery)) {
+            deleteStmt.setInt(1, ownerId);
+            deleteStmt.executeUpdate();
+        }
+
+        return "success";
+    }
+
+
     public String updateSlot(String plate) throws SQLException {
         //Alliberem l'slot que l'usuari ha deixat lliure.
         String updateSlotQuery = "UPDATE slots SET is_occupied = 0, booked = 0, vehicle_plate = NULL WHERE vehicle_plate = ?";
