@@ -352,6 +352,7 @@ public class SlotSqlDao {
             stmt.executeUpdate();
         }
     }
+
     // Cancelar booked
     public void updateTheSlotUnbooked(String plate,int idSlot) throws SQLException {
         userSqlDao = new UserSqlDao();

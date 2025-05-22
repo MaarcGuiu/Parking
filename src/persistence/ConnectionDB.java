@@ -23,7 +23,7 @@ public class ConnectionDB {
                 e.printStackTrace();
                 throw new SQLException("MySQL JDBC Driver no encontrado.");
             }
-            String url = config.getServerIp();
+            String url = config.getServerIp() + config.getDbName();
             String usr = config.getUser();
             String pwd = config.getPwd();
             instance = DriverManager.getConnection(url, usr, pwd);

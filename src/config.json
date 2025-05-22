@@ -1,9 +1,9 @@
 {
   "DbPort": 3306,
-  "serverIp": "jdbc:mysql://localhost:3306/parkingdpo?useSSL=false&serverTimezone=UTC",
-  "DbName": "parkingdpo",
+  "serverIp": "jdbc:mysql://localhost:3306/",
+  "dbName": "parkingdpo",
   "user": "root",
   "pwd": "",
   "adminPwd": "admin",
-  "vehicleTime": 10
+  "vehicleTime": 1000
 }
