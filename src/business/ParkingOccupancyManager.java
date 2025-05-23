@@ -1,5 +1,6 @@
 package business;
 import business.model.VehicleEntry;
+import business.model.VehicleEvent;
 import persistence.LogsSqlDao;
 import presentation.views.OccupancyChangeListener;
 
@@ -11,7 +12,6 @@ import java.util.List;
 public class ParkingOccupancyManager {
     private final LogsSqlDao repository;
     private static final List<OccupancyChangeListener> listeners = new ArrayList<>();
-
 
     public ParkingOccupancyManager(LogsSqlDao repository) {
         this.repository = repository;
@@ -27,7 +27,7 @@ public class ParkingOccupancyManager {
         LocalDateTime sixtyMinutesAgo = now.minusMinutes(60);
 
         // Obtener todos los eventos de los últimos 60 minutos
-        List<LogsSqlDao.VehicleEvent> events = repository.getVehicleEventsLast60Minutes();
+        List<VehicleEvent> events = repository.getVehicleEventsLast60Minutes();
 
         // También necesitamos los vehículos que entraron antes pero aún no han salido
         List<VehicleEntry> activeBefore = repository.getActiveVehicleEntries();
@@ -43,7 +43,7 @@ public class ParkingOccupancyManager {
             LocalDateTime currentMinuteEnd = currentMinuteStart.plusMinutes(1);
 
             // Procesar eventos que ocurrieron en este minuto
-            for (LogsSqlDao.VehicleEvent event : events) {
+            for (VehicleEvent event : events) {
                 if (event.getTimestamp().isAfter(currentMinuteStart) &&
                         !event.getTimestamp().isAfter(currentMinuteEnd)) {
 

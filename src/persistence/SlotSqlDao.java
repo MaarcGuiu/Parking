@@ -465,7 +465,7 @@ public class SlotSqlDao {
         userSqlDao = new UserSqlDao();
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, plate);
-            stmt.setInt(2, ThreadLocalRandom.current().nextInt(1, userSqlDao.getUserCount()));
+            stmt.setInt(2, 1);
             stmt.setString(3, typeVehicle);
             stmt.executeUpdate();
         }
