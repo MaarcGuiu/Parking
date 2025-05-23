@@ -157,11 +157,6 @@ public class BookMenuView extends JPanel {
         createButton.setForeground(Color.WHITE);
         inputPanel.add(createButton);
 
-        backButton = new RoundButton("Back");
-        backButton.setBounds(250, 420, 100, 40);
-        backButton.setFont(new Font("Arial", Font.PLAIN, 14));
-        mainPanel.add(backButton);
-
         // Cambiar los slots disponibles cuando se seleccione un tipo de vehiculo diferente
         vehicleCombo.addActionListener(e -> {
             loadAvailableSlots();
@@ -266,8 +261,6 @@ public class BookMenuView extends JPanel {
             }
         });
 
-        backButton.addActionListener(e -> goBackToReservationMenu());
-
         closeButton.addMouseListener(
                 new java.awt.event.MouseAdapter() {
                     @Override
@@ -353,16 +346,6 @@ public class BookMenuView extends JPanel {
             slotComboBox.removeAllItems();
             slotComboBox.setEnabled(false);
             compatibleSlots.clear();
-        }
-    }
-
-    private void goBackToReservationMenu() {
-        setVisible(false);
-        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        if (parentFrame != null) {
-            parentFrame.setContentPane(new ReservationView(loggedUser));
-            parentFrame.revalidate();
-            parentFrame.repaint();
         }
     }
 

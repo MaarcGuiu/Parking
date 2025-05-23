@@ -241,10 +241,6 @@ public class RemoveBookMenuView extends JPanel {
             }
         });
 
-        backButton.addActionListener(e -> {
-            goBackToReservationMenu();
-        });
-
         closeButton.addMouseListener(
             new java.awt.event.MouseAdapter() {
                 @Override
@@ -273,16 +269,6 @@ public class RemoveBookMenuView extends JPanel {
                 parentFrame.repaint();
             }
         });
-    }
-    
-    private void goBackToReservationMenu() {
-        setVisible(false);
-        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        if (parentFrame != null) {
-            parentFrame.setContentPane(new ReservationView(loggedUser));
-            parentFrame.revalidate();
-            parentFrame.repaint();
-        }
     }
 
     private void goBackToUserMenu() {
