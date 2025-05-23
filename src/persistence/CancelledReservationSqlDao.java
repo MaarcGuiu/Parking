@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CancelledReservationSqlDao {
-    static Connection connection;
+    private static Connection connection;
 
     public CancelledReservationSqlDao() {
         try {

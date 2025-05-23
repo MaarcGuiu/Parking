@@ -5,7 +5,7 @@ import persistence.SlotSqlDao;
 import java.sql.SQLException;
 
 public class AdminManager {
-    SlotSqlDao slotSqlDao = new SlotSqlDao();
+    private SlotSqlDao slotSqlDao = new SlotSqlDao();
     private static int totalSlots;
     public AdminManager() {
         totalSlots = 60;                       // Creamos unas 60 plazas, y a partir de ahi las que creemos se irá sumando a ese numero

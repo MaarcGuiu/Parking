@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class SlotSqlDao {
-    static Connection connection;
+    private static Connection connection;
     private UserSqlDao userSqlDao;
 
     public SlotSqlDao() {

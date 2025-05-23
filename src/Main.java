@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    static Connection connection;
+    private static Connection connection;
 
     public static void main(String[] args) {
         MainController controller = new MainController();

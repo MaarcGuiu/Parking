@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class UserManager {
-    SlotSqlDao slotSqlDao;
-    UserSqlDao userSqlDao;
-    VehicleSqlDao vehicleSqlDao;
+    private SlotSqlDao slotSqlDao;
+    private UserSqlDao userSqlDao;
+    private VehicleSqlDao vehicleSqlDao;
     public UserManager () {
         this.slotSqlDao = new SlotSqlDao();
         this.userSqlDao = new UserSqlDao();

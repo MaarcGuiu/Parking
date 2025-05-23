@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 public class LogsSqlDao {
-    static Connection connection;
+    private static Connection connection;
 
     public LogsSqlDao() {
         try {
@@ -90,6 +90,7 @@ public class LogsSqlDao {
         public String getPlate() {
             return plate;
         }
+
         public String getAction() {
             return action;
         }

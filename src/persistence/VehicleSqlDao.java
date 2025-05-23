@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class VehicleSqlDao {
-    static Connection connection;
+    private static Connection connection;
 
     public VehicleSqlDao() {
         try {
