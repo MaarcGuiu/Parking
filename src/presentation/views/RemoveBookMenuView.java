@@ -188,11 +188,6 @@ public class RemoveBookMenuView extends JPanel {
         cancelReservationButton.setForeground(Color.WHITE);
         confirmPanel.add(cancelReservationButton);
 
-        backButton = new RoundButton("Back");
-        backButton.setBounds(250, 420, 100, 40);
-        backButton.setFont(new Font("Arial", Font.PLAIN, 14));
-        mainPanel.add(backButton);
-
         // Listeners
         cancelReservationButton.addActionListener(e -> {
             int selectedRow = reservationsTable.getSelectedRow();
