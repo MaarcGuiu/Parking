@@ -85,7 +85,7 @@ public class BookMenuView extends JPanel {
         bookMenuButton = new RoundButton("Book");
         bookMenuButton.setBounds(20, 210, 160, 40);
         bookMenuButton.setFont(new Font("Arial", Font.BOLD, 16));
-        bookMenuButton.setBackground(new Color(255, 200, 0)); // Active color - we are in Book view
+        bookMenuButton.setBackground(new Color(255, 200, 0));
         bookMenuButton.setForeground(Color.BLACK);
         bookMenuButton.setFocusPainted(false);
         menuPanel.add(bookMenuButton);
@@ -93,7 +93,7 @@ public class BookMenuView extends JPanel {
         removeBookMenuButton = new RoundButton("Remove book");
         removeBookMenuButton.setBounds(20, 270, 160, 40);
         removeBookMenuButton.setFont(new Font("Arial", Font.BOLD, 16));
-        removeBookMenuButton.setBackground(new Color(150, 130, 200)); // Inactive color
+        removeBookMenuButton.setBackground(new Color(150, 130, 200));
         removeBookMenuButton.setForeground(Color.BLACK);
         removeBookMenuButton.setFocusPainted(false);
         menuPanel.add(removeBookMenuButton);
@@ -114,7 +114,7 @@ public class BookMenuView extends JPanel {
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(null);
         inputPanel.setOpaque(false);
-        inputPanel.setBounds(350, 120, 400, 250); // Aumentado la altura para el nuevo campo
+        inputPanel.setBounds(350, 120, 400, 250);
         mainPanel.add(inputPanel);
 
         JLabel plateLabel = new JLabel("PLATE:");
@@ -147,12 +147,12 @@ public class BookMenuView extends JPanel {
 
         slotComboBox = new JComboBox<>();
         slotComboBox.setBounds(180, 120, 200, 30);
-        slotComboBox.setEnabled(false); // Deshabilitado hasta que se carguen los slots
+        slotComboBox.setEnabled(false);
         inputPanel.add(slotComboBox);
 
         createButton = new RoundButton("CREATE BOOKING");
         createButton.setFont(new Font("Arial", Font.BOLD, 14));
-        createButton.setBounds(125, 190, 150, 40); // Movido hacia abajo
+        createButton.setBounds(125, 190, 150, 40);
         createButton.setBackground(new Color(204, 140, 0));
         createButton.setForeground(Color.WHITE);
         inputPanel.add(createButton);
@@ -162,7 +162,7 @@ public class BookMenuView extends JPanel {
         backButton.setFont(new Font("Arial", Font.PLAIN, 14));
         mainPanel.add(backButton);
 
-        // Listener para cargar slots cuando cambie el tipo de vehículo
+        // Cambiar los slots disponibles cuando se seleccione un tipo de vehiculo diferente
         vehicleCombo.addActionListener(e -> {
             loadAvailableSlots();
         });
@@ -300,7 +300,7 @@ public class BookMenuView extends JPanel {
             }
         });
 
-        // Cargar slots iniciales
+        // Cargar slots disponibles
         loadAvailableSlots();
     }
 
@@ -318,7 +318,7 @@ public class BookMenuView extends JPanel {
                 return;
             }
 
-            // Filtrar slots compatibles con el tipo de vehículo seleccionado
+            // Filtrar slots compatibles con el tipo de vehículo
             compatibleSlots.clear();
             for (Slot slot : freeSlots) {
                 String slotType = slot.getVehicle();
