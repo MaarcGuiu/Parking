@@ -40,15 +40,6 @@ public class ReservationView extends JPanel {
         mainPanel.setBounds(0, 0, 900, 500);
         add(mainPanel);
 
-        JLabel titleLabel = new JLabel(
-            "RESERVATION MENU",
-            SwingConstants.CENTER
-        );
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setBounds(200 + (900 - 200 - 300) / 2, 50, 300, 40);
-        mainPanel.add(titleLabel);
-
         closeButton = new JLabel("\u2716");
         closeButton.setFont(new Font("Dialog", Font.BOLD, 22));
         closeButton.setForeground(Color.WHITE);
