@@ -105,7 +105,6 @@ public class ParkingStatusManager {
         configJsonDao = new ConfigJsonDao();
         Config config = configJsonDao.loadAllConfig();
         int vehicleTime = config.getVehicleTime();
-            System.out.println("vehTime: "+vehicleTime);
             freq = ThreadLocalRandom.current().nextInt(1, vehicleTime);
         return freq;
     }
@@ -129,6 +128,7 @@ public class ParkingStatusManager {
             case 3: vehicle_type = "Truck"; break;
         }
         String randomPlate = generateRandomVehiclePlate();
+        System.out.println("\n------------------Random plate: "+randomPlate);
         System.out.println("plateEntry: \n"+ randomPlate);
         slotSqlDao.userEntryNotBooked(randomPlate,vehicle_type);
     }

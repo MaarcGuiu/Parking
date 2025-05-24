@@ -228,6 +228,7 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                         if (parkingStatusButton != null) {
                             parkingStatusButton.setBackground(Color.YELLOW);
                         }
+
                         ParkingStatusView.show(mainPanel, menuPanel, resetMainPanel, isAdmin);
                     }
                 } catch (NumberFormatException ex) {
