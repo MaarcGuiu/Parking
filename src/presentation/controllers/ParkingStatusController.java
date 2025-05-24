@@ -1,16 +1,24 @@
 package presentation.controllers;
 
 import business.ParkingStatusManager;
+import business.SimulationParkingStatusManager;
 import business.model.CancelledReservation;
 import business.model.Slot;
 
 import java.util.List;
 
 public class ParkingStatusController {
+
     private static ParkingStatusManager parkingStatusManager;
+    private SimulationParkingStatusManager simulationParkingStatusManager;
 
     public ParkingStatusController() {
         parkingStatusManager = new ParkingStatusManager();
+    }
+
+    public SimulationParkingStatusManager createThreadSimulation (Runnable refreshView) {
+        SimulationParkingStatusManager simulationParkingStatusManager = new SimulationParkingStatusManager(refreshView);
+        return simulationParkingStatusManager;
     }
 
     public List<Slot> getAllSlots() {

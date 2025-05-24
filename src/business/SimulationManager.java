@@ -14,7 +14,6 @@ public class SimulationManager implements Runnable {
         running = true;
         parkingStatusManager = new ParkingStatusManager();
         long frequency = parkingStatusManager.calculateFrequency() * 1000L;
-        System.out.println("FREQ: "+frequency);
         while (running) {
             try {
                 Thread.sleep(frequency);
