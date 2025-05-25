@@ -13,12 +13,8 @@ import java.util.TimeZone;
 public class LogsSqlDao {
     private static Connection connection;
 
-    public LogsSqlDao() {
-        try {
-            connection = ConnectionDB.getInstance();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al conectar con la base de datos.", e);
-        }
+    public LogsSqlDao() throws SQLException {
+        connection = ConnectionDB.getInstance();
     }
 
     /**

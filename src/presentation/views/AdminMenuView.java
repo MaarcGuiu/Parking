@@ -15,6 +15,7 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,8 +27,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class AdminMenuView extends JPanel implements OccupancyChangeListener{
     private JPanel mainPanel;
     private JPanel menuPanel;
-    private final AdminController adminController = new AdminController();
-    private persistence.LogsSqlDao LogsSqlDao = new LogsSqlDao();
+    private AdminController adminController;
+    private persistence.LogsSqlDao LogsSqlDao;
     private business.ParkingOccupancyManager ParkingOccupancyManager = new ParkingOccupancyManager(LogsSqlDao);
     private final ParkingOccupancyController parkingOccupancyService = new ParkingOccupancyController(ParkingOccupancyManager);
     private AtomicReference<int[]> occupancyDataRef = new AtomicReference<>(new int[60]);
@@ -35,6 +36,14 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
     private JPanel timeBarChartPanel;
 
     public AdminMenuView() {
+        try {
+            adminController = new AdminController();
+            LogsSqlDao = new LogsSqlDao();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+        } catch (ClassNotFoundException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+        }
         // Permitir posicionamiento absoluto
         setLayout(null);
         parkingOccupancyService.addOccupancyChangeListener(this);
@@ -231,9 +240,11 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                         ParkingStatusView.show(mainPanel, menuPanel, resetMainPanel, isAdmin);
                     }
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(mainPanel,
-                            "ID y Floor deben ser números válidos.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(mainPanel,"ID y Floor deben ser números válidos.","Error", JOptionPane.ERROR_MESSAGE);
+                } catch (IllegalArgumentException ex) {
+                    JOptionPane.showMessageDialog(mainPanel,"Error de validació: " + ex.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(mainPanel,"Error de base de dades: " + ex.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
                 }
             });
 
@@ -320,9 +331,11 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                                 "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(mainPanel,
-                            "ID y Floor deben ser números válidos.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(mainPanel,"ID y Floor deben ser números válidos.","Error", JOptionPane.ERROR_MESSAGE);
+                } catch (IllegalArgumentException ex) {
+                    JOptionPane.showMessageDialog(mainPanel,"Error de validació: " + ex.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(mainPanel,"Error de base de dades: " + ex.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
                 }
             });
 
@@ -381,9 +394,11 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                                 deleted + " " + id,
                                 "Deleted", JOptionPane.INFORMATION_MESSAGE);
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(mainPanel,
-                            "ID debe ser un número válido.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(mainPanel,"ID debe ser un número válido.","Error", JOptionPane.ERROR_MESSAGE);
+                } catch (IllegalArgumentException ex) {
+                    JOptionPane.showMessageDialog(mainPanel,"Error de validació: " + ex.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(mainPanel,"Error de base de dades: " + ex.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
                 }
             });
 
@@ -406,9 +421,13 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
 
 
         statisticsButton.addActionListener(e -> {
-            resetMainPanel.run();
-            statisticsButton.setBackground(Color.YELLOW);
-            initializeStatisticsView(); // Llamamos a la nueva función
+            try {
+                resetMainPanel.run();
+                statisticsButton.setBackground(Color.YELLOW);
+                initializeStatisticsView();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         mainPanel.add(menuPanel);
@@ -504,7 +523,12 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
         chartContainer.add(chartTitle);
 
         // Obtener datos actuales
-        parkingOccupancyService.updateOccupancyData();
+
+        try {
+            parkingOccupancyService.updateOccupancyData();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+        }
         occupancyDataRef.set(parkingOccupancyService.getCurrentOccupancy());
 
         // Panel del gráfico de barras

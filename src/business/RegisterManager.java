@@ -1,10 +1,17 @@
 package business;
 
+import business.exceptions.RegisterException;
 import persistence.UserSqlDao;
+import presentation.controllers.RegisterController;
 
 import java.sql.SQLException;
 
 public class RegisterManager {
+    private UserSqlDao userDao;
+
+    public RegisterManager() throws SQLException {
+        userDao = new UserSqlDao();
+    }
 
     private boolean isValidEmail(String email) {
         if (email == null || email.isEmpty()) {
@@ -16,16 +23,15 @@ public class RegisterManager {
         return atPosition > 0 && dotPosition > atPosition + 1;
     }
 
-    public String register(String name, String password, String email) {
+    public String register(String name, String password, String email) throws RegisterException {
         if (!isValidEmail(email)) {
-            return "El correo electrónico no tiene un formato válido.";
+            throw new RegisterException("El correo electrónico no tiene un formato válido.");
         }
-        UserSqlDao dao = new UserSqlDao();
+
         try {
-            return dao.register(name, password, email);
+            return userDao.register(name, password, email);
         } catch (SQLException e) {
-            e.printStackTrace();
-            return "Error en la base de datos.";
+            throw new RegisterException("Error en la base de datos al registrar el usuario.", e);
         }
     }
 }

@@ -5,11 +5,14 @@ import persistence.SlotSqlDao;
 import java.sql.SQLException;
 
 public class AdminManager {
-    private SlotSqlDao slotSqlDao = new SlotSqlDao();
+    private SlotSqlDao slotSqlDao;
     private static int totalSlots;
-    public AdminManager() {
+
+    public AdminManager() throws SQLException {
+        this.slotSqlDao = new SlotSqlDao();
         totalSlots = 60;                       // Creamos unas 60 plazas, y a partir de ahi las que creemos se irá sumando a ese numero
     }
+
     public String createSlot(Slot newSlot) throws SQLException {
         Slot slot = slotSqlDao.getSlot(newSlot.getIdSlot());
         if (slot != null) {
@@ -26,6 +29,7 @@ public class AdminManager {
 
         return "Slot with id " + newSlot.getIdSlot() + " created";
     }
+
     public boolean editSlot(Slot editSlot) throws SQLException {
         Slot existingSlot = slotSqlDao.getSlot2(editSlot.getIdSlot());
         if (existingSlot == null) {
@@ -44,6 +48,7 @@ public class AdminManager {
 
         return true;
     }
+
     public String deleteSlot(int idSlot) throws SQLException {
         Slot slot = slotSqlDao.getSlot2(idSlot);
 
@@ -76,9 +81,11 @@ public class AdminManager {
             default:return false;
         }
     }
+
     public int getNumByFloor (int floor) throws SQLException {
         return slotSqlDao.getNumByFloor(floor);
     }
+
     public int getTotalSlots () throws SQLException {
         return slotSqlDao.getTotalSlots();
     }

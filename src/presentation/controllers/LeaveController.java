@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class LeaveController {
     private LeaveManager leaveManager;
 
-    public LeaveController(User loggedUser) {
+    public LeaveController(User loggedUser) throws SQLException {
         leaveManager = new LeaveManager();
     }
 

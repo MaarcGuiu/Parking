@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class EnterController {
     private EnterManager enterManager;
 
-    public EnterController(User loggedUser) {
+    public EnterController(User loggedUser) throws SQLException {
         enterManager = new EnterManager();
     }
 

@@ -16,12 +16,8 @@ public class SlotSqlDao {
     private static Connection connection;
     private UserSqlDao userSqlDao;
 
-    public SlotSqlDao() {
-        try {
-            this.connection = ConnectionDB.getInstance();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al conectar con la base de datos.", e);
-        }
+    public SlotSqlDao() throws SQLException {
+        this.connection = ConnectionDB.getInstance();
     }
 
     //SLOT_NUMER ES LO QUE OCUPA dependiendo si es CAR, MOTORBIKE o TRUCK

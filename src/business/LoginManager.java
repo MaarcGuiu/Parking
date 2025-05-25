@@ -12,54 +12,35 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class LoginManager {
-    public String login(String emailOrName, String password) {
-        UserSqlDao dao = new UserSqlDao();
+    private UserSqlDao userDao;
+
+    public LoginManager() throws SQLException {
+        this.userDao = new UserSqlDao();
+    }
+
+    public String login(String emailOrName, String password) throws SQLException {
         ConfigJsonDao configDao = new ConfigJsonDao();
 
         String adminPwd = configDao.loadAllConfig().getAdminPwd();
-        try {
-            return dao.login(emailOrName, password, adminPwd);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return "Error en la base de datos.";
-        }
+        return userDao.login(emailOrName, password, adminPwd);
     }
 
-    public User getUser(String emailOrName) {
-        UserSqlDao dao = new UserSqlDao();
-        try {
-            return dao.getUser(emailOrName);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public User getUser(String emailOrName) throws SQLException {
+        return userDao.getUser(emailOrName);
     }
 
-    public List<CancelledReservation> getCancelledReservationsByUserId(int userId) {
+    public List<CancelledReservation> getCancelledReservationsByUserId(int userId) throws SQLException {
         CancelledReservationSqlDao cancelledDao = new CancelledReservationSqlDao();
-        try {
-            return cancelledDao.getCancelledReservationsByUserId(userId);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return cancelledDao.getCancelledReservationsByUserId(userId);
     }
 
-    public void deleteCancelledReservationById(int id) {
+    public void deleteCancelledReservationById(int id) throws SQLException {
         CancelledReservationSqlDao cancelledDao = new CancelledReservationSqlDao();
-        try {
-            cancelledDao.deleteCancelledReservationsById(id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        cancelledDao.deleteCancelledReservationsById(id);
     }
 
-    public Slot getSlotByPlate(String vehiclePlate) {
+    public Slot getSlotByPlate(String vehiclePlate) throws SQLException {
         SlotSqlDao slotDao = new SlotSqlDao();
-        try {
-            return slotDao.getSlotByPlate(vehiclePlate);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return slotDao.getSlotByPlate(vehiclePlate);
     }
 }

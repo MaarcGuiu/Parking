@@ -15,7 +15,12 @@ public class ExitParkingView extends JPanel {
     private LeaveController leaveController;
 
     public ExitParkingView(User loggedUser) {
-        leaveController = new LeaveController(loggedUser);
+        try {
+            leaveController = new LeaveController(loggedUser);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
         this.loggedUser = loggedUser;
         // Permitir posicionamiento absoluto
         setLayout(null);

@@ -5,6 +5,7 @@ import presentation.views.AdminMenuView;
 import presentation.views.OccupancyChangeListener;
 
 import javax.swing.*;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,20 +55,20 @@ public class ParkingOccupancyController {
     }
 
     public void updateOccupancyData() {
-        try {
-            int[] newData = occupancyManager.calculateLast60MinutesOccupancy();
+        if (occupancyManager != null) {
+            try {
+                int[] newData = occupancyManager.calculateLast60MinutesOccupancy();
 
-            this.currentOccupancy = newData;
-            notifyOccupancyChanged(); // Notificar a los listeners
-
-            System.out.println("Datos de ocupación actualizados: " + LocalDateTime.now());
-        } catch (Exception e) {
-            System.err.println("Error actualizando datos: " + e.getMessage());
+                this.currentOccupancy = newData;
+                notifyOccupancyChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public int[] getCurrentOccupancy() {
-        return currentOccupancy.clone(); // Devuelve copia para evitar modificaciones externas
+        return currentOccupancy.clone();
     }
 
 }

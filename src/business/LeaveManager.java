@@ -6,15 +6,18 @@ import persistence.UserSqlDao;
 import java.sql.SQLException;
 
 public class LeaveManager {
+    private UserSqlDao userDao;
+
+    public LeaveManager() throws SQLException {
+        this.userDao = new UserSqlDao();
+    }
 
     public String userPlate(User loggedUser, String plate) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        return dao.userPlate(loggedUser, plate);
+        return userDao.userPlate(loggedUser, plate);
     }
 
     public String isVehicleInside(String plate) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        if (dao.isVehicleInside(plate)) {
+        if (userDao.isVehicleInside(plate)) {
             return "success";
         } else {
             return "The vehicle is not in the parking lot.";
@@ -22,18 +25,15 @@ public class LeaveManager {
     }
 
     public String updateSlot(String plate) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        return dao.updateSlot(plate);
+        return userDao.updateSlot(plate);
     }
 
     public void registerExitLogs(String action, String plate, int slotId) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        dao.registerEntryExitLogs(action, plate, slotId);
+        userDao.registerEntryExitLogs(action, plate, slotId);
     }
 
     public int getSlotIdByPlate(String plate) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        return dao.getSlotIdByPlate(plate);
+        return userDao.getSlotIdByPlate(plate);
     }
 
     public boolean isValidPlateFormat(String plate) {

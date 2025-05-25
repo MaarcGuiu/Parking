@@ -10,12 +10,8 @@ import java.sql.SQLException;
 public class UserSqlDao {
     private static Connection connection;
 
-    public UserSqlDao() {
-        try {
-            this.connection = ConnectionDB.getInstance();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al conectar con la base de datos.", e);
-        }
+    public UserSqlDao() throws SQLException {
+        this.connection = ConnectionDB.getInstance();
     }
 
     public String login(String emailOrName, String password, String adminPwd) throws SQLException {

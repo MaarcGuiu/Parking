@@ -40,10 +40,15 @@ public class BookMenuView extends JPanel {
      * @param loggedUser the logged user
      */
     public BookMenuView(User loggedUser) {
-        this.loggedUser = loggedUser;
-        this.userController = new UserController();
-        this.enterController = new EnterController(loggedUser);
-        this.parkingStatusController = new ParkingStatusController();
+        try {
+            this.loggedUser = loggedUser;
+            this.userController = new UserController();
+            this.enterController = new EnterController(loggedUser);
+            this.parkingStatusController = new ParkingStatusController();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+        }
+
         this.compatibleSlots = new ArrayList<>();
         setLayout(null);
 

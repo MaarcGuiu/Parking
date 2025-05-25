@@ -6,32 +6,37 @@ public class SimulationManager implements Runnable {
     private boolean running;
     private ParkingStatusManager parkingStatusManager;
 
-    public SimulationManager() {
+    public SimulationManager()  {
     }
 
     @Override
     public void run() {
         running = true;
-        parkingStatusManager = new ParkingStatusManager();
-        long frequency = parkingStatusManager.calculateFrequency() * 1000L;
-        System.out.println("FREQ: "+frequency);
-        while (running) {
-            try {
-                Thread.sleep(frequency);
-                if (!parkingStatusManager.getFreeUnbookedSlots()) {
-                    parkingStatusManager.simulateEntry(); System.out.println("ENTRA VEHICLE\n");
-                } else {
-                    if (parkingStatusManager.calculateEntryOrExit()){
-                        parkingStatusManager.simulateEntry(); System.out.println("ENTRA VEHICLE\n");
+
+        try {
+            parkingStatusManager = new ParkingStatusManager();
+        } catch (SQLException e) {
+            parkingStatusManager = null;
+        }
+
+        if (parkingStatusManager != null) {
+            long frequency = parkingStatusManager.calculateFrequency() * 1000L;
+            while (running) {
+                try {
+                    Thread.sleep(frequency);
+                    if (!parkingStatusManager.getFreeUnbookedSlots()) {
+                        parkingStatusManager.simulateEntry();
                     } else {
-                        parkingStatusManager.simulateExit();System.out.println("SALE UN VEHICULO");
+                        if (parkingStatusManager.calculateEntryOrExit()){
+                            parkingStatusManager.simulateEntry();
+                        } else {
+                            parkingStatusManager.simulateExit();
+                        }
                     }
+                } catch (InterruptedException e) {
+                    running = false;
+                } catch (SQLException e) {
                 }
-            } catch (InterruptedException e) {
-                System.out.println("There was an interruption of the thread");
-                running = false;
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
             }
         }
     }

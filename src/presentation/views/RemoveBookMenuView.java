@@ -36,10 +36,14 @@ public class RemoveBookMenuView extends JPanel {
     private Map<String, Integer> plateToSlotMap; // Para mapear cada matrícula a su ID de slot
 
     public RemoveBookMenuView(User loggedUser) {
-        this.loggedUser = loggedUser;
-        this.userController = new UserController();
-        this.parkingStatusController = new ParkingStatusController();
-        this.loginController = new LoginController();
+        try {
+            this.loggedUser = loggedUser;
+            this.userController = new UserController();
+            this.parkingStatusController = new ParkingStatusController();
+            this.loginController = new LoginController();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+        }
         this.plateToSlotMap = new HashMap<>();
         setLayout(null);
         

@@ -1,5 +1,6 @@
 package presentation.views;
 
+import business.exceptions.RegisterException;
 import business.model.User;
 import presentation.components.RoundButton;
 import presentation.components.RoundPasswordField;
@@ -9,12 +10,17 @@ import presentation.controllers.RegisterController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
 
 public class RegisterView extends JPanel {
     private RegisterController registerController;
 
     public RegisterView() {
-        registerController = new RegisterController();
+        try {
+            registerController = new RegisterController();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+        }
 
         setLayout(null);
         setPreferredSize(new Dimension(900, 500));
@@ -115,20 +121,31 @@ public class RegisterView extends JPanel {
                         "Contrasenya insegura",
                         JOptionPane.ERROR_MESSAGE);
             } else {
-                String result = registerController.register(username, password, email);
+                if (registerController != null) {
+                    try {
+                        String result = registerController.register(username, password, email);
+                        if (result != null) {
+                            if ("success".equals(result)) {
+                                LoginController loginController = new LoginController();
 
-                if ("success".equals(result)) {
-                    LoginController loginController = new LoginController();
+                                User user = loginController.getUser(email);
+                                JOptionPane.showMessageDialog(this, "Registro exitoso\nEntrando al menú principal...", "Registro Completado", JOptionPane.INFORMATION_MESSAGE);
 
-                    User user = loginController.getUser(email);
-                    JOptionPane.showMessageDialog(this, "Registro exitoso\nEntrando al menú principal...", "Registro Completado", JOptionPane.INFORMATION_MESSAGE);
-
-                    JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(RegisterView.this);
-                    parentFrame.setContentPane(new UserMenuView(user));
-                    parentFrame.revalidate();
-                    parentFrame.repaint();
+                                JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(RegisterView.this);
+                                parentFrame.setContentPane(new UserMenuView(user));
+                                parentFrame.revalidate();
+                                parentFrame.repaint();
+                            } else {
+                                JOptionPane.showMessageDialog(this, result, "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    } catch (RegisterException ex) {
+                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de registro", JOptionPane.ERROR_MESSAGE);
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(this, "Error de base de datos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 } else {
-                    JOptionPane.showMessageDialog(this, result, "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Could not connect to database. Please check your configuration.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

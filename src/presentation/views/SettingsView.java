@@ -9,6 +9,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class SettingsView extends JPanel {
     private JPanel mainPanel;
@@ -117,13 +118,18 @@ public class SettingsView extends JPanel {
         );
 
         if (option == JOptionPane.YES_OPTION) {
-            DeleteAccountController deleteAccountController = new DeleteAccountController();
-            deleteAccountController.deleteAccount(loggedUser.getUserName(), loggedUser.getPassword());
-
-            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            parentFrame.setContentPane(new MainView());
-            parentFrame.revalidate();
-            parentFrame.repaint();
+            try {
+                DeleteAccountController deleteAccountController = new DeleteAccountController();
+                deleteAccountController.deleteAccount(loggedUser.getUserName(), loggedUser.getPassword());
+                JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+                parentFrame.setContentPane(new MainView());
+                parentFrame.revalidate();
+                parentFrame.repaint();
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Error en la base de datos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 

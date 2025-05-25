@@ -17,8 +17,12 @@ public class EntryParkingView extends JPanel {
     private EnterController enterController;
 
     public EntryParkingView(User loggedUser) {
-        enterController = new EnterController(loggedUser);
-        this.loggedUser = loggedUser;
+        try {
+            enterController = new EnterController(loggedUser);
+            this.loggedUser = loggedUser;
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+        }
         // Permitir posicionamiento absoluto
         setLayout(null);
 

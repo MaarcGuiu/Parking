@@ -21,42 +21,36 @@ public class ParkingStatusManager {
     private ConfigJsonDao configJsonDao;
     private SlotSqlDao slotSqlDao;
     private VehicleSqlDao vehicleSqlDao;
-    public ParkingStatusManager () {
+
+    public ParkingStatusManager () throws SQLException {
         slotSqlDao = new SlotSqlDao();
     }
-    public List<Slot> getAllSlots() {
+
+    public List<Slot> getAllSlots() throws SQLException {
         SlotSqlDao dao = new SlotSqlDao();
         VehicleSqlDao vehicleSqlDao = new VehicleSqlDao();
-        try {
-            List<Slot> slots = dao.getAllSlots();
-            for (Slot slot : slots) {
-                slot.setVehicleObject(vehicleSqlDao.getVehicleByPlate(slot.getVehiclePlate()));
-            }
-            return slots;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+
+        List<Slot> slots = dao.getAllSlots();
+        for (Slot slot : slots) {
+            slot.setVehicleObject(vehicleSqlDao.getVehicleByPlate(slot.getVehiclePlate()));
         }
+        return slots;
+
     }
 
-    public boolean cancelSlot(int slotId) {
-        SlotSqlDao dao = new SlotSqlDao();
-        try {
+        public boolean cancelSlot(int slotId) throws SQLException {
+            SlotSqlDao dao = new SlotSqlDao();
             dao.cancelSlot(slotId);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return true;
         }
-        return true;
-    }
 
-    public boolean createCancelledReservation(int slotId, int userId, String vehiclePlate) {
-        SlotSqlDao slotDao = new SlotSqlDao();
+    public boolean createCancelledReservation(int slotId, int userId, String vehiclePlate) throws SQLException {
         CancelledReservationSqlDao cancelledDao = new CancelledReservationSqlDao();
         UserSqlDao userDao = new UserSqlDao();
         VehicleSqlDao vehicleDao = new VehicleSqlDao();
 
         try {
-            Slot slot = slotDao.getSlot(slotId);
+            Slot slot = slotSqlDao.getSlot(slotId);
 
             CancelledReservation reservation = new CancelledReservation(0, userDao.getUserById(userId), slot, vehicleDao.getVehicleByPlate(vehiclePlate));
             cancelledDao.createCancelledReservation(reservation);
@@ -67,36 +61,24 @@ public class ParkingStatusManager {
         }
     }
 
-    public int setUserNewReservationSlot(int slotId, String vehiclePlate) {
+    public int setUserNewReservationSlot(int slotId, String vehiclePlate) throws SQLException {
         SlotSqlDao slotDao = new SlotSqlDao();
-        try {
-            return slotDao.setUserNewReservationSlot(slotId, vehiclePlate);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return slotDao.setUserNewReservationSlot(slotId, vehiclePlate);
     }
 
-    public Slot getSlot(int slotId) {
+    public Slot getSlot(int slotId) throws SQLException {
         SlotSqlDao slotDao = new SlotSqlDao();
-        try {
-            return slotDao.getSlot(slotId);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return slotDao.getSlot(slotId);
     }
 
-    public boolean getFreeUnbookedSlots() {
+    public boolean getFreeUnbookedSlots() throws SQLException {
         SlotSqlDao slotDao = new SlotSqlDao();
         List<Slot> slots = new ArrayList<>();
-        try {
-            slots = slotDao.getFreeUnbookedSlots();
-            if (slots.isEmpty()) {
-                return false;
-            } else {
-                return true;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        slots = slotDao.getFreeUnbookedSlots();
+        if (slots.isEmpty()) {
+            return false;
+        } else {
+            return true;
         }
     }
     // TRAFFIC SIMULATION:

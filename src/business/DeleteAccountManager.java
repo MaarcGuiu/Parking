@@ -6,17 +6,23 @@ import persistence.UserSqlDao;
 import java.sql.SQLException;
 
 public class DeleteAccountManager {
-    public String deleteAccount(String emailOrName, String password) {
-        UserSqlDao dao = new UserSqlDao();
-        try {
-            User user = dao.getUser(emailOrName);
-            dao.freeSlotsByOwnerId(user.getId());
-            dao.deleteVehiclesByOwnerId(user.getId());
-            dao.deleteAccount(emailOrName, password);
-            return "success";
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return "Error en la base de datos.";
+    private UserSqlDao userSqlDao;
+
+    public DeleteAccountManager() throws SQLException {
+        this.userSqlDao = new UserSqlDao();
+    }
+
+    public String deleteAccount(String emailOrName, String password) throws SQLException {
+        User user = userSqlDao.getUser(emailOrName);
+
+        if (user == null) {
+            throw new IllegalArgumentException("User not found.");
         }
+
+        userSqlDao.freeSlotsByOwnerId(user.getId());
+        userSqlDao.deleteVehiclesByOwnerId(user.getId());
+        userSqlDao.deleteAccount(emailOrName, password);
+
+        return "success";
     }
 }

@@ -1,35 +1,36 @@
 package business;
 
 import business.model.User;
+import persistence.SlotSqlDao;
 import persistence.UserSqlDao;
 
 import java.sql.SQLException;
 
 public class EnterManager {
+    private UserSqlDao userDao;
 
+    public EnterManager() throws SQLException {
+        this.userDao = new UserSqlDao();
+    }
     public String registeredVehicle(String plate) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        return dao.registeredVehicle(plate);
+        return userDao.registeredVehicle(plate);
     }
 
     public String isBooked(String plate) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        return dao.isBooked(plate);
+        return userDao.isBooked(plate);
     }
 
     public String placesAvailable(String plate, String vehicle) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        if (dao.vehicleExists(plate)) {
-            if (!dao.sameTypeVehicle(plate, vehicle)) {
+        if (userDao.vehicleExists(plate)) {
+            if (!userDao.sameTypeVehicle(plate, vehicle)) {
                 return "notEqual";
             }
         }
-        return dao.placesAvailable(plate, vehicle);
+        return userDao.placesAvailable(plate, vehicle);
     }
 
     public String registerVehicle(User loggedUser, String plate, String vehicle) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        return dao.registerVehicle(loggedUser, plate, vehicle);
+        return userDao.registerVehicle(loggedUser, plate, vehicle);
     }
 
     public boolean isValidPlateFormat(String plate) {
@@ -37,22 +38,18 @@ public class EnterManager {
     }
 
     public void registerEntryLogs(String action, String plate, int slotId) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        dao.registerEntryExitLogs(action, plate, slotId);
+        userDao.registerEntryExitLogs(action, plate, slotId);
     }
 
     public int getSlotIdByPlate(String plate) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        return dao.getSlotIdByPlate(plate);
+        return userDao.getSlotIdByPlate(plate);
     }
 
     public boolean isUserPlate(User loggedUser, String plate) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        return dao.isUserPlate(loggedUser, plate);
+        return userDao.isUserPlate(loggedUser, plate);
     }
 
     public boolean vehicleExists(String plate) throws SQLException {
-        UserSqlDao dao = new UserSqlDao();
-        return dao.vehicleExists(plate);
+        return userDao.vehicleExists(plate);
     }
 }

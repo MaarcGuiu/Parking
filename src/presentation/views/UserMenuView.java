@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicReference;
@@ -21,13 +22,18 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
     private JPanel cardPanel;      // Panel que contendrá todas las vistas
     private JPanel menuPanel;
     private AtomicReference<int[]> occupancyDataRef = new AtomicReference<>(new int[60]);
-    private persistence.LogsSqlDao LogsSqlDao = new LogsSqlDao();
+    private persistence.LogsSqlDao LogsSqlDao;
     private business.ParkingOccupancyManager ParkingOccupancyManager = new ParkingOccupancyManager(LogsSqlDao);
     private final ParkingOccupancyController parkingOccupancyService = new ParkingOccupancyController(ParkingOccupancyManager);
 
     private JPanel timeBarChartPanel;
 
     public UserMenuView(User loggedUser) {
+        try {
+            LogsSqlDao = new LogsSqlDao();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+        }
         this.loggedUser = loggedUser;
         parkingOccupancyService.addOccupancyChangeListener(this); // Registrar como listener
 
@@ -196,7 +202,12 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
         chartContainer.add(chartTitle);
 
         // Obtener datos actuales
-        parkingOccupancyService.updateOccupancyData();
+
+        try {
+            parkingOccupancyService.updateOccupancyData();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+        }
         occupancyDataRef.set(parkingOccupancyService.getCurrentOccupancy());
 
         // Panel del gráfico de barras

@@ -20,13 +20,16 @@ public class ConnectionDB {
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
                 throw new SQLException("MySQL JDBC Driver no encontrado.");
             }
             String url = config.getServerIp();
             String usr = config.getUser();
             String pwd = config.getPwd();
-            instance = DriverManager.getConnection(url, usr, pwd);
+            try {
+                instance = DriverManager.getConnection(url, usr, pwd);
+            } catch (SQLException e) {
+                throw new SQLException("Could not connect to database. Please check your configuration.");
+            }
         }
         return instance;
     }
