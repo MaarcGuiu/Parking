@@ -10,16 +10,26 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
+/**
+ * The type Logs sql dao.
+ */
 public class LogsSqlDao {
     private static Connection connection;
 
+    /**
+     * Instantiates a new Logs sql dao.
+     *
+     * @throws SQLException the sql exception
+     */
     public LogsSqlDao() throws SQLException {
         connection = ConnectionDB.getInstance();
     }
 
     /**
      * Obtiene todos los registros de entrada de vehículos que no tienen salida registrada
+     *
      * @return Lista de pares (matrícula, fecha entrada)
+     * @throws SQLException the sql exception
      */
     public List<VehicleEntry> getActiveVehicleEntries() throws SQLException {
         List<VehicleEntry> activeEntries = new ArrayList<>();
@@ -46,6 +56,12 @@ public class LogsSqlDao {
         return activeEntries;
     }
 
+    /**
+     * Gets vehicle events last 60 minutes.
+     *
+     * @return the vehicle events last 60 minutes
+     * @throws SQLException the sql exception
+     */
     public List<VehicleEvent> getVehicleEventsLast60Minutes() throws SQLException {
         List<VehicleEvent> events = new ArrayList<>();
         LocalDateTime sixtyMinutesAgo = LocalDateTime.now().minusMinutes(60);

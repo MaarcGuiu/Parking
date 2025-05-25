@@ -14,16 +14,27 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
+/**
+ * The type Parking occupancy controller.
+ */
 public class ParkingOccupancyController {
     private final ParkingOccupancyManager occupancyManager;
     private ScheduledExecutorService scheduler;
     private volatile int[] currentOccupancy = new int[60];
 
+    /**
+     * Instantiates a new Parking occupancy controller.
+     *
+     * @param occupancyManager the occupancy manager
+     */
     public ParkingOccupancyController(ParkingOccupancyManager occupancyManager) {
         this.occupancyManager = occupancyManager;
         init();
     }
 
+    /**
+     * Init.
+     */
     public void init() {
         cleanup();
         scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -32,6 +43,9 @@ public class ParkingOccupancyController {
     }
 
 
+    /**
+     * Cleanup.
+     */
     public void cleanup() {
         if (scheduler != null) {
             scheduler.shutdown();
@@ -40,10 +54,20 @@ public class ParkingOccupancyController {
 
     private final List<OccupancyChangeListener> listeners = new ArrayList<>();
 
+    /**
+     * Add occupancy change listener.
+     *
+     * @param listener the listener
+     */
     public void addOccupancyChangeListener(OccupancyChangeListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Remove occupancy change listener.
+     *
+     * @param listener the listener
+     */
     public void removeOccupancyChangeListener(OccupancyChangeListener listener) {
         listeners.remove(listener);
     }
@@ -54,6 +78,9 @@ public class ParkingOccupancyController {
         }
     }
 
+    /**
+     * Update occupancy data.
+     */
     public void updateOccupancyData() {
         if (occupancyManager != null) {
             try {
@@ -67,6 +94,11 @@ public class ParkingOccupancyController {
         }
     }
 
+    /**
+     * Get current occupancy int [ ].
+     *
+     * @return the int [ ]
+     */
     public int[] getCurrentOccupancy() {
         return currentOccupancy.clone();
     }

@@ -7,13 +7,30 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * The type User sql dao.
+ */
 public class UserSqlDao {
     private static Connection connection;
 
+    /**
+     * Instantiates a new User sql dao.
+     *
+     * @throws SQLException the sql exception
+     */
     public UserSqlDao() throws SQLException {
         this.connection = ConnectionDB.getInstance();
     }
 
+    /**
+     * Login string.
+     *
+     * @param emailOrName the email or name
+     * @param password    the password
+     * @param adminPwd    the admin pwd
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String login(String emailOrName, String password, String adminPwd) throws SQLException {
         //Verificar si es admin
         if ("admin".equals(emailOrName)) {
@@ -47,6 +64,13 @@ public class UserSqlDao {
         }
     }
 
+    /**
+     * Gets user.
+     *
+     * @param emailOrName the email or name
+     * @return the user
+     * @throws SQLException the sql exception
+     */
     public User getUser(String emailOrName) throws SQLException {
         String query = "SELECT id, username, password, email FROM users WHERE username = ? OR email = ?";
 
@@ -69,6 +93,13 @@ public class UserSqlDao {
         return null;
     }
 
+    /**
+     * Gets user by id.
+     *
+     * @param id the id
+     * @return the user by id
+     * @throws SQLException the sql exception
+     */
     public User getUserById(int id) throws SQLException {
         String query = "SELECT id, username, password, email FROM users WHERE id = ?";
 
@@ -90,6 +121,15 @@ public class UserSqlDao {
         return null;
     }
 
+    /**
+     * Register string.
+     *
+     * @param username the username
+     * @param password the password
+     * @param email    the email
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String register(String username, String password, String email) throws SQLException {
         // 1. Verificar si el nombre de usuario ya existe
         if (getUser(username) != null) {
@@ -117,6 +157,14 @@ public class UserSqlDao {
         }
     }
 
+    /**
+     * Delete account string.
+     *
+     * @param emailOrName the email or name
+     * @param password    the password
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String deleteAccount(String emailOrName, String password) throws SQLException {
         // Primero, verificar si el usuario/email existe y la contraseña es correcta
         String checkUserQuery = "SELECT id, password FROM users WHERE username = ? OR email = ?";
@@ -152,6 +200,14 @@ public class UserSqlDao {
         }
     }
 
+    /**
+     * User plate string.
+     *
+     * @param loggedUser the logged user
+     * @param plate      the plate
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String userPlate(User loggedUser, String plate) throws SQLException {
         //Verificar si l'usuari té aquesta matrícula assignada.
         String query = "SELECT * FROM vehicles WHERE plate = ? AND owner_id = ?;";
@@ -182,6 +238,13 @@ public class UserSqlDao {
         }
     }
 
+    /**
+     * Is vehicle inside boolean.
+     *
+     * @param plate the plate
+     * @return the boolean
+     * @throws SQLException the sql exception
+     */
     public boolean isVehicleInside(String plate) throws SQLException {
         String query = "SELECT 1 FROM slots WHERE vehicle_plate = ? AND is_occupied = 1";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -192,6 +255,13 @@ public class UserSqlDao {
         }
     }
 
+    /**
+     * Registered vehicle string.
+     *
+     * @param plate the plate
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String registeredVehicle(String plate) throws SQLException {
         //Mirem si el vehicle està registrat
         String vehicleRegisteredQuery = "SELECT * FROM vehicles WHERE plate = ?";
@@ -222,6 +292,13 @@ public class UserSqlDao {
     }
 
 
+    /**
+     * Free slots by owner id string.
+     *
+     * @param ownerId the owner id
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String freeSlotsByOwnerId(int ownerId) throws SQLException {
         String updateQuery = """
         UPDATE slots 
@@ -240,6 +317,13 @@ public class UserSqlDao {
     }
 
 
+    /**
+     * Delete vehicles by owner id string.
+     *
+     * @param ownerId the owner id
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String deleteVehiclesByOwnerId(int ownerId) throws SQLException {
         String deleteQuery = "DELETE FROM vehicles WHERE owner_id = ?";
 
@@ -252,6 +336,13 @@ public class UserSqlDao {
     }
 
 
+    /**
+     * Update slot string.
+     *
+     * @param plate the plate
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String updateSlot(String plate) throws SQLException {
         //Alliberem l'slot que l'usuari ha deixat lliure.
         String updateSlotQuery = "UPDATE slots SET is_occupied = 0, booked = 0, vehicle_plate = NULL WHERE vehicle_plate = ?";
@@ -264,6 +355,13 @@ public class UserSqlDao {
         return "success";
     }
 
+    /**
+     * Is booked string.
+     *
+     * @param plate the plate
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String isBooked(String plate) throws SQLException {
         //Mirem si el vehicle té reservada una plaça o no
         String isBookedQuery = "SELECT * FROM slots WHERE vehicle_plate = ? AND booked = 1";
@@ -287,6 +385,14 @@ public class UserSqlDao {
         }
     }
 
+    /**
+     * Places available string.
+     *
+     * @param plate       the plate
+     * @param vehicleType the vehicle type
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String placesAvailable(String plate, String vehicleType) throws SQLException {
         //Mirem si hi ha places disponibles, és a dir, que no estiguin ocupades ni reservades i que coincideixin amb el vehicle introduït.
         String placesAvailableQuery = "SELECT id, plant, slot_number, is_occupied, vehicle_plate, booked, vehicle_type " +
@@ -315,6 +421,14 @@ public class UserSqlDao {
         }
     }
 
+    /**
+     * Same type vehicle boolean.
+     *
+     * @param plate   the plate
+     * @param vehicle the vehicle
+     * @return the boolean
+     * @throws SQLException the sql exception
+     */
     public boolean sameTypeVehicle(String plate, String vehicle) throws SQLException {
         //Comprovem que el tipus de vehicle que ens han introduït sigui el mateix tipus que el que tenim registrat, utilitzant la matrícula per comprovar-ho
         String sameVehicleQuery = "SELECT * FROM vehicles WHERE plate = ? AND type_vehicle = ?";
@@ -328,6 +442,13 @@ public class UserSqlDao {
         }
     }
 
+    /**
+     * Vehicle exists boolean.
+     *
+     * @param plate the plate
+     * @return the boolean
+     * @throws SQLException the sql exception
+     */
     public boolean vehicleExists(String plate) throws SQLException {
         String query = "SELECT 1 FROM vehicles WHERE plate = ?";
 
@@ -339,6 +460,15 @@ public class UserSqlDao {
         }
     }
 
+    /**
+     * Register vehicle string.
+     *
+     * @param loggedUser  the logged user
+     * @param plate       the plate
+     * @param vehicleType the vehicle type
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String registerVehicle(User loggedUser, String plate, String vehicleType) throws SQLException {
         String insertVehicleQuery = "INSERT INTO vehicles (plate, brand, model, color, owner_id, type_vehicle) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -360,6 +490,13 @@ public class UserSqlDao {
         }
     }
 
+    /**
+     * Gets slot id by plate.
+     *
+     * @param plate the plate
+     * @return the slot id by plate
+     * @throws SQLException the sql exception
+     */
     public int getSlotIdByPlate(String plate) throws SQLException {
         String selectSlotIdQuery = "SELECT id FROM slots WHERE vehicle_plate = ?";
         int slotId = -1;
@@ -378,6 +515,14 @@ public class UserSqlDao {
         return slotId;
     }
 
+    /**
+     * Register entry exit logs.
+     *
+     * @param action       the action
+     * @param vehiclePlate the vehicle plate
+     * @param slotId       the slot id
+     * @throws SQLException the sql exception
+     */
     public void registerEntryExitLogs(String action, String vehiclePlate, int slotId) throws SQLException {
         String logQuery = "INSERT INTO entry_leave_logs (slot_id, vehicle_plate, action) VALUES (?, ?, ?)";
 
@@ -389,6 +534,14 @@ public class UserSqlDao {
         }
     }
 
+    /**
+     * Is user plate boolean.
+     *
+     * @param loggedUser the logged user
+     * @param plate      the plate
+     * @return the boolean
+     * @throws SQLException the sql exception
+     */
     public boolean isUserPlate(User loggedUser, String plate) throws SQLException {
         //Verificar si l'usuari té aquesta matrícula assignada.
         String query = "SELECT * FROM vehicles WHERE plate = ? AND owner_id = ?;";
@@ -403,6 +556,12 @@ public class UserSqlDao {
         }
     }
 
+    /**
+     * Gets user count.
+     *
+     * @return the user count
+     * @throws SQLException the sql exception
+     */
     public int getUserCount() throws SQLException {
         String query = "SELECT COUNT(users.id) FROM users";
         try (PreparedStatement stmt = connection.prepareStatement(query);

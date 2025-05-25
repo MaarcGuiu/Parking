@@ -12,15 +12,30 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * The type Slot sql dao.
+ */
 public class SlotSqlDao {
     private static Connection connection;
     private UserSqlDao userSqlDao;
 
+    /**
+     * Instantiates a new Slot sql dao.
+     *
+     * @throws SQLException the sql exception
+     */
     public SlotSqlDao() throws SQLException {
         this.connection = ConnectionDB.getInstance();
     }
 
-    //SLOT_NUMER ES LO QUE OCUPA dependiendo si es CAR, MOTORBIKE o TRUCK
+    /**
+     * Gets slot.
+     *
+     * @param idSlot the id slot
+     * @return the slot
+     * @throws SQLException the sql exception
+     */
+//SLOT_NUMER ES LO QUE OCUPA dependiendo si es CAR, MOTORBIKE o TRUCK
     public Slot getSlot(int idSlot) throws SQLException {
         String query = "SELECT id, plant, is_occupied, slot_number FROM slots WHERE id = ?";
 
@@ -40,7 +55,14 @@ public class SlotSqlDao {
         return null;
     }
 
-    //String vehiclePlate, int idSlot, int isOccupeid , int floor, boolean booked, String vehicleType
+    /**
+     * Gets slot 2.
+     *
+     * @param idSlot the id slot
+     * @return the slot 2
+     * @throws SQLException the sql exception
+     */
+//String vehiclePlate, int idSlot, int isOccupeid , int floor, boolean booked, String vehicleType
     public Slot getSlot2(int idSlot) throws SQLException {
         String query = "SELECT id, plant, is_occupied, slot_number, booked, vehicle_type, vehicle_plate FROM slots WHERE id = ?";
 
@@ -65,6 +87,12 @@ public class SlotSqlDao {
         return null;
     }
 
+    /**
+     * Gets total slots.
+     *
+     * @return the total slots
+     * @throws SQLException the sql exception
+     */
     public int getTotalSlots() throws SQLException {
         String query = "SELECT COUNT(slots.id) FROM slots ";
 
@@ -77,6 +105,13 @@ public class SlotSqlDao {
         }
         return 0;
     }
+
+    /**
+     * Gets occupied slots count.
+     *
+     * @return the occupied slots count
+     * @throws SQLException the sql exception
+     */
     public int getOccupiedSlotsCount() throws SQLException {
         String query = "SELECT COUNT(slots.id) FROM slots WHERE slots.is_occupied = 1 ";
 
@@ -89,6 +124,13 @@ public class SlotSqlDao {
         }
         return 0;
     }
+
+    /**
+     * Gets total slots free and not booked.
+     *
+     * @return the total slots free and not booked
+     * @throws SQLException the sql exception
+     */
     public int getTotalSlotsFreeAndNotBooked() throws SQLException {
         String query = "SELECT COUNT(slots.id) FROM slots WHERE slots.booked = 0 AND slots.is_occupied = 0 ";
 
@@ -101,6 +143,13 @@ public class SlotSqlDao {
         }
         return 0;
     }
+
+    /**
+     * Gets total slots not booked.
+     *
+     * @return the total slots not booked
+     * @throws SQLException the sql exception
+     */
     public int getTotalSlotsNotBooked() throws SQLException {
         String query = "SELECT COUNT(slots.id) FROM slots WHERE slots.booked = 0 ";
 
@@ -114,6 +163,13 @@ public class SlotSqlDao {
         return 0;
     }
 
+    /**
+     * Gets num by floor.
+     *
+     * @param floor the floor
+     * @return the num by floor
+     * @throws SQLException the sql exception
+     */
     public int getNumByFloor(int floor) throws SQLException {
         String query = "SELECT COUNT(slots.id) FROM slots WHERE slots.plant = ?";
 
@@ -127,6 +183,14 @@ public class SlotSqlDao {
         }
         return 0;
     }
+
+    /**
+     * Gets by floor.
+     *
+     * @param floor the floor
+     * @return the by floor
+     * @throws SQLException the sql exception
+     */
     public ArrayList<Slot> getByFloor(int floor) throws SQLException {
         ArrayList<Slot> slots = new ArrayList<>();
         String query = "SELECT id, plant, is_occupied, slot_number FROM slots WHERE plant = ?";
@@ -148,6 +212,13 @@ public class SlotSqlDao {
         return slots;
     }
 
+    /**
+     * Gets by vehicle.
+     *
+     * @param vehicle the vehicle
+     * @return the by vehicle
+     * @throws SQLException the sql exception
+     */
     public ArrayList<Slot> getByVehicle(int vehicle) throws SQLException {
         ArrayList<Slot> slots = new ArrayList<>();
         String query = "SELECT id, plant, is_occupied, slot_number FROM slots WHERE slot_number = ?";
@@ -168,6 +239,13 @@ public class SlotSqlDao {
         }
         return slots;
     }
+
+    /**
+     * Edit slot.
+     *
+     * @param slot the slot
+     * @throws SQLException the sql exception
+     */
     public void editSlot(Slot slot) throws SQLException {
         if (slot.getAvailabilityState() == 1 || slot.getBooked() == true) {
             return;
@@ -184,6 +262,14 @@ public class SlotSqlDao {
             stmt.executeUpdate();
         }
     }
+
+    /**
+     * Create slot.
+     *
+     * @param slot   the slot
+     * @param slotId the slot id
+     * @throws SQLException the sql exception
+     */
     public void createSlot(Slot slot, int slotId) throws SQLException {
         String query = "INSERT INTO slots (id, slot_number, plant, is_occupied, vehicle_type) VALUES (?, ?, ?, ?, ?)";
 
@@ -196,6 +282,13 @@ public class SlotSqlDao {
             stmt.executeUpdate();
         }
     }
+
+    /**
+     * Delete slot.
+     *
+     * @param idSlot the id slot
+     * @throws SQLException the sql exception
+     */
     public void deleteSlot(int idSlot) throws SQLException {
         String query = "DELETE FROM slots WHERE id = ?";
 
@@ -205,6 +298,13 @@ public class SlotSqlDao {
         }
     }
 
+    /**
+     * Give new slot to the user boolean.
+     *
+     * @param slot the slot
+     * @return the boolean
+     * @throws SQLException the sql exception
+     */
     public boolean giveNewSlotToTheUser(Slot slot) throws SQLException {
         List<Slot> slots = getAllSlots();
 
@@ -220,6 +320,12 @@ public class SlotSqlDao {
         //return "The slot can't be deleted becouse it isn't a free slot to change for this one to the user.";
     }
 
+    /**
+     * Edit slot 2.
+     *
+     * @param slot the slot
+     * @throws SQLException the sql exception
+     */
     public void editSlot2(Slot slot) throws SQLException {
         String query = "UPDATE slots SET booked = ?, vehicle_plate = ? WHERE id = ?";
 
@@ -232,6 +338,12 @@ public class SlotSqlDao {
         }
     }
 
+    /**
+     * Gets all slots.
+     *
+     * @return the all slots
+     * @throws SQLException the sql exception
+     */
     public ArrayList<Slot> getAllSlots() throws SQLException {
         ArrayList<Slot> slots = new ArrayList<>();
         String query = "SELECT vehicle_plate, plant, is_occupied, id, booked, vehicle_type FROM slots";
@@ -253,6 +365,13 @@ public class SlotSqlDao {
         }
         return slots;
     }
+
+    /**
+     * Gets all slots booked.
+     *
+     * @return the all slots booked
+     * @throws SQLException the sql exception
+     */
     public ArrayList<Slot> getAllSlotsBooked() throws SQLException {
         ArrayList<Slot> slots = new ArrayList<>();
         String query = "SELECT vehicle_plate, plant, is_occupied, id, booked, vehicle_type FROM slots WHERE booked = 1";
@@ -275,6 +394,13 @@ public class SlotSqlDao {
         return slots;
     }
 
+    /**
+     * Cancel slot boolean.
+     *
+     * @param slotId the slot id
+     * @return the boolean
+     * @throws SQLException the sql exception
+     */
     public boolean cancelSlot(int slotId) throws SQLException {
         String query = "UPDATE slots SET vehicle_plate = ?, booked = ? WHERE id = ?";
 
@@ -316,6 +442,13 @@ public class SlotSqlDao {
                 return "Unknown";
         }
     }
+
+    /**
+     * Gets free unbooked slots.
+     *
+     * @return the free unbooked slots
+     * @throws SQLException the sql exception
+     */
     public ArrayList<Slot> getFreeUnbookedSlots() throws SQLException { // Array de todas las plazas libres del parking
         ArrayList<Slot> slots = new ArrayList<>();
         String query = "SELECT id, plant, is_occupied, vehicle_plate, booked, vehicle_type FROM slots WHERE booked = 0 AND is_occupied = 0";
@@ -337,6 +470,13 @@ public class SlotSqlDao {
         }
         return slots;
     }
+
+    /**
+     * Gets occupied slots.
+     *
+     * @return the occupied slots
+     * @throws SQLException the sql exception
+     */
     public ArrayList<Slot> getOccupiedSlots() throws SQLException { // Array de todas las plazas libres del parking
         ArrayList<Slot> slots = new ArrayList<>();
         String query = "SELECT id, plant, is_occupied, vehicle_plate, booked, vehicle_type FROM slots WHERE booked = 0 AND is_occupied = 1";
@@ -359,7 +499,15 @@ public class SlotSqlDao {
         return slots;
     }
 
-    // Este metodo es para cuando el admin decide cancelar una reserva y se le re asigna una al user
+    /**
+     * Sets user new reservation slot.
+     *
+     * @param slotId       the slot id
+     * @param vehiclePlate the vehicle plate
+     * @return the user new reservation slot
+     * @throws SQLException the sql exception
+     */
+// Este metodo es para cuando el admin decide cancelar una reserva y se le re asigna una al user
     // este user no se quede con la reserva de el mismo slot que el admin le ha cancelado
     public int setUserNewReservationSlot(int slotId, String vehiclePlate) throws SQLException {
         ArrayList<Slot> slots = getFreeUnbookedSlots();
@@ -385,6 +533,13 @@ public class SlotSqlDao {
         return newSlotId;
     }
 
+    /**
+     * Gets slot booked.
+     *
+     * @param vehiclePlate the vehicle plate
+     * @return the slot booked
+     * @throws SQLException the sql exception
+     */
     public Slot getSlotBooked(String vehiclePlate) throws SQLException {
         String query = "SELECT id, plant, slot_number, is_occupied, vehicle_type FROM slots WHERE vehicle_plate = ? AND booked = 1";
 
@@ -406,7 +561,15 @@ public class SlotSqlDao {
         }
         return null;
     }
-    // Crear booked
+
+    /**
+     * Update the slot booked.
+     *
+     * @param plate  the plate
+     * @param idSlot the id slot
+     * @throws SQLException the sql exception
+     */
+// Crear booked
     public void updateTheSlotBooked(String plate, int idSlot) throws SQLException {
         String query = "UPDATE slots SET vehicle_plate = ?,booked = 1, is_occupied = 0, reservation_date = NOW()  WHERE id = ?";
 
@@ -416,7 +579,15 @@ public class SlotSqlDao {
             stmt.executeUpdate();
         }
     }
-    // Cancelar booked
+
+    /**
+     * Update the slot unbooked.
+     *
+     * @param plate  the plate
+     * @param idSlot the id slot
+     * @throws SQLException the sql exception
+     */
+// Cancelar booked
     public void updateTheSlotUnbooked(String plate,int idSlot) throws SQLException {
         userSqlDao = new UserSqlDao();
         String query = "UPDATE slots SET booked = 0, is_occupied = 0, vehicle_plate = ? WHERE vehicle_plate = ?";
@@ -427,7 +598,14 @@ public class SlotSqlDao {
             stmt.executeUpdate();
         }
     }
-    // USER CON RESERVA ENTRA AL SLOT
+
+    /**
+     * User entry if booked.
+     *
+     * @param plate the plate
+     * @throws SQLException the sql exception
+     */
+// USER CON RESERVA ENTRA AL SLOT
     //Update del slot; de estar reservado para estar ocupado porque entra al parking
     public void userEntryIfBooked(String plate) throws SQLException {
         // Buscar el slot sin cancelar la reserva primero
@@ -452,7 +630,15 @@ public class SlotSqlDao {
             }
         }
     }
-    // USER SIN RESERVA ENTRA AL SLOT
+
+    /**
+     * User entry not booked.
+     *
+     * @param plate        the plate
+     * @param vehicle_type the vehicle type
+     * @throws SQLException the sql exception
+     */
+// USER SIN RESERVA ENTRA AL SLOT
     //Update del slot; de estar reservado para estar ocupado porque entra al parking
     public void userEntryNotBooked(String plate,String vehicle_type) throws SQLException {
         Slot slot = findASlotToPark(vehicle_type);
@@ -468,6 +654,14 @@ public class SlotSqlDao {
             userSqlDao.registerEntryExitLogs("entry", plate, slot.getIdSlot());
         }
     }
+
+    /**
+     * Insert vehicle if not exists.
+     *
+     * @param plate       the plate
+     * @param typeVehicle the type vehicle
+     * @throws SQLException the sql exception
+     */
     public void insertVehicleIfNotExists(String plate, String typeVehicle) throws SQLException {
         String query = "INSERT IGNORE INTO vehicles (plate, brand, model, color, owner_id, type_vehicle) VALUES (?, 'SimBrand', 'SimModel', 'Gray', ?, ?)";
         userSqlDao = new UserSqlDao();
@@ -480,7 +674,14 @@ public class SlotSqlDao {
 
     }
 
-    //Te busca una plaza libre, con el criterio de que te de la que tiene el id mas bajo
+    /**
+     * Find a slot to park slot.
+     *
+     * @param vehicle_type the vehicle type
+     * @return the slot
+     * @throws SQLException the sql exception
+     */
+//Te busca una plaza libre, con el criterio de que te de la que tiene el id mas bajo
     public Slot findASlotToPark (String vehicle_type) throws SQLException {
         ArrayList<Slot> slots = getFreeUnbookedSlots();
         int lowestId = 100;
@@ -491,7 +692,14 @@ public class SlotSqlDao {
         }
         return getSlot(lowestId);
     }
-    // USER EXIT
+
+    /**
+     * User exit.
+     *
+     * @param vehicle_plate the vehicle plate
+     * @throws SQLException the sql exception
+     */
+// USER EXIT
     public void userExit (String vehicle_plate) throws SQLException {
         String query = "UPDATE slots SET vehicle_plate = ?,booked = 0, is_occupied = 0 WHERE id = ?";
         Slot slot = getSlotByPlate(vehicle_plate);
@@ -502,6 +710,14 @@ public class SlotSqlDao {
             stmt.executeUpdate();
         }
     }
+
+    /**
+     * Check user vehicle is parked boolean.
+     *
+     * @param plate the plate
+     * @return the boolean
+     * @throws SQLException the sql exception
+     */
     public boolean checkUserVehicleIsParked(String plate) throws SQLException { // True si el user tiene algun coche aparcado
         String query = "SELECT 1 FROM slots WHERE vehicle_plate = ? AND is_occupied = 1 LIMIT 1";
 
@@ -513,6 +729,14 @@ public class SlotSqlDao {
             }
         }
     }
+
+    /**
+     * Check user booking boolean.
+     *
+     * @param plate the plate
+     * @return the boolean
+     * @throws SQLException the sql exception
+     */
     public boolean checkUserBooking(String plate) throws SQLException { // True si el user tiene alguna reserva
         String query = "SELECT 1 FROM slots WHERE vehicle_plate = ? AND booked = 1 LIMIT 1";
 
@@ -525,6 +749,13 @@ public class SlotSqlDao {
         }
     }
 
+    /**
+     * Gets slot by plate.
+     *
+     * @param vehiclePlate the vehicle plate
+     * @return the slot by plate
+     * @throws SQLException the sql exception
+     */
     public Slot getSlotByPlate(String vehiclePlate) throws SQLException {
         String query = "SELECT id, plant, is_occupied, slot_number FROM slots WHERE vehicle_plate = ?";
 
@@ -545,6 +776,13 @@ public class SlotSqlDao {
         return null;
     }
 
+    /**
+     * Gets panel bookings.
+     *
+     * @param userId the user id
+     * @return the panel bookings
+     * @throws SQLException the sql exception
+     */
     public ArrayList<Vehicle> getPanelBookings(int userId) throws SQLException {
         ArrayList<Vehicle> vehicles = new ArrayList<>();
         String query = "SELECT plate, brand, model, color, type_vehicle FROM vehicles WHERE owner_id = ?";
@@ -566,6 +804,13 @@ public class SlotSqlDao {
         }
         return vehicles;
     }
+
+    /**
+     * Gets all slots reserved.
+     *
+     * @return the all slots reserved
+     * @throws SQLException the sql exception
+     */
     public ArrayList<Slot> getAllSlotsReserved() throws SQLException {
         ArrayList<Slot> slots = new ArrayList<>();
         String query = "SELECT vehicle_plate, plant, is_occupied, id, booked, vehicle_type FROM slots WHERE booked = 1";

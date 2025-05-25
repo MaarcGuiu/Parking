@@ -9,10 +9,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 
+/**
+ * The type Exit parking view.
+ */
 public class ExitParkingView extends JPanel {
     private JPanel mainPanel;
     private User loggedUser;
     private LeaveController leaveController;
+
     /**
      * Constructor for ExitParkingView.
      * Initializes the view with the logged user and sets up the UI components.

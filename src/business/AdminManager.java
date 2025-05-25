@@ -4,15 +4,30 @@ import persistence.SlotSqlDao;
 
 import java.sql.SQLException;
 
+/**
+ * The type Admin manager.
+ */
 public class AdminManager {
     private SlotSqlDao slotSqlDao;
     private static int totalSlots;
 
+    /**
+     * Instantiates a new Admin manager.
+     *
+     * @throws SQLException the sql exception
+     */
     public AdminManager() throws SQLException {
         this.slotSqlDao = new SlotSqlDao();
         totalSlots = 60;                       // Creamos unas 60 plazas, y a partir de ahi las que creemos se irá sumando a ese numero
     }
 
+    /**
+     * Create slot string.
+     *
+     * @param newSlot the new slot
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String createSlot(Slot newSlot) throws SQLException {
         Slot slot = slotSqlDao.getSlot(newSlot.getIdSlot());
         if (slot != null) {
@@ -30,6 +45,13 @@ public class AdminManager {
         return "Slot with id " + newSlot.getIdSlot() + " created";
     }
 
+    /**
+     * Edit slot boolean.
+     *
+     * @param editSlot the edit slot
+     * @return the boolean
+     * @throws SQLException the sql exception
+     */
     public boolean editSlot(Slot editSlot) throws SQLException {
         Slot existingSlot = slotSqlDao.getSlot2(editSlot.getIdSlot());
         if (existingSlot == null) {
@@ -49,6 +71,13 @@ public class AdminManager {
         return true;
     }
 
+    /**
+     * Delete slot string.
+     *
+     * @param idSlot the id slot
+     * @return the string
+     * @throws SQLException the sql exception
+     */
     public String deleteSlot(int idSlot) throws SQLException {
         Slot slot = slotSqlDao.getSlot2(idSlot);
 
@@ -82,10 +111,23 @@ public class AdminManager {
         }
     }
 
+    /**
+     * Gets num by floor.
+     *
+     * @param floor the floor
+     * @return the num by floor
+     * @throws SQLException the sql exception
+     */
     public int getNumByFloor (int floor) throws SQLException {
         return slotSqlDao.getNumByFloor(floor);
     }
 
+    /**
+     * Gets total slots.
+     *
+     * @return the total slots
+     * @throws SQLException the sql exception
+     */
     public int getTotalSlots () throws SQLException {
         return slotSqlDao.getTotalSlots();
     }

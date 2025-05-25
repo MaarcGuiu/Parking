@@ -10,6 +10,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 
+/**
+ * The type Entry parking view.
+ */
 public class EntryParkingView extends JPanel {
     private static final String SELECT_VEHICLE_OPTION = "--Select vehicle--";
     private JPanel mainPanel;
@@ -18,11 +21,13 @@ public class EntryParkingView extends JPanel {
 
     private JTextField plateField;
     private JComboBox<String> vehicleComboBox;
+
     /**
      * Constructor for EntryParkingView.
      * Initializes the view with the logged user and sets up the UI components.
      *
      * @param loggedUser The user currently logged in.
+
      */
     public EntryParkingView(User loggedUser) {
         try {

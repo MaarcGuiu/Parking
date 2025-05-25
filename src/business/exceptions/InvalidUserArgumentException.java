@@ -6,6 +6,7 @@ package business.exceptions;
 public class InvalidUserArgumentException extends BusinessException {
     /**
      * Returns the error message of this exception.
+     *
      * @param message String that has the info of the exeption
      * @return The error message
      */

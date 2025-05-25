@@ -6,6 +6,7 @@ package business.exceptions;
 public abstract class BusinessException extends Exception {
     /**
      * Returns the error message of this exception.
+     *
      * @param message message of the exception
      * @return The error message
      */

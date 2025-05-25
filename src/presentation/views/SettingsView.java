@@ -11,10 +11,14 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
+/**
+ * The type Settings view.
+ */
 public class SettingsView extends JPanel {
     private JPanel mainPanel;
     private JButton deleteAccountButton;
     private JButton logoutButton;
+
     /**
      * Constructor for SettingsView.
      * Initializes the view with the logged user and sets up the UI components.

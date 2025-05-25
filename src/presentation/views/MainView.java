@@ -5,12 +5,16 @@ import presentation.components.RoundButton;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The type Main view.
+ */
 public class MainView extends JPanel {
 
     private JPanel backgroundPanel;
     private JLabel title;
     private JButton loginButton;
     private JButton signUpButton;
+
     /**
      * Constructor for MainView.
      * Initializes the main view with a background, title, and buttons for login and sign-up.

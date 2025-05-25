@@ -2,10 +2,16 @@ package business;
 
 import java.sql.SQLException;
 
+/**
+ * The type Simulation manager.
+ */
 public class SimulationManager implements Runnable {
     private boolean running;
     private ParkingStatusManager parkingStatusManager;
 
+    /**
+     * Instantiates a new Simulation manager.
+     */
     public SimulationManager()  {
     }
 
@@ -41,6 +47,10 @@ public class SimulationManager implements Runnable {
             }
         }
     }
+
+    /**
+     * Stop.
+     */
     public void stop() {
         running = false;
     }

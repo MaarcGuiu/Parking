@@ -3,9 +3,17 @@ package presentation.components;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The type Round text field.
+ */
 public class RoundTextField extends JTextField {
     private int arc = 20;
 
+    /**
+     * Instantiates a new Round text field.
+     *
+     * @param columns the columns
+     */
     public RoundTextField(int columns) {
         super(columns);
         setOpaque(false);

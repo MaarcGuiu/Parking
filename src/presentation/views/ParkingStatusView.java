@@ -12,9 +12,13 @@ import java.awt.event.*;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * The type Parking status view.
+ */
 public class ParkingStatusView {
     private static ParkingStatusController parkingStatusController;
     private static AdminController adminController;
+
 /**
      * Default constructor for ParkingStatusView.
      * Initializes the view without any parameters.

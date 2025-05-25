@@ -3,9 +3,17 @@ package presentation.components;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The type Round password field.
+ */
 public class RoundPasswordField extends JPasswordField {
     private int arc = 20;
 
+    /**
+     * Instantiates a new Round password field.
+     *
+     * @param columns the columns
+     */
     public RoundPasswordField(int columns) {
         super(columns);
         setOpaque(false);

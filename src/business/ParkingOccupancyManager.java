@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Parking occupancy manager.
+ */
 public class ParkingOccupancyManager {
     private final LogsSqlDao repository;
 
@@ -22,12 +25,17 @@ public class ParkingOccupancyManager {
 
     private static final List<OccupancyChangeListener> listeners = new ArrayList<>();
 
+    /**
+     * Instantiates a new Parking occupancy manager.
+     */
     public ParkingOccupancyManager() {
     }
 
     /**
      * Calcula la ocupación por minuto para los últimos 60 minutos
+     *
      * @return Array donde cada posición representa un minuto (0 = hace 60 min, 59 = ahora)
+     * @throws SQLException the sql exception
      */
     public int[] calculateLast60MinutesOccupancy() throws SQLException {
         int[] occupancyPerMinute = new int[60];

@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * The type Admin menu view.
+ */
 public class AdminMenuView extends JPanel implements OccupancyChangeListener {
     private JPanel mainPanel;
     private JPanel menuPanel;
@@ -42,6 +45,7 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
     private AtomicReference<int[]> occupancyDataRef = new AtomicReference<>(new int[60]);
 
     private JPanel timeBarChartPanel;
+  
     /**
      * Constructor for the AdminMenuView class.
      * Initializes the admin menu view with necessary controllers and sets up the main menu.
@@ -525,6 +529,7 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
             }
         });
     }
+
     /**
      * Returns the main panel of the admin menu view.
      *

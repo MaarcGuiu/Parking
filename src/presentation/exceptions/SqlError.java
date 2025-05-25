@@ -6,6 +6,7 @@ package presentation.exceptions;
 public class SqlError extends PresentationException {
     /**
      * Returns the error message of this exception.
+     *
      * @param message String that has the info of the exception
      * @return The error message
      */

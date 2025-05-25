@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Map;
 
+/**
+ * The type Remove book menu view.
+ */
 public class RemoveBookMenuView extends JPanel {
 
     private JPanel mainPanel;
@@ -34,6 +37,7 @@ public class RemoveBookMenuView extends JPanel {
     private LoginController loginController;
     private ArrayList<Vehicle> userBookings;
     private Map<String, Integer> plateToSlotMap; // Para mapear cada matrícula a su ID de slot
+
     /**
      * Constructor for RemoveBookMenuView.
      * Initializes the view with the logged user and sets up the UI components.
@@ -312,6 +316,7 @@ public class RemoveBookMenuView extends JPanel {
             parentFrame.repaint();
         }
     }
+
 /**
      * Returns the main panel of this view.
      * This method is used to retrieve the main panel for adding to a JFrame or other container.

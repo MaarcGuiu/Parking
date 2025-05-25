@@ -13,12 +13,16 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * The type Login view.
+ */
 public class LoginView extends JPanel {
     private JPanel mainPanel;
     private LoginController loginController;
 
     private JTextField nameOrEmail;
     private JPasswordField password;
+
     /**
      * Constructor for LoginView.
      * Initializes the view and sets up the UI components.

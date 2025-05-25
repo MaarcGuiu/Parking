@@ -12,6 +12,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * The type User menu view.
+ */
 public class UserMenuView extends JPanel implements OccupancyChangeListener{
     private JPanel mainPanel;
     private User loggedUser;
@@ -29,6 +32,7 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
     private JButton enterLeaveButton;
     private JButton settingsButton;
     private JPanel timeBarChartPanel;
+
     /**
      * Constructor for UserMenuView.
      * Initializes the view with the logged user and sets up the UI components.
@@ -373,6 +377,7 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
             }
         });
     }
+
     /**
      * Cleans up resources and removes the occupancy change listener.
      * This method should be called when the view is no longer needed.
