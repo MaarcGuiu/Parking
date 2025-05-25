@@ -396,7 +396,7 @@ public class SlotSqlDao {
     }
     // Crear booked
     public void updateTheSlotBooked(String plate, int idSlot) throws SQLException {
-        String query = "UPDATE slots SET vehicle_plate = ?,booked = 1, is_occupied = 0 WHERE id = ?";
+        String query = "UPDATE slots SET vehicle_plate = ?,booked = 1, is_occupied = 0, reservation_date = NOW()  WHERE id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, plate);

@@ -243,13 +243,12 @@ public class BookMenuView extends JPanel {
             }
 
             if (!enterController.vehicleExists(plate)) {
-                String registerResult = enterController.registerVehicle(loggedUser, plate, vehicleType);
-                if (!"success".equals(registerResult)) {
-                    JOptionPane.showMessageDialog(this,
-                            "Error registering vehicle: " + registerResult,
+                JOptionPane.showMessageDialog(this,
+                        "The Vehicle doesn't exist!",
                             "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+
+                return;
+
             }
 
             int selectedIndex = slotComboBox.getSelectedIndex();
