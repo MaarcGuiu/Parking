@@ -1,0 +1,60 @@
+package persistence;
+
+import persistence.ConfigDao.Config;
+import persistence.ConfigDao.ConfigDao;
+import persistence.ConfigDao.ConfigJsonDao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+/**
+ * The type Connection db.
+ */
+public class ConnectionDB {
+    private static Connection instance;
+
+    private ConnectionDB() {}
+
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     * @throws SQLException the sql exception
+     */
+    public static Connection getInstance() throws SQLException {
+        if (instance == null) {
+            ConfigDao configDao = new ConfigJsonDao();
+            Config config = configDao.loadAllConfig();
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+            } catch (ClassNotFoundException e) {
+                throw new SQLException("MySQL JDBC Driver no encontrado.");
+            }
+            String url = config.getServerIp() + config.getDbPort() + '/' + config.getDbName();
+            String usr = config.getUser();
+            String pwd = config.getPwd();
+            try {
+                instance = DriverManager.getConnection(url, usr, pwd);
+            } catch (SQLException e) {
+                throw new SQLException("Could not connect to database. Please check your configuration.");
+            }
+        }
+        return instance;
+    }
+
+    /**
+     * Close connection.
+     *
+     * @throws SQLException the sql exception
+     */
+    public static void closeConnection() throws SQLException {
+        if (instance != null) {
+            try {
+                instance.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
