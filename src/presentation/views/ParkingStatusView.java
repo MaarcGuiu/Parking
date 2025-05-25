@@ -15,10 +15,20 @@ import java.util.List;
 public class ParkingStatusView {
     private static ParkingStatusController parkingStatusController;
     private static AdminController adminController;
-
+/**
+     * Default constructor for ParkingStatusView.
+     * Initializes the view without any parameters.
+     */
     public ParkingStatusView() {
     }
-
+    /**
+     * Displays the parking status view with a table of slots and their details.
+     *
+     * @param mainPanel      The main panel where the view will be displayed.
+     * @param menuPanel      The menu panel to be displayed alongside the main content.
+     * @param resetMainPanel A runnable to reset the main panel before displaying the view.
+     * @param isAdmin        A boolean indicating if the user is an admin, enabling additional functionalities.
+     */
     public static void show(JPanel mainPanel, JPanel menuPanel, Runnable resetMainPanel, boolean isAdmin) {
         try {
             initControllers();
@@ -39,12 +49,22 @@ public class ParkingStatusView {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    /**
+     * Initializes the controllers used in the parking status view.
+     *
+     * @throws SQLException           If there is an error accessing the database.
+     * @throws ClassNotFoundException If the JDBC driver class is not found.
+     */
     private static void initControllers() throws SQLException, ClassNotFoundException {
         parkingStatusController = new ParkingStatusController();
         adminController = new AdminController();
     }
-
+    /**
+     * Creates a JTable to display the parking slots.
+     *
+     * @param slots The list of slots to be displayed in the table.
+     * @return A JTable containing the slot data.
+     */
     private static JTable createTable(List<Slot> slots) {
         String[][] data = new String[slots.size()][5];
         for (int i = 0; i < slots.size(); i++) {
@@ -69,7 +89,11 @@ public class ParkingStatusView {
 
         return table;
     }
-
+    /**
+     * Updates the slot counter label with the current number of occupied and total slots.
+     *
+     * @param slotCounterLabel The JLabel to be updated with the slot count.
+     */
     private static void updateSlotCounterLabel(JLabel slotCounterLabel) {
         try {
             int total = parkingStatusController.getAllSlots().size();
@@ -86,7 +110,11 @@ public class ParkingStatusView {
         }
     }
 
-
+    /**
+     * Styles the JTable with custom fonts and colors.
+     *
+     * @param table The JTable to be styled.
+     */
     private static void styleTable(JTable table) {
         JTableHeader header = table.getTableHeader();
         header.setFont(new Font("Arial", Font.BOLD, 14));
@@ -103,13 +131,22 @@ public class ParkingStatusView {
         table.setShowGrid(true);
         table.setGridColor(Color.GRAY);
     }
-
+    /**
+     * Creates a JScrollPane containing the JTable.
+     *
+     * @param table The JTable to be added to the scroll pane.
+     * @return A JScrollPane containing the specified JTable.
+     */
     private static JScrollPane createScrollPane(JTable table) {
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBounds(220, 50, 600, 400);
         return scrollPane;
     }
-
+    /**
+     * Creates a JLabel to display the slot counter.
+     *
+     * @return A JLabel configured to show the number of occupied slots.
+     */
     private static JLabel createSlotCounterLabel() {
         JLabel slotCounterLabel = new JLabel();
         slotCounterLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -120,7 +157,14 @@ public class ParkingStatusView {
         return slotCounterLabel;
     }
 
-
+    /**
+     * Sets up the main panel with the menu panel, scroll pane, and slot counter label.
+     *
+     * @param mainPanel        The main panel to be set up.
+     * @param menuPanel        The menu panel to be added to the main panel.
+     * @param scrollPane       The scroll pane containing the JTable.
+     * @param slotCounterLabel The label displaying the slot count.
+     */
     private static void setupMainPanel(JPanel mainPanel, JPanel menuPanel, JScrollPane scrollPane, JLabel slotCounterLabel) {
         mainPanel.removeAll();
         mainPanel.setLayout(null);
@@ -138,7 +182,16 @@ public class ParkingStatusView {
     }
 
 
-
+    /**
+     * Adds a mouse listener to the JTable to handle click events on the slots.
+     *
+     * @param table      The JTable to which the listener will be added.
+     * @param slots      The list of slots to be displayed in the table.
+     * @param mainPanel  The main panel where the slot details will be displayed.
+     * @param menuPanel  The menu panel to be displayed alongside the slot details.
+     * @param scrollPane The scroll pane containing the JTable.
+     * @param isAdmin    A boolean indicating if the user is an admin, enabling additional functionalities.
+     */
     private static void addTableClickListener(JTable table, List<Slot> slots, JPanel mainPanel,
                                               JPanel menuPanel, JScrollPane scrollPane, boolean isAdmin) {
         table.addMouseListener(new MouseAdapter() {
@@ -170,7 +223,22 @@ public class ParkingStatusView {
             }
         });
     }
-
+    /**
+     * Displays the details of a selected slot in a new panel.
+     *
+     * @param mainPanel      The main panel where the details will be displayed.
+     * @param menuPanel      The menu panel to be displayed alongside the details.
+     * @param scrollPane     The scroll pane containing the JTable.
+     * @param isAdmin        A boolean indicating if the user is an admin, enabling additional functionalities.
+     * @param code           The code of the selected slot.
+     * @param floor          The floor of the selected slot.
+     * @param vehicleType    The type of vehicle parked in the slot.
+     * @param ownerName      The name of the owner of the vehicle parked in the slot.
+     * @param ownerEmail     The email of the owner of the vehicle parked in the slot.
+     * @param isReserved     A boolean indicating if the slot is reserved.
+     * @param slots          The list of all slots to update after any changes.
+     * @param table          The JTable displaying the slots.
+     */
     private static void showSlotDetails(JPanel mainPanel, JPanel menuPanel, JScrollPane scrollPane, boolean isAdmin,
                                         String code, String floor, String vehicleType, String ownerName, String ownerEmail, boolean isReserved,
                                         List<Slot> slots, JTable table) {
@@ -196,7 +264,11 @@ public class ParkingStatusView {
         mainPanel.revalidate();
         mainPanel.repaint();
     }
-
+    /**
+     * Creates a JPanel with a gradient background for displaying slot details.
+     *
+     * @return A JPanel with a gradient background.
+     */
     private static JPanel createGradientPanel() {
         JPanel gradientPanel = new JPanel() {
             @Override
@@ -213,7 +285,17 @@ public class ParkingStatusView {
         gradientPanel.setOpaque(false);
         return gradientPanel;
     }
-
+    /**
+     * Adds labels to the detail panel to display information about the selected slot.
+     *
+     * @param panel        The JPanel where the labels will be added.
+     * @param code         The code of the selected slot.
+     * @param floor        The floor of the selected slot.
+     * @param vehicleType  The type of vehicle parked in the slot.
+     * @param ownerName    The name of the owner of the vehicle parked in the slot.
+     * @param ownerEmail   The email of the owner of the vehicle parked in the slot.
+     * @param isReserved   A boolean indicating if the slot is reserved.
+     */
     private static void addLabelsToDetailPanel(JPanel panel, String code, String floor, String vehicleType,
                                                String ownerName, String ownerEmail, boolean isReserved) {
         JLabel titleLabel = new JLabel("Detall de la Plaça", SwingConstants.CENTER);
@@ -254,7 +336,17 @@ public class ParkingStatusView {
             panel.add(emailLabel);
         }
     }
-
+    /**
+     * Adds a cancel button to the detail panel for cancelling a reservation.
+     *
+     * @param panel        The JPanel where the button will be added.
+     * @param mainPanel    The main panel to update after cancellation.
+     * @param menuPanel    The menu panel to be displayed alongside the main content.
+     * @param scrollPane   The scroll pane containing the JTable.
+     * @param code         The code of the selected slot.
+     * @param slots        The list of all slots to update after cancellation.
+     * @param table        The JTable displaying the slots.
+     */
     private static void addCancelButton(JPanel panel, JPanel mainPanel, JPanel menuPanel, JScrollPane scrollPane,
                                         String code, List<Slot> slots, JTable table) {
         RoundButton cancelButton = new RoundButton("Cancel·lar reserva");
@@ -312,7 +404,13 @@ public class ParkingStatusView {
 
         panel.add(cancelButton);
     }
-
+    /**
+     * Updates the JTable model with the latest slot data after a reservation is cancelled.
+     *
+     * @param updatedSlots The list of updated slots to be displayed in the table.
+     * @param slots        The original list of slots to be updated.
+     * @param table        The JTable to be updated with the new data.
+     */
     private static void updateTableModel(List<Slot> updatedSlots, List<Slot> slots, JTable table) {
         String[][] updatedData = new String[updatedSlots.size()][5];
         for (int i = 0; i < updatedSlots.size(); i++) {
@@ -339,7 +437,14 @@ public class ParkingStatusView {
         table.revalidate();
         table.repaint();
     }
-
+    /**
+     * Creates a back button to return to the previous view.
+     *
+     * @param mainPanel  The main panel where the button will be added.
+     * @param menuPanel  The menu panel to be displayed alongside the main content.
+     * @param scrollPane The scroll pane containing the JTable.
+     * @return A RoundButton configured as a back button.
+     */
     private static RoundButton createBackButton(JPanel mainPanel, JPanel menuPanel, JScrollPane scrollPane) {
         RoundButton backButton = new RoundButton("←");
         backButton.setBounds(20, 20, 50, 30);

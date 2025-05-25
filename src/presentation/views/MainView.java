@@ -11,7 +11,10 @@ public class MainView extends JPanel {
     private JLabel title;
     private JButton loginButton;
     private JButton signUpButton;
-
+    /**
+     * Constructor for MainView.
+     * Initializes the main view with a background, title, and buttons for login and sign-up.
+     */
     public MainView() {
         setLayout(null);
         setPreferredSize(new Dimension(900, 500));
@@ -22,7 +25,10 @@ public class MainView extends JPanel {
 
         add(backgroundPanel);
     }
-
+    /**
+     * Initializes the background panel with a gradient color.
+     * The panel covers the entire view and provides a visually appealing background.
+     */
     private void initBackgroundPanel() {
         backgroundPanel = new JPanel() {
             @Override
@@ -37,7 +43,10 @@ public class MainView extends JPanel {
         backgroundPanel.setLayout(null);
         backgroundPanel.setBounds(0, 0, 900, 500);
     }
-
+    /**
+     * Initializes the title label with a specific font and color.
+     * The title is displayed at the top of the main view.
+     */
     private void initTitle() {
         title = new JLabel("THE PARKING LS");
         title.setFont(new Font("Arial", Font.BOLD, 24));
@@ -45,7 +54,10 @@ public class MainView extends JPanel {
         title.setBounds(30, 50, 300, 40);
         backgroundPanel.add(title);
     }
-
+    /**
+     * Initializes the login and sign-up buttons.
+     * Each button has an action listener that switches to the respective view when clicked.
+     */
     private void initButtons() {
         loginButton = new RoundButton("Log In");
         loginButton.setBounds(30, 150, 160, 40);
@@ -58,7 +70,10 @@ public class MainView extends JPanel {
         backgroundPanel.add(signUpButton);
     }
 
-
+    /**
+     * Switches the content of the JFrame to the login view.
+     * This method is called when the login button is clicked.
+     */
     private void switchToLogin() {
         // Cambiar el contenido del JFrame a la vista de login
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -66,7 +81,10 @@ public class MainView extends JPanel {
         parentFrame.revalidate();
         parentFrame.repaint();
     }
-
+    /**
+     * Switches the content of the JFrame to the sign-up view.
+     * This method is called when the sign-up button is clicked.
+     */
     private void switchToSignUp() {
         // Cambiar el contenido del JFrame a la vista de sign-up
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);

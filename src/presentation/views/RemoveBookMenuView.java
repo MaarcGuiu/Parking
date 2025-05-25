@@ -34,7 +34,12 @@ public class RemoveBookMenuView extends JPanel {
     private LoginController loginController;
     private ArrayList<Vehicle> userBookings;
     private Map<String, Integer> plateToSlotMap; // Para mapear cada matrícula a su ID de slot
-
+    /**
+     * Constructor for RemoveBookMenuView.
+     * Initializes the view with the logged user and sets up the UI components.
+     *
+     * @param loggedUser The user who is currently logged in.
+     */
     public RemoveBookMenuView(User loggedUser) {
         this.loggedUser = loggedUser;
         initControllers();
@@ -46,7 +51,10 @@ public class RemoveBookMenuView extends JPanel {
         initConfirmPanel();
         initListeners();
     }
-
+    /**
+     * Initializes the controllers needed for this view.
+     * Catches any SQL exceptions and shows an error message if the controller cannot be initialized.
+     */
     private void initControllers() {
         try {
             userController = new UserController();
@@ -56,7 +64,10 @@ public class RemoveBookMenuView extends JPanel {
             JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    /**
+     * Initializes the data needed for the view, such as user bookings and slot mappings.
+     * Catches any SQL exceptions and shows an error message if the data cannot be loaded.
+     */
     private void initData() {
         plateToSlotMap = new HashMap<>();
         try {
@@ -79,7 +90,10 @@ public class RemoveBookMenuView extends JPanel {
             JOptionPane.showMessageDialog(this, "Error loading reservations: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    /**
+     * Initializes the layout of the RemoveBookMenuView.
+     * Sets the layout manager, preferred size, and adds the main panel with a gradient background.
+     */
     private void initLayout() {
         setLayout(null);
         mainPanel = new JPanel() {
@@ -96,7 +110,10 @@ public class RemoveBookMenuView extends JPanel {
         mainPanel.setBounds(0, 0, 900, 500);
         add(mainPanel);
     }
-
+    /**
+     * Initializes the menu panel with buttons for booking and removing bookings.
+     * The menu is styled with a specific background color and font.
+     */
     private void initMenu() {
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(null);
@@ -126,7 +143,10 @@ public class RemoveBookMenuView extends JPanel {
         removeBookMenuButton.setFocusPainted(false);
         menuPanel.add(removeBookMenuButton);
     }
-
+    /**
+     * Initializes the title and close button for the RemoveBookMenuView.
+     * The title is displayed at the top of the view, and the close button allows users to return to the user menu.
+     */
     private void initTitleAndClose() {
         JLabel titleLabel = new JLabel("CANCEL A RESERVATION", SwingConstants.CENTER);
         titleLabel.setForeground(Color.WHITE);
@@ -141,7 +161,10 @@ public class RemoveBookMenuView extends JPanel {
         closeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         mainPanel.add(closeButton);
     }
-
+    /**
+     * Initializes the reservations table that displays the user's bookings.
+     * The table is non-editable and styled with a specific font and row height.
+     */
     private void initReservationsTable() {
         String[] columns = {"License Plate", "Vehicle Type", "Slot ID"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
@@ -171,7 +194,10 @@ public class RemoveBookMenuView extends JPanel {
         mainPanel.add(scrollPane);
     }
 
-
+    /**
+     * Initializes the confirmation panel where users can enter their license plate to confirm cancellation.
+     * The panel includes a label, text field, and a button to cancel the reservation.
+     */
     private void initConfirmPanel() {
         JPanel confirmPanel = new JPanel();
         confirmPanel.setLayout(null);
@@ -197,7 +223,10 @@ public class RemoveBookMenuView extends JPanel {
         cancelReservationButton.setForeground(Color.WHITE);
         confirmPanel.add(cancelReservationButton);
     }
-
+    /**
+     * Initializes the listeners for the buttons and other interactive components in the view.
+     * This includes handling cancellation of reservations and navigation back to the user menu.
+     */
     private void initListeners() {
         cancelReservationButton.addActionListener(e -> handleCancelReservation());
 
@@ -226,7 +255,10 @@ public class RemoveBookMenuView extends JPanel {
             }
         });
     }
-
+    /**
+     * Handles the cancellation of a reservation based on the selected row in the table and the entered license plate.
+     * Validates the input and performs the cancellation operation.
+     */
     private void handleCancelReservation() {
         int selectedRow = reservationsTable.getSelectedRow();
         String enteredPlate = licensePlateField.getText().trim();
@@ -267,7 +299,10 @@ public class RemoveBookMenuView extends JPanel {
             JOptionPane.showMessageDialog(this, "Error during cancellation: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    /**
+     * Navigates back to the user menu view.
+     * This method is called when the close button is clicked.
+     */
     private void goBackToUserMenu() {
         setVisible(false);
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -277,7 +312,12 @@ public class RemoveBookMenuView extends JPanel {
             parentFrame.repaint();
         }
     }
-
+/**
+     * Returns the main panel of this view.
+     * This method is used to retrieve the main panel for adding to a JFrame or other container.
+     *
+     * @return The main JPanel containing the RemoveBookMenuView components.
+     */
     public JPanel getMainPanel() {
         return mainPanel;
     }

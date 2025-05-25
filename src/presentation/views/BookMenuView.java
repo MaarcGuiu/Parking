@@ -48,7 +48,9 @@ public class BookMenuView extends JPanel {
         initView();
 
     }
-
+    /**
+     * Initializes the controllers used in this view.
+     */
     private void initControllers() {
         try {
             userController = new UserController();
@@ -61,7 +63,9 @@ public class BookMenuView extends JPanel {
             JOptionPane.showMessageDialog(this, "Unexpected error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    /**
+     * Initializes the view components and layout.
+     */
     private void initView() {
         initializeMainPanel();
         initializeInputPanel();
@@ -69,7 +73,9 @@ public class BookMenuView extends JPanel {
 
         loadAvailableSlots();
     }
-
+    /**
+     * Initializes the main panel with a gradient background and menu buttons.
+     */
     private void initializeMainPanel() {
         mainPanel = new JPanel() {
             @Override
@@ -129,7 +135,9 @@ public class BookMenuView extends JPanel {
         closeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         mainPanel.add(closeButton);
     }
-
+    /**
+     * Initializes the input panel with fields for booking a slot.
+     */
     private void initializeInputPanel() {
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(null);
@@ -176,7 +184,9 @@ public class BookMenuView extends JPanel {
         createButton.setForeground(Color.WHITE);
         inputPanel.add(createButton);
     }
-
+    /**
+     * Initializes the listeners for the components in this view.
+     */
     private void initializeListeners() {
         vehicleCombo.addActionListener(e -> loadAvailableSlots());
 
@@ -213,7 +223,9 @@ public class BookMenuView extends JPanel {
             }
         });
     }
-
+    /**
+     * Creates a booking based on the input fields.
+     */
     private void createBooking() {
         String plate = plateField.getText().trim();
         String vehicleType = (String) vehicleCombo.getSelectedItem();
@@ -273,7 +285,9 @@ public class BookMenuView extends JPanel {
         }
     }
 
-
+    /**
+     * Loads the available slots based on the selected vehicle type.
+     */
     private void loadAvailableSlots() {
         try {
             String vehicleType = (String) vehicleCombo.getSelectedItem();
@@ -325,7 +339,9 @@ public class BookMenuView extends JPanel {
             compatibleSlots.clear();
         }
     }
-
+    /**
+     * Navigates back to the user menu view.
+     */
     private void goBackToUserMenu() {
         setVisible(false);
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);

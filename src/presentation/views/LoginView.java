@@ -19,13 +19,19 @@ public class LoginView extends JPanel {
 
     private JTextField nameOrEmail;
     private JPasswordField password;
-
+    /**
+     * Constructor for LoginView.
+     * Initializes the view and sets up the UI components.
+     */
     public LoginView() {
         initController();
         initLayout();
         initComponents();
     }
-
+    /**
+     * Initializes the LoginController.
+     * Catches any SQL exceptions and shows an error message if the controller cannot be initialized.
+     */
     private void initController() {
         try {
             loginController = new LoginController();
@@ -33,7 +39,10 @@ public class LoginView extends JPanel {
             JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    /**
+     * Initializes the layout of the LoginView.
+     * Sets the layout manager, preferred size, and adds the main panel with a gradient background.
+     */
     private void initLayout() {
         setLayout(null);
         setPreferredSize(new Dimension(900, 500));
@@ -52,7 +61,10 @@ public class LoginView extends JPanel {
         mainPanel.setBounds(0, 0, 900, 500);
         add(mainPanel);
     }
-
+    /**
+     * Initializes the UI components of the LoginView.
+     * Adds labels, text fields, and buttons to the main panel.
+     */
     private void initComponents() {
         JLabel backArrow = new JLabel("←");
         backArrow.setFont(new Font("Arial", Font.BOLD, 20));
@@ -99,14 +111,21 @@ public class LoginView extends JPanel {
 
         loginButton.addActionListener(e -> checkLogin());
     }
-
+    /**
+     * Navigates back to the main view of the application.
+     * Replaces the current content pane with the MainView.
+     */
     private void backToMainView() {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(LoginView.this);
         parentFrame.setContentPane(new MainView());
         parentFrame.revalidate();
         parentFrame.repaint();
     }
-
+    /**
+     * Checks the login credentials entered by the user.
+     * Validates the input fields and attempts to log in using the LoginController.
+     * Displays appropriate messages based on the login result.
+     */
     private void checkLogin() {
         String user = nameOrEmail.getText();
         String pass = new String(password.getPassword());
@@ -157,6 +176,13 @@ public class LoginView extends JPanel {
         }
     }
 
+    /**
+     * Displays the cancelled reservations for the logged-in user.
+     * Retrieves the cancelled reservations from the LoginController and shows them in a dialog.
+     * Deletes the cancelled reservations after displaying them.
+     *
+     * @param userId The ID of the logged-in user.
+     */
     private void mostrarReservasCanceladas(int userId) {
         try {
             List<CancelledReservation> canceladas = loginController.getCancelledReservationsByUserId(userId);

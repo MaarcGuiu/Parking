@@ -2,15 +2,11 @@ package presentation.views;
 
 import business.ParkingOccupancyManager;
 import business.model.User;
-import persistence.LogsSqlDao;
 import presentation.components.RoundButton;
 import presentation.controllers.ParkingOccupancyController;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -33,7 +29,12 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
     private JButton enterLeaveButton;
     private JButton settingsButton;
     private JPanel timeBarChartPanel;
-
+    /**
+     * Constructor for UserMenuView.
+     * Initializes the view with the logged user and sets up the UI components.
+     *
+     * @param loggedUser The user who is currently logged in.
+     */
     public UserMenuView(User loggedUser) {
         this.loggedUser = loggedUser;
         initDaoAndServices();
@@ -41,14 +42,20 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
         initMenuButtons();
         registerListeners();
     }
-
+    /**
+     * Initializes the DAO and services required for the view.
+     * Sets up the ParkingOccupancyManager and ParkingOccupancyController.
+     */
     private void initDaoAndServices() {
         ParkingOccupancyManager = new ParkingOccupancyManager();
         parkingOccupancyService = new ParkingOccupancyController(ParkingOccupancyManager);
         parkingOccupancyService.addOccupancyChangeListener(this);
 
     }
-
+    /**
+     * Initializes the main panel and the menu panel.
+     * Sets the layout, background, and adds the menu panel to the main panel.
+     */
     private void initMainAndMenuPanels() {
         setLayout(null);
 
@@ -81,7 +88,10 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
         mainPanel.add(menuPanel);
         add(mainPanel);
     }
-
+    /**
+     * Initializes the menu buttons and adds them to the menu panel.
+     * Each button is styled and positioned appropriately.
+     */
     private void initMenuButtons() {
         bookingsButton = createMenuButton("Bookings", 70);
         parkingStatusButton = createMenuButton("Parking Status", 130);
@@ -95,7 +105,14 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
         menuPanel.add(enterLeaveButton);
         menuPanel.add(settingsButton);
     }
-
+    /**
+     * Creates a menu button with specified text and y-position.
+     * The button is styled with a rounded appearance and specific colors.
+     *
+     * @param text The text to display on the button.
+     * @param yPosition The vertical position of the button in the menu panel.
+     * @return A JButton with the specified text and position.
+     */
     private JButton createMenuButton(String text, int yPosition) {
         JButton button = new RoundButton(text);
         button.setBounds(20, yPosition, 160, 40);
@@ -104,7 +121,10 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
         button.setFocusPainted(false);
         return button;
     }
-
+    /**
+     * Resets the background color of all menu buttons to their default color.
+     * This is used to visually indicate which button is currently active.
+     */
     private void resetButtonColors() {
         bookingsButton.setBackground(new Color(150, 130, 200));
         parkingStatusButton.setBackground(new Color(150, 130, 200));
@@ -112,7 +132,10 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
         enterLeaveButton.setBackground(new Color(150, 130, 200));
         settingsButton.setBackground(new Color(150, 130, 200));
     }
-
+    /**
+     * Registers action listeners for each menu button.
+     * Each listener defines the action to take when the button is clicked.
+     */
     private void registerListeners() {
         Runnable resetMainPanel = () -> {
             mainPanel.removeAll();
@@ -160,14 +183,20 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
             parentFrame.repaint();
         });
     }
-
+    /**
+     * Initializes the statistics view by setting up the main panel and chart container.
+     * It updates the occupancy data and sets up the time bar chart panel.
+     */
     private void initializeStatisticsView() {
         clearMainPanel();
         JPanel chartContainer = createChartContainer();
         updateOccupancyData();
         setupTimeBarChartPanel(chartContainer);
     }
-
+    /**
+     * Clears the main panel and resets it to the menu panel.
+     * Adds a title label to the main panel for the statistics view.
+     */
     private void clearMainPanel() {
         mainPanel.removeAll();
         mainPanel.add(menuPanel);
@@ -178,7 +207,12 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
         titleLabel.setBounds(400, 30, 300, 30);
         mainPanel.add(titleLabel);
     }
-
+    /**
+     * Creates a container for the chart with a gradient background.
+     * The container includes a title label for the chart.
+     *
+     * @return A JPanel that serves as the chart container.
+     */
     private JPanel createChartContainer() {
         JPanel chartContainer = new JPanel() {
             @Override
@@ -202,7 +236,10 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
 
         return chartContainer;
     }
-
+    /**
+     * Updates the occupancy data by calling the service and handles any exceptions.
+     * The data is stored in an AtomicReference for thread-safe access.
+     */
     private void updateOccupancyData() {
         try {
             parkingOccupancyService.updateOccupancyData();
@@ -211,7 +248,12 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
         }
         occupancyDataRef.set(parkingOccupancyService.getCurrentOccupancy());
     }
-
+    /**
+     * Sets up the time bar chart panel with the occupancy data.
+     * The chart displays the number of vehicles over the last 60 minutes.
+     *
+     * @param chartContainer The container where the chart will be added.
+     */
     private void setupTimeBarChartPanel(JPanel chartContainer) {
         timeBarChartPanel = new JPanel() {
             @Override
@@ -315,7 +357,12 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
         mainPanel.revalidate();
         mainPanel.repaint();
     }
-
+    /**
+     * Updates the occupancy data when the occupancy changes.
+     * This method is called by the ParkingOccupancyController when the occupancy data is updated.
+     *
+     * @param newData The new occupancy data.
+     */
     @Override
     public void onOccupancyChanged(int[] newData) {
         // Actualizar los datos y repintar en el hilo de eventos de Swing
@@ -326,12 +373,11 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
             }
         });
     }
-
+    /**
+     * Cleans up resources and removes the occupancy change listener.
+     * This method should be called when the view is no longer needed.
+     */
     public void cleanup() {
         parkingOccupancyService.removeOccupancyChangeListener(this);
-    }
-
-    public JPanel getMainPanel() {
-        return mainPanel;
     }
 }

@@ -18,7 +18,12 @@ public class EntryParkingView extends JPanel {
 
     private JTextField plateField;
     private JComboBox<String> vehicleComboBox;
-
+    /**
+     * Constructor for EntryParkingView.
+     * Initializes the view with the logged user and sets up the UI components.
+     *
+     * @param loggedUser The user currently logged in.
+     */
     public EntryParkingView(User loggedUser) {
         try {
             enterController = new EnterController(loggedUser);
@@ -33,7 +38,9 @@ public class EntryParkingView extends JPanel {
         initMenuPanel();
         add(mainPanel);
     }
-
+    /**
+     * Initializes the main panel with a gradient background and title.
+     */
     private void initMainPanel() {
         mainPanel = new JPanel() {
             @Override
@@ -57,7 +64,11 @@ public class EntryParkingView extends JPanel {
         JLabel closeButton = createCloseButton();
         mainPanel.add(closeButton);
     }
-
+    /**
+     * Creates a close button that allows the user to exit the entry parking view.
+     *
+     * @return A JLabel configured as a close button.
+     */
     private JLabel createCloseButton() {
         JLabel closeButton = new JLabel("\u2716");
         closeButton.setFont(new Font("Dialog", Font.BOLD, 22));
@@ -76,7 +87,9 @@ public class EntryParkingView extends JPanel {
         });
         return closeButton;
     }
-
+    /**
+     * Initializes the user interaction panel where users can enter their vehicle details.
+     */
     private void initUserInteractionPanel() {
         JPanel userInteractionPanel = new JPanel() {
             @Override
@@ -100,7 +113,11 @@ public class EntryParkingView extends JPanel {
 
         addUserInteractionComponents(userInteractionPanel);
     }
-
+    /**
+     * Adds user interaction components such as labels, text fields, and buttons to the user interaction panel.
+     *
+     * @param panel The panel to which the components will be added.
+     */
     private void addUserInteractionComponents(JPanel panel) {
         JLabel plateLabel = new JLabel("PLATE");
         plateLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -133,7 +150,9 @@ public class EntryParkingView extends JPanel {
 
         enterActionButton.addActionListener(e -> handleEnterAction());
     }
-
+/**
+     * Initializes the menu panel with buttons for entering and leaving parking.
+     */
     private void initMenuPanel() {
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(null);
@@ -164,7 +183,9 @@ public class EntryParkingView extends JPanel {
 
         mainPanel.add(menuPanel);
     }
-
+    /**
+     * Switches to the LeaveParkingView when the user clicks the "Leave Parking" button.
+     */
     private void switchToLeaveParkingView() {
         setVisible(false);
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -172,7 +193,10 @@ public class EntryParkingView extends JPanel {
         parentFrame.revalidate();
         parentFrame.repaint();
     }
-
+/**
+     * Handles the action when the user clicks the "Enter" button.
+     * Validates the input and registers the vehicle entry into the parking lot.
+     */
     private void handleEnterAction() {
         String plate = plateField.getText().toUpperCase();
         String vehicle = vehicleComboBox.getSelectedItem().toString();
@@ -229,7 +253,14 @@ public class EntryParkingView extends JPanel {
             JOptionPane.showMessageDialog(this, "An unexpected error occurred: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    /**
+     * Handles the case where the vehicle is not booked.
+     * Checks for available parking spaces and registers the vehicle entry.
+     *
+     * @param vehicle The type of vehicle being entered.
+     * @param plate   The license plate of the vehicle.
+     * @throws SQLException If there is an error accessing the database.
+     */
     private void handleNonBookedVehicle(String vehicle, String plate) throws SQLException {
         if (vehicle.equals(SELECT_VEHICLE_OPTION)) {
             JOptionPane.showMessageDialog(this, "Enter the type of vehicle so we can assign you an available space.", "Error", JOptionPane.ERROR_MESSAGE);
