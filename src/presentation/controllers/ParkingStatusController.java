@@ -37,4 +37,11 @@ public class ParkingStatusController {
     public Slot getSlot(int slotId) throws SQLException {
         return parkingStatusManager.getSlot(slotId);
     }
+
+    public int getTotalSlots() throws SQLException {
+        return parkingStatusManager.getTotalSlots();
+    }
+    public int getOccupiedSlotsCount() throws SQLException {
+        return parkingStatusManager.getOccupiedSlotsCount();
+    }
 }
