@@ -24,30 +24,57 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class AdminMenuView extends JPanel implements OccupancyChangeListener{
+public class AdminMenuView extends JPanel implements OccupancyChangeListener {
     private JPanel mainPanel;
     private JPanel menuPanel;
+    private JButton createButton;
+    private JButton editButton;
+    private JButton deleteButton;
+    private JButton statisticsButton;
+    private JButton parkingStatusButton;
+    private JButton settingsButton;
+
     private AdminController adminController;
     private persistence.LogsSqlDao LogsSqlDao;
     private business.ParkingOccupancyManager ParkingOccupancyManager = new ParkingOccupancyManager(LogsSqlDao);
     private final ParkingOccupancyController parkingOccupancyService = new ParkingOccupancyController(ParkingOccupancyManager);
+
     private AtomicReference<int[]> occupancyDataRef = new AtomicReference<>(new int[60]);
 
     private JPanel timeBarChartPanel;
 
     public AdminMenuView() {
+        initializeControllers();
+        principalAdminMenu();
+    }
+
+    private void initializeControllers() {
         try {
             adminController = new AdminController();
             LogsSqlDao = new LogsSqlDao();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
-        } catch (ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException | ClassNotFoundException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-        // Permitir posicionamiento absoluto
+    }
+
+    private void principalAdminMenu() {
+        setupFrame();
+        setupMainPanel();
+        setupMenuPanel();
+        setupMenuButtons();
+        resetMainPanel();
+        setupButtonActions();
+
+        mainPanel.add(menuPanel);
+        add(mainPanel);
+    }
+
+    private void setupFrame() {
         setLayout(null);
         parkingOccupancyService.addOccupancyChangeListener(this);
+    }
 
+    private void setupMainPanel() {
         // Panel principal con degradado
         mainPanel = new JPanel() {
             @Override
@@ -61,7 +88,9 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
         };
         mainPanel.setLayout(null);
         mainPanel.setBounds(0, 0, 900, 500);
+    }
 
+    private void setupMenuPanel() {
         // Menú lateral
         menuPanel = new JPanel();
         menuPanel.setLayout(null);
@@ -77,58 +106,53 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
         menuTitle.setFont(new Font("Arial", Font.BOLD, 20));
         menuTitle.setBounds(0, 20, 200, 30); // Ancho igual al panel para centrar
         menuPanel.add(menuTitle);
+    }
 
-        // Botones del menú del admin
-        // Botón 1: Create
-        JButton createButton = new RoundButton("Create");
+    private void setupMenuButtons() {
+        createButton = new RoundButton("Create");
         createButton.setBounds(20, 70, 160, 40);
         createButton.setBackground(new Color(150, 130, 200));
         createButton.setForeground(Color.BLACK);
         createButton.setFocusPainted(false);
         menuPanel.add(createButton);
 
-        // Botón 2: Edit
-        JButton editButton = new RoundButton("Edit");
+        editButton = new RoundButton("Edit");
         editButton.setBounds(20, 130, 160, 40);
         editButton.setBackground(new Color(150, 130, 200));
         editButton.setForeground(Color.BLACK);
         editButton.setFocusPainted(false);
         menuPanel.add(editButton);
 
-        // Botón 3: Delete
-        JButton deleteButton = new RoundButton("Delete");
+        deleteButton = new RoundButton("Delete");
         deleteButton.setBounds(20, 190, 160, 40);
         deleteButton.setBackground(new Color(150, 130, 200));
         deleteButton.setForeground(Color.BLACK);
         deleteButton.setFocusPainted(false);
         menuPanel.add(deleteButton);
 
-        // Botón 4: Statistics
-        JButton statisticsButton = new RoundButton("Statistics");
+        statisticsButton = new RoundButton("Statistics");
         statisticsButton.setBounds(20, 250, 160, 40);
         statisticsButton.setBackground(new Color(150, 130, 200));
         statisticsButton.setForeground(Color.BLACK);
         statisticsButton.setFocusPainted(false);
         menuPanel.add(statisticsButton);
 
-        // Botón 5: Parking Status
-        JButton parkingStatusButton = new RoundButton("Parking Status");
+        parkingStatusButton = new RoundButton("Parking Status");
         parkingStatusButton.setBounds(20, 310, 160, 40);
         parkingStatusButton.setBackground(new Color(150, 130, 200));
         parkingStatusButton.setForeground(Color.BLACK);
         parkingStatusButton.setFocusPainted(false);
         menuPanel.add(parkingStatusButton);
 
-
-        // Botón 5 de Log out (Ajustes)
-        JButton settingsButton = new RoundButton("Log out");
+        settingsButton = new RoundButton("Log out");
         settingsButton.setBounds(20, 370, 160, 40);
         settingsButton.setBackground(new Color(150, 130, 200));
         settingsButton.setForeground(Color.BLACK);
         settingsButton.setFocusPainted(false);
         menuPanel.add(settingsButton);
+    }
 
-        // MODIFICAR EL COLOR DE LOS BOTONES DEL MENU
+    private void resetMainPanel() {
         List<JButton> menuButtons = new ArrayList<>();
         menuButtons.add(createButton);
         menuButtons.add(editButton);
@@ -139,27 +163,35 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
 
         Color defaultButtonColor = new Color(150, 130, 200);
 
-        Runnable resetMainPanel = () -> {
-            for (JButton btn : menuButtons) {
-                btn.setBackground(defaultButtonColor);
-            }
-            mainPanel.removeAll();
-            mainPanel.add(menuPanel);
-            mainPanel.revalidate();
-            mainPanel.repaint();
-        };
+        for (JButton btn : menuButtons) {
+            btn.setBackground(defaultButtonColor);
+        }
+        mainPanel.removeAll();
+        mainPanel.add(menuPanel);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
 
+    private void setupButtonActions() {
+        setupParkingStatusButtonAction();
+        setupCreateButtonAction();
+        setupEditButtonAction();
+        setupDeleteButtonAction();
+        setupSettingButtonAction();
+        setupStatisticsButton();
+    }
+
+    private void setupParkingStatusButtonAction() {
         parkingStatusButton.addActionListener(e -> {
             boolean isAdmin = true;
-            if (parkingStatusButton != null) {
-                parkingStatusButton.setBackground(Color.YELLOW);
-            }
-            ParkingStatusView.show(mainPanel, menuPanel, resetMainPanel, isAdmin);
+            ParkingStatusView.show(mainPanel, menuPanel, this::resetMainPanel, isAdmin);
+            parkingStatusButton.setBackground(Color.YELLOW);
         });
+    }
 
-
+    private void setupCreateButtonAction() {
         createButton.addActionListener(e -> {
-            resetMainPanel.run();
+            resetMainPanel();
             createButton.setBackground(Color.YELLOW);
             mainPanel.removeAll();
             mainPanel.add(menuPanel);
@@ -237,7 +269,7 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                         if (parkingStatusButton != null) {
                             parkingStatusButton.setBackground(Color.YELLOW);
                         }
-                        ParkingStatusView.show(mainPanel, menuPanel, resetMainPanel, isAdmin);
+                        ParkingStatusView.show(mainPanel, menuPanel, this::resetMainPanel, isAdmin);
                     }
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(mainPanel,"ID y Floor deben ser números válidos.","Error", JOptionPane.ERROR_MESSAGE);
@@ -252,9 +284,12 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
             mainPanel.revalidate();
             mainPanel.repaint();
         });
+    }
 
+
+    private void setupEditButtonAction() {
         editButton.addActionListener(e -> {
-            resetMainPanel.run();
+            resetMainPanel();
             editButton.setBackground(Color.YELLOW);
 
             JLabel titleLabel = new JLabel("EDIT SLOT");
@@ -343,10 +378,11 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
             mainPanel.revalidate();
             mainPanel.repaint();
         });
+    }
 
-
+    private void setupDeleteButtonAction() {
         deleteButton.addActionListener(e -> {
-            resetMainPanel.run();
+            resetMainPanel();
             deleteButton.setBackground(Color.YELLOW);
 
             JLabel titleLabel = new JLabel("DELETE SLOT");
@@ -390,9 +426,9 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                 try {
                     int id = Integer.parseInt(idField.getText());
                     String deleted = adminController.deleteSlot(id);
-                        JOptionPane.showMessageDialog(mainPanel,
-                                deleted + " " + id,
-                                "Deleted", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(mainPanel,
+                            deleted + " " + id,
+                            "Deleted", JOptionPane.INFORMATION_MESSAGE);
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(mainPanel,"ID debe ser un número válido.","Error", JOptionPane.ERROR_MESSAGE);
                 } catch (IllegalArgumentException ex) {
@@ -406,8 +442,9 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
             mainPanel.revalidate();
             mainPanel.repaint();
         });
+    }
 
-
+    private void setupSettingButtonAction() {
         settingsButton.addActionListener(e -> {
             settingsButton.setBackground(Color.YELLOW);
 
@@ -417,23 +454,19 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
             parentFrame.revalidate();
             parentFrame.repaint();
         });
+    }
 
-
-
+    private void setupStatisticsButton() {
         statisticsButton.addActionListener(e -> {
             try {
-                resetMainPanel.run();
+                resetMainPanel();
                 statisticsButton.setBackground(Color.YELLOW);
                 initializeStatisticsView();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
             }
         });
-
-        mainPanel.add(menuPanel);
-        add(mainPanel);
     }
-
 
     @Override
     public void onOccupancyChanged(int[] newData) {
@@ -489,18 +522,24 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
     }
 
     private void initializeStatisticsView() {
-        // Limpiar el panel principal
+        clearMainPanel();
+        JPanel chartContainer = createChartContainer();
+        updateOccupancyData();
+        setupTimeBarChartPanel(chartContainer);
+    }
+
+    private void clearMainPanel() {
         mainPanel.removeAll();
         mainPanel.add(menuPanel);
 
-        // Título
         JLabel titleLabel = new JLabel("PARKING STATISTICS");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
         titleLabel.setForeground(Color.BLACK);
         titleLabel.setBounds(400, 30, 300, 30);
         mainPanel.add(titleLabel);
+    }
 
-        // Contenedor del gráfico
+    private JPanel createChartContainer() {
         JPanel chartContainer = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -516,22 +555,24 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
         chartContainer.setBounds(230, 80, 640, 380);
         chartContainer.setOpaque(false);
 
-        // Título del gráfico
         JLabel chartTitle = new JLabel("Vehicles per Minute (Last 60 Minutes)", SwingConstants.CENTER);
         chartTitle.setFont(new Font("Arial", Font.BOLD, 18));
         chartTitle.setBounds(0, 10, 640, 30);
         chartContainer.add(chartTitle);
 
-        // Obtener datos actuales
+        return chartContainer;
+    }
 
+    private void updateOccupancyData() {
         try {
             parkingOccupancyService.updateOccupancyData();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
         occupancyDataRef.set(parkingOccupancyService.getCurrentOccupancy());
+    }
 
-        // Panel del gráfico de barras
+    private void setupTimeBarChartPanel(JPanel chartContainer) {
         timeBarChartPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -539,40 +580,35 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                // Configuración de márgenes y dimensiones
-                int leftMargin = 60;
-                int rightMargin = 20;
-                int topMargin = 40;
-                int bottomMargin = 60;
+                int leftMargin = 60, rightMargin = 20, topMargin = 40, bottomMargin = 60;
                 int chartWidth = getWidth() - leftMargin - rightMargin;
                 int chartHeight = getHeight() - topMargin - bottomMargin;
 
-                // Dibujar ejes
+                // Draw axes
                 g2d.setColor(Color.BLACK);
-                g2d.drawLine(leftMargin, getHeight() - bottomMargin, getWidth() - rightMargin, getHeight() - bottomMargin); // Eje X
-                g2d.drawLine(leftMargin, topMargin, leftMargin, getHeight() - bottomMargin); // Eje Y
+                g2d.drawLine(leftMargin, getHeight() - bottomMargin, getWidth() - rightMargin, getHeight() - bottomMargin); // X axis
+                g2d.drawLine(leftMargin, topMargin, leftMargin, getHeight() - bottomMargin); // Y axis
 
-                // Etiquetas del eje Y
+                // Draw Y labels and ticks
                 g2d.setFont(new Font("Arial", Font.PLAIN, 12));
                 int maxOccupancy = 60;
                 int yStep = 10;
-
                 for (int i = 0; i <= 5; i++) {
                     int value = i * yStep;
                     int y = getHeight() - bottomMargin - (i * chartHeight / 5);
                     g2d.drawString(String.valueOf(value), leftMargin - 30, y + 5);
-                    g2d.drawLine(leftMargin - 5, y, leftMargin, y); // Marcas
+                    g2d.drawLine(leftMargin - 5, y, leftMargin, y);
                 }
 
-                // Título del eje Y
+                // Y axis title
                 g2d.setFont(new Font("Arial", Font.BOLD, 12));
-                Graphics2D g2d2 = (Graphics2D) g.create();
+                Graphics2D g2d2 = (Graphics2D) g2d.create();
                 g2d2.translate(20, getHeight() / 2);
                 g2d2.rotate(-Math.PI / 2);
                 g2d2.drawString("Number of Vehicles", 0, 0);
                 g2d2.dispose();
 
-                // Etiquetas del eje X (minutos)
+                // Draw X labels and ticks
                 g2d.setFont(new Font("Arial", Font.PLAIN, 10));
                 for (int i = 0; i < 60; i += 10) {
                     int x = leftMargin + (i * chartWidth / 60);
@@ -581,11 +617,11 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                 }
                 g2d.drawString("now", getWidth() - rightMargin - 15, getHeight() - bottomMargin + 20);
 
-                // Título del eje X
+                // X axis title
                 g2d.setFont(new Font("Arial", Font.BOLD, 12));
                 g2d.drawString("Time (minutes ago)", getWidth() / 2 - 200, getHeight() - 15);
 
-                // Dibujar barras
+                // Draw bars
                 int barWidth = chartWidth / 65;
                 int[] currentData = occupancyDataRef.get();
 
@@ -595,7 +631,6 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                     int y = getHeight() - bottomMargin - (totalVehicles * chartHeight / maxOccupancy);
                     int height = (totalVehicles * chartHeight / maxOccupancy);
 
-                    // Gradiente para las barras
                     GradientPaint barGradient = new GradientPaint(
                             x, y, new Color(65, 105, 225),
                             x, y + height, new Color(30, 70, 180)
@@ -603,21 +638,19 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                     g2d.setPaint(barGradient);
                     g2d.fillRect(x, y, barWidth, height);
 
-                    // Contorno de las barras
                     g2d.setColor(new Color(40, 40, 40, 120));
                     g2d.drawRect(x, y, barWidth, height);
 
-                    // Mostrar valor si hay espacio
                     if (height > 20) {
                         g2d.setColor(Color.BLACK);
                         g2d.setFont(new Font("Arial", Font.PLAIN, 8));
                         String valueText = String.valueOf(totalVehicles);
                         int textWidth = g2d.getFontMetrics().stringWidth(valueText);
-                        g2d.drawString(valueText, x + (barWidth - textWidth)/2, y + 10);
+                        g2d.drawString(valueText, x + (barWidth - textWidth) / 2, y + 10);
                     }
                 }
 
-                // Leyenda
+                // Legend
                 int legendX = leftMargin + 170;
                 int legendY = topMargin + 225;
                 g2d.setColor(new Color(65, 105, 225));
@@ -625,7 +658,7 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                 g2d.setColor(Color.BLACK);
                 g2d.drawString("Vehicles", legendX + 20, legendY + 12);
 
-                // Hora de actualización
+                // Last update time
                 g2d.setFont(new Font("Arial", Font.ITALIC, 10));
                 g2d.drawString("Last updated: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),
                         leftMargin + 350, topMargin + 20);
@@ -638,6 +671,7 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
         mainPanel.revalidate();
         mainPanel.repaint();
     }
+
 
     private void handleLogout() {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);

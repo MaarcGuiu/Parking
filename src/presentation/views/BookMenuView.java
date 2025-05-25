@@ -40,31 +40,45 @@ public class BookMenuView extends JPanel {
      * @param loggedUser the logged user
      */
     public BookMenuView(User loggedUser) {
-        try {
-            this.loggedUser = loggedUser;
-            this.userController = new UserController();
-            this.enterController = new EnterController(loggedUser);
-            this.parkingStatusController = new ParkingStatusController();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
-        }
-
-        this.compatibleSlots = new ArrayList<>();
+        this.loggedUser = loggedUser;
+        compatibleSlots = new ArrayList<>();
         setLayout(null);
 
-        // Panel principal
+        initControllers();
+        initView();
+
+    }
+
+    private void initControllers() {
+        try {
+            userController = new UserController();
+            enterController = new EnterController(loggedUser);
+            parkingStatusController = new ParkingStatusController();
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Unexpected error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void initView() {
+        initializeMainPanel();
+        initializeInputPanel();
+        initializeListeners();
+
+        loadAvailableSlots();
+    }
+
+    private void initializeMainPanel() {
         mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 GradientPaint gp = new GradientPaint(
-                        0,
-                        0,
-                        new Color(44, 37, 80),
-                        getWidth(),
-                        getHeight(),
-                        new Color(161, 141, 204)
+                        0, 0, new Color(44, 37, 80),
+                        getWidth(), getHeight(), new Color(161, 141, 204)
                 );
                 g2d.setPaint(gp);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
@@ -74,7 +88,6 @@ public class BookMenuView extends JPanel {
         mainPanel.setBounds(0, 0, 900, 500);
         add(mainPanel);
 
-        // Menu lateral
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(null);
         menuPanel.setBackground(new Color(70, 60, 130));
@@ -115,7 +128,9 @@ public class BookMenuView extends JPanel {
         closeButton.setBounds(840, 20, 30, 30);
         closeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         mainPanel.add(closeButton);
+    }
 
+    private void initializeInputPanel() {
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(null);
         inputPanel.setOpaque(false);
@@ -143,7 +158,6 @@ public class BookMenuView extends JPanel {
         vehicleCombo.setBounds(180, 70, 200, 30);
         inputPanel.add(vehicleCombo);
 
-        // Nuevo campo para seleccionar slot
         JLabel slotLabel = new JLabel("SELECT SLOT:");
         slotLabel.setForeground(Color.WHITE);
         slotLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -161,131 +175,32 @@ public class BookMenuView extends JPanel {
         createButton.setBackground(new Color(204, 140, 0));
         createButton.setForeground(Color.WHITE);
         inputPanel.add(createButton);
+    }
 
-        // Cambiar los slots disponibles cuando se seleccione un tipo de vehiculo diferente
-        vehicleCombo.addActionListener(e -> {
-            loadAvailableSlots();
-        });
+    private void initializeListeners() {
+        vehicleCombo.addActionListener(e -> loadAvailableSlots());
 
-        // ACCIÓN DE RESERVA
-        createButton.addActionListener(e -> {
-            String plate = plateField.getText().trim();
-            String vehicleType = (String) vehicleCombo.getSelectedItem();
+        createButton.addActionListener(e -> createBooking());
 
-            if (plate.isEmpty()) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Please enter a license plate.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
-                return;
+        closeButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                goBackToUserMenu();
             }
 
-            if (slotComboBox.getSelectedIndex() == -1) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Please select a parking slot.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
-                return;
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                closeButton.setForeground(Color.RED);
             }
 
-            try {
-                if (!enterController.isValidPlateFormat(plate)) {
-                    JOptionPane.showMessageDialog(
-                            this,
-                            "Invalid plate format. It should be 3 letters followed by 3 numbers (e.g., ABC123).",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-                    return;
-                }
-
-                // Verificar si ya hay una reserva para este vehículo
-                if (userController.checkUserBooking(plate)) {
-                    JOptionPane.showMessageDialog(
-                            this,
-                            "This vehicle already has a reservation.",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-                    return;
-                }
-
-                // Registrar el vehículo si no existe
-                if (!enterController.vehicleExists(plate)) {
-                    String registerResult = enterController.registerVehicle(loggedUser, plate, vehicleType);
-                    if (!"success".equals(registerResult)) {
-                        JOptionPane.showMessageDialog(
-                                this,
-                                "Error registering vehicle: " + registerResult,
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE
-                        );
-                        return;
-                    }
-                }
-
-                // Obtener el slot seleccionado
-                int selectedIndex = slotComboBox.getSelectedIndex();
-                Slot selectedSlot = compatibleSlots.get(selectedIndex);
-
-                // Realizar la reserva
-                userController.updateTheSlotBooked(plate, selectedSlot.getIdSlot());
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Reservation created successfully!\n" +
-                                "Vehicle: " + plate + "\n" +
-                                "Slot ID: " + selectedSlot.getIdSlot() + "\n" +
-                                "Floor: " + selectedSlot.getFloor(),
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
-
-                plateField.setText("");
-                vehicleCombo.setSelectedIndex(0);
-                loadAvailableSlots(); // Recargar slots disponibles
-
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Database error: " + ex.getMessage(),
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Unexpected error: " + ex.getMessage(),
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                closeButton.setForeground(Color.WHITE);
             }
         });
-
-        closeButton.addMouseListener(
-                new java.awt.event.MouseAdapter() {
-                    @Override
-                    public void mouseClicked(java.awt.event.MouseEvent e) {
-                        goBackToUserMenu();
-                    }
-
-                    @Override
-                    public void mouseEntered(java.awt.event.MouseEvent e) {
-                        closeButton.setForeground(Color.RED);
-                    }
-
-                    @Override
-                    public void mouseExited(java.awt.event.MouseEvent e) {
-                        closeButton.setForeground(Color.WHITE);
-                    }
-                }
-        );
 
         bookMenuButton.addActionListener(e -> {
+            // Actualment no fa res
         });
 
         removeBookMenuButton.addActionListener(e -> {
@@ -297,10 +212,68 @@ public class BookMenuView extends JPanel {
                 parentFrame.repaint();
             }
         });
-
-        // Cargar slots disponibles
-        loadAvailableSlots();
     }
+
+    private void createBooking() {
+        String plate = plateField.getText().trim();
+        String vehicleType = (String) vehicleCombo.getSelectedItem();
+
+        if (plate.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a license plate.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (slotComboBox.getSelectedIndex() == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a parking slot.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            if (!enterController.isValidPlateFormat(plate)) {
+                JOptionPane.showMessageDialog(this,
+                        "Invalid plate format. It should be 3 letters followed by 3 numbers (e.g., ABC123).",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (userController.checkUserBooking(plate)) {
+                JOptionPane.showMessageDialog(this,
+                        "This vehicle already has a reservation.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!enterController.vehicleExists(plate)) {
+                String registerResult = enterController.registerVehicle(loggedUser, plate, vehicleType);
+                if (!"success".equals(registerResult)) {
+                    JOptionPane.showMessageDialog(this,
+                            "Error registering vehicle: " + registerResult,
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+
+            int selectedIndex = slotComboBox.getSelectedIndex();
+            Slot selectedSlot = compatibleSlots.get(selectedIndex);
+
+            userController.updateTheSlotBooked(plate, selectedSlot.getIdSlot());
+
+            JOptionPane.showMessageDialog(this,
+                    "Reservation created successfully!\nVehicle: " + plate +
+                            "\nSlot ID: " + selectedSlot.getIdSlot() +
+                            "\nFloor: " + selectedSlot.getFloor(),
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            plateField.setText("");
+            vehicleCombo.setSelectedIndex(0);
+            loadAvailableSlots();
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Unexpected error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 
     private void loadAvailableSlots() {
         try {

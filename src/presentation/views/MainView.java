@@ -7,13 +7,24 @@ import java.awt.*;
 
 public class MainView extends JPanel {
 
+    private JPanel backgroundPanel;
+    private JLabel title;
+    private JButton loginButton;
+    private JButton signUpButton;
+
     public MainView() {
-        // Configuración básica del JPanel
         setLayout(null);
         setPreferredSize(new Dimension(900, 500));
 
-        // Fondo con degradado
-        JPanel backgroundPanel = new JPanel() {
+        initBackgroundPanel();
+        initTitle();
+        initButtons();
+
+        add(backgroundPanel);
+    }
+
+    private void initBackgroundPanel() {
+        backgroundPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -25,29 +36,28 @@ public class MainView extends JPanel {
         };
         backgroundPanel.setLayout(null);
         backgroundPanel.setBounds(0, 0, 900, 500);
+    }
 
-        // Título
-        JLabel title = new JLabel("THE PARKING LS");
+    private void initTitle() {
+        title = new JLabel("THE PARKING LS");
         title.setFont(new Font("Arial", Font.BOLD, 24));
         title.setForeground(Color.BLACK);
         title.setBounds(30, 50, 300, 40);
         backgroundPanel.add(title);
+    }
 
-        // Botón Log In
-        JButton loginButton = new RoundButton("Log In");
+    private void initButtons() {
+        loginButton = new RoundButton("Log In");
         loginButton.setBounds(30, 150, 160, 40);
         loginButton.addActionListener(e -> switchToLogin());
         backgroundPanel.add(loginButton);
 
-        // Botón Sign Up
-        JButton signUpButton = new RoundButton("Sign Up");
+        signUpButton = new RoundButton("Sign Up");
         signUpButton.setBounds(30, 210, 160, 40);
         signUpButton.addActionListener(e -> switchToSignUp());
         backgroundPanel.add(signUpButton);
-
-        // Añadir el panel de fondo al JPanel
-        add(backgroundPanel);
     }
+
 
     private void switchToLogin() {
         // Cambiar el contenido del JFrame a la vista de login

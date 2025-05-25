@@ -17,18 +17,27 @@ public class LoginView extends JPanel {
     private JPanel mainPanel;
     private LoginController loginController;
 
+    private JTextField nameOrEmail;
+    private JPasswordField password;
+
     public LoginView() {
+        initController();
+        initLayout();
+        initComponents();
+    }
+
+    private void initController() {
         try {
             loginController = new LoginController();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
-
         }
-        // Configuración del panel principal
-        setLayout(null);
-        setPreferredSize(new Dimension(900, 500));  // Tamaño del panel
+    }
 
-        // Panel de fondo con degradado
+    private void initLayout() {
+        setLayout(null);
+        setPreferredSize(new Dimension(900, 500));
+
         mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -40,40 +49,29 @@ public class LoginView extends JPanel {
             }
         };
         mainPanel.setLayout(null);
-        mainPanel.setBounds(0, 0, 900, 500);  // Ajustamos el tamaño del panel al tamaño deseado
+        mainPanel.setBounds(0, 0, 900, 500);
+        add(mainPanel);
+    }
 
-        // Flecha de regreso
+    private void initComponents() {
         JLabel backArrow = new JLabel("←");
         backArrow.setFont(new Font("Arial", Font.BOLD, 20));
         backArrow.setForeground(Color.BLACK);
         backArrow.setBounds(20, 20, 30, 30);
         mainPanel.add(backArrow);
 
-        // Acción para volver atrás sin abrir una nueva instancia
-        backArrow.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(LoginView.this);
-                parentFrame.setContentPane(new MainView());  // Cambia el contenido por MainView
-                parentFrame.revalidate();
-                parentFrame.repaint();
-            }
-        });
-
-        // Título
         JLabel title = new JLabel("Log In");
         title.setFont(new Font("Arial", Font.BOLD, 30));
         title.setForeground(Color.BLACK);
         title.setBounds(100, 50, 200, 40);
         mainPanel.add(title);
 
-        // Etiquetas de texto
         JLabel userLabel = new JLabel("User name or email");
         userLabel.setForeground(Color.BLACK);
         userLabel.setBounds(100, 100, 200, 20);
         mainPanel.add(userLabel);
 
-        // Campos de texto con bordes redondeados
-        JTextField nameOrEmail = new RoundTextField(20);
+        nameOrEmail = new RoundTextField(20);
         nameOrEmail.setBounds(100, 120, 250, 35);
         mainPanel.add(nameOrEmail);
 
@@ -82,11 +80,10 @@ public class LoginView extends JPanel {
         passLabel.setBounds(100, 160, 200, 20);
         mainPanel.add(passLabel);
 
-        JPasswordField password = new RoundPasswordField(20);
+        password = new RoundPasswordField(20);
         password.setBounds(100, 180, 250, 35);
         mainPanel.add(password);
 
-        // Botón de inicio de sesión
         JButton loginButton = new RoundButton("Log In");
         loginButton.setBounds(100, 250, 250, 40);
         loginButton.setBackground(new Color(66, 133, 244));
@@ -94,53 +91,70 @@ public class LoginView extends JPanel {
         loginButton.setFont(new Font("Arial", Font.BOLD, 14));
         mainPanel.add(loginButton);
 
-        loginButton.addActionListener(e -> {
-            String user = nameOrEmail.getText();
-            String pass = new String(password.getPassword());
-
-            if (user.isEmpty() || pass.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please complete all fields.", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                if (loginController != null) {
-                    try {
-                        String result = loginController.login(user, pass);
-                        if (result != null) {
-                            if ("success".equals(result)) {
-                                User loggedUser = loginController.getUser(user);
-                                JOptionPane.showMessageDialog(this, "Successful login", "Welcome " + loggedUser.getUserName(), JOptionPane.INFORMATION_MESSAGE);
-                                mostrarReservasCanceladas(loggedUser.getId());
-
-                                // Reemplazar la vista en lugar de abrir una nueva ventana
-                                // Aquí pasamos el panel de usuario después de login
-                                setVisible(false);
-                                JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-                                parentFrame.setContentPane(new UserMenuView(loggedUser));  // Suponiendo que UserMenuView es un JPanel
-                                parentFrame.revalidate();
-                                parentFrame.repaint();
-                            } else {
-                                if ("admin_success".equals(result)) {
-                                    JOptionPane.showMessageDialog(this, "Successful login.", "Bienvenido Admin", JOptionPane.INFORMATION_MESSAGE);
-
-                                    setVisible(false);
-                                    JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-                                    parentFrame.setContentPane(new AdminMenuView());  // Suponiendo que UserMenuView es un JPanel
-                                    parentFrame.revalidate();
-                                    parentFrame.repaint();
-                                } else {
-                                    JOptionPane.showMessageDialog(this, result, "Error", JOptionPane.ERROR_MESSAGE);
-                                }
-                            }
-                        }
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(this, "Could not connect to database. Please check your configuration.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
+        backArrow.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                backToMainView();
             }
         });
 
-        add(mainPanel);
+        loginButton.addActionListener(e -> checkLogin());
+    }
+
+    private void backToMainView() {
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(LoginView.this);
+        parentFrame.setContentPane(new MainView());
+        parentFrame.revalidate();
+        parentFrame.repaint();
+    }
+
+    private void checkLogin() {
+        String user = nameOrEmail.getText();
+        String pass = new String(password.getPassword());
+
+        if (user.isEmpty() || pass.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please complete all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (loginController == null) {
+            JOptionPane.showMessageDialog(this, "Could not connect to database. Please check your configuration.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            String result = loginController.login(user, pass);
+            if (result == null) {
+                JOptionPane.showMessageDialog(this, "Unknown error during login.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            switch (result) {
+                case "success" -> {
+                    User loggedUser = loginController.getUser(user);
+                    JOptionPane.showMessageDialog(this, "Successful login", "Welcome " + loggedUser.getUserName(), JOptionPane.INFORMATION_MESSAGE);
+                    mostrarReservasCanceladas(loggedUser.getId());
+
+                    setVisible(false);
+                    JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+                    parentFrame.setContentPane(new UserMenuView(loggedUser));
+                    parentFrame.revalidate();
+                    parentFrame.repaint();
+                }
+                case "admin_success" -> {
+                    JOptionPane.showMessageDialog(this, "Successful login.", "Bienvenido Admin", JOptionPane.INFORMATION_MESSAGE);
+
+                    setVisible(false);
+                    JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+                    parentFrame.setContentPane(new AdminMenuView());
+                    parentFrame.revalidate();
+                    parentFrame.repaint();
+                }
+                default -> JOptionPane.showMessageDialog(this, result, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void mostrarReservasCanceladas(int userId) {
@@ -148,25 +162,25 @@ public class LoginView extends JPanel {
             List<CancelledReservation> canceladas = loginController.getCancelledReservationsByUserId(userId);
 
             if (canceladas != null && !canceladas.isEmpty()) {
-                StringBuilder mensaje = new StringBuilder("El admin ha cancelado tus siguientes reservas:\n\n");
+                StringBuilder mensaje = new StringBuilder("The admin has canceled your following reservations:\n\n");
                 Slot newSlot;
                 for (CancelledReservation reservas : canceladas) {
-                    mensaje.append("Anterior Slot Code: ").append(reservas.getSlot().getIdSlot()).append("\n");
-                    mensaje.append("Anterior Slot Plant: ").append(reservas.getSlot().getFloor()).append("\n");
+                    mensaje.append("Previous Slot Code: ").append(reservas.getSlot().getIdSlot()).append("\n");
+                    mensaje.append("Previous Slot Plant: ").append(reservas.getSlot().getFloor()).append("\n");
                     newSlot = loginController.getSlotByPlate(reservas.getVehicle().getPlate());
                     if (newSlot != null) {
                         mensaje.append("New Slot Code: ").append(newSlot.getIdSlot()).append("\n");
                         mensaje.append("New Slot Plant: ").append(newSlot.getFloor()).append("\n");
                     }
                 }
-                JOptionPane.showMessageDialog(null, mensaje.toString(), "Reservas canceladas", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null, mensaje.toString(), "Cancelled reservations", JOptionPane.WARNING_MESSAGE);
 
                 for (CancelledReservation c : canceladas) {
                     loginController.deleteCancelledReservationById(c.getId());
                 }
             }
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al cargar las reservas canceladas: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error loading canceled reservations: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

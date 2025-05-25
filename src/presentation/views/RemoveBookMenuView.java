@@ -36,57 +36,58 @@ public class RemoveBookMenuView extends JPanel {
     private Map<String, Integer> plateToSlotMap; // Para mapear cada matrícula a su ID de slot
 
     public RemoveBookMenuView(User loggedUser) {
+        this.loggedUser = loggedUser;
+        initControllers();
+        initData();
+        initLayout();
+        initMenu();
+        initTitleAndClose();
+        initReservationsTable();
+        initConfirmPanel();
+        initListeners();
+    }
+
+    private void initControllers() {
         try {
-            this.loggedUser = loggedUser;
-            this.userController = new UserController();
-            this.parkingStatusController = new ParkingStatusController();
-            this.loginController = new LoginController();
+            userController = new UserController();
+            parkingStatusController = new ParkingStatusController();
+            loginController = new LoginController();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
         }
-        this.plateToSlotMap = new HashMap<>();
-        setLayout(null);
-        
-        try {
-            // Obtener vehículos del usuario
-            userBookings = userController.getPanelBookings(loggedUser.getId());
-            
-            // Obtener todos los slots reservados
-            List<Slot> allSlots = userController.getAllSlotsReserved();
-            plateToSlotMap = new HashMap<>();
+    }
 
-            // Crear un mapa de matrículas a IDs de slot para uso posterior
-            if (allSlots != null && !allSlots.isEmpty()) {
+    private void initData() {
+        plateToSlotMap = new HashMap<>();
+        try {
+            userBookings = userController.getPanelBookings(loggedUser.getId());
+            List<Slot> allSlots = userController.getAllSlotsReserved();
+
+            if (allSlots != null) {
                 for (Slot slot : allSlots) {
                     if (slot.getVehiclePlate() != null && slot.getBooked()) {
                         plateToSlotMap.put(slot.getVehiclePlate(), slot.getIdSlot());
                     }
                 }
             }
-            
-            // Si no tenemos userBookings o está vacío, inicializarlo
-            if (userBookings == null || userBookings.isEmpty()) {
+
+            if (userBookings == null) {
                 userBookings = new ArrayList<>();
             }
         } catch (SQLException e) {
             userBookings = new ArrayList<>();
             JOptionPane.showMessageDialog(this, "Error loading reservations: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
 
-        // Panel principal
+    private void initLayout() {
+        setLayout(null);
         mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
-                GradientPaint gp = new GradientPaint(
-                    0,
-                    0,
-                    new Color(44, 37, 80),
-                    getWidth(),
-                    getHeight(),
-                    new Color(161, 141, 204)
-                );
+                GradientPaint gp = new GradientPaint(0, 0, new Color(44, 37, 80), getWidth(), getHeight(), new Color(161, 141, 204));
                 g2d.setPaint(gp);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }
@@ -94,8 +95,9 @@ public class RemoveBookMenuView extends JPanel {
         mainPanel.setLayout(null);
         mainPanel.setBounds(0, 0, 900, 500);
         add(mainPanel);
+    }
 
-        // Menu lateral
+    private void initMenu() {
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(null);
         menuPanel.setBackground(new Color(70, 60, 130));
@@ -111,7 +113,7 @@ public class RemoveBookMenuView extends JPanel {
         bookMenuButton = new RoundButton("Book");
         bookMenuButton.setBounds(20, 210, 160, 40);
         bookMenuButton.setFont(new Font("Arial", Font.BOLD, 16));
-        bookMenuButton.setBackground(new Color(150, 130, 200)); // Inactive color
+        bookMenuButton.setBackground(new Color(150, 130, 200));
         bookMenuButton.setForeground(Color.BLACK);
         bookMenuButton.setFocusPainted(false);
         menuPanel.add(bookMenuButton);
@@ -119,11 +121,13 @@ public class RemoveBookMenuView extends JPanel {
         removeBookMenuButton = new RoundButton("Remove book");
         removeBookMenuButton.setBounds(20, 270, 160, 40);
         removeBookMenuButton.setFont(new Font("Arial", Font.BOLD, 16));
-        removeBookMenuButton.setBackground(new Color(255, 200, 0)); // Active color - we are in Remove Book view
+        removeBookMenuButton.setBackground(new Color(255, 200, 0));
         removeBookMenuButton.setForeground(Color.BLACK);
         removeBookMenuButton.setFocusPainted(false);
         menuPanel.add(removeBookMenuButton);
+    }
 
+    private void initTitleAndClose() {
         JLabel titleLabel = new JLabel("CANCEL A RESERVATION", SwingConstants.CENTER);
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
@@ -136,23 +140,22 @@ public class RemoveBookMenuView extends JPanel {
         closeButton.setBounds(840, 20, 30, 30);
         closeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         mainPanel.add(closeButton);
+    }
 
-        // Tabla de reservas
+    private void initReservationsTable() {
         String[] columns = {"License Plate", "Vehicle Type", "Slot ID"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
+            public boolean isCellEditable(int row, int column) { return false; }
         };
 
         if (userBookings != null && !userBookings.isEmpty()) {
             for (Vehicle vehicle : userBookings) {
                 Integer slotId = plateToSlotMap.get(vehicle.getPlate());
                 model.addRow(new Object[]{
-                    vehicle.getPlate(),
-                    vehicle.getType(),
-                    slotId != null ? slotId.toString() : "N/A"
+                        vehicle.getPlate(),
+                        vehicle.getType(),
+                        slotId != null ? slotId.toString() : "N/A"
                 });
             }
         }
@@ -162,12 +165,14 @@ public class RemoveBookMenuView extends JPanel {
         reservationsTable.setFont(new Font("Arial", Font.PLAIN, 14));
         reservationsTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
         reservationsTable.setRowHeight(25);
-        
+
         JScrollPane scrollPane = new JScrollPane(reservationsTable);
         scrollPane.setBounds(250, 90, 550, 200);
         mainPanel.add(scrollPane);
+    }
 
-        // Confirmacion
+
+    private void initConfirmPanel() {
         JPanel confirmPanel = new JPanel();
         confirmPanel.setLayout(null);
         confirmPanel.setOpaque(false);
@@ -191,73 +196,25 @@ public class RemoveBookMenuView extends JPanel {
         cancelReservationButton.setBackground(new Color(204, 60, 60));
         cancelReservationButton.setForeground(Color.WHITE);
         confirmPanel.add(cancelReservationButton);
+    }
 
-        // Listeners
-        cancelReservationButton.addActionListener(e -> {
-            int selectedRow = reservationsTable.getSelectedRow();
-            String enteredPlate = licensePlateField.getText().trim();
-            
-            if (selectedRow == -1) {
-                JOptionPane.showMessageDialog(this, "Please select a reservation to cancel.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
+    private void initListeners() {
+        cancelReservationButton.addActionListener(e -> handleCancelReservation());
+
+        closeButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                goBackToUserMenu();
             }
-            
-            String selectedPlate = (String) reservationsTable.getValueAt(selectedRow, 0);
-            
-            if (!Objects.equals(enteredPlate, selectedPlate)) {
-                JOptionPane.showMessageDialog(this, "The entered license plate doesn't match the selected reservation.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                closeButton.setForeground(new Color(255, 80, 80));
             }
-            
-            // Obtenemos el ID del slot directamente del map
-            Integer slotId = plateToSlotMap.get(selectedPlate);
-            
-            if (slotId == null) {
-                JOptionPane.showMessageDialog(this, "Cannot find the slot ID for this reservation. Please refresh and try again.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            
-            try {
-                // Verificar que el vehículo tenga reserva
-                if (userController.checkUserBooking(selectedPlate)) {
-                    if (parkingStatusController.cancelSlot(slotId)) {
-                        parkingStatusController.createCancelledReservation(slotId, loggedUser.getId(), selectedPlate);
-                        JOptionPane.showMessageDialog(this, "Reservation for " + selectedPlate + " has been successfully cancelled.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        
-                        // Actualizar la vista actual en lugar de navegar
-                        refreshReservations();
-                        
-                        // Limpiar el campo de texto
-                        licensePlateField.setText("");
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Failed to cancel the reservation.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(this, "No active reservation found for " + selectedPlate, "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error during cancellation: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                closeButton.setForeground(Color.WHITE);
             }
         });
-
-        closeButton.addMouseListener(
-            new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseClicked(java.awt.event.MouseEvent e) {
-                    goBackToUserMenu();
-                }
-
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent e) {
-                    closeButton.setForeground(new Color(255, 80, 80));
-                }
-
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent e) {
-                    closeButton.setForeground(Color.WHITE);
-                }
-            }
-        );
 
         bookMenuButton.addActionListener(e -> {
             setVisible(false);
@@ -268,6 +225,47 @@ public class RemoveBookMenuView extends JPanel {
                 parentFrame.repaint();
             }
         });
+    }
+
+    private void handleCancelReservation() {
+        int selectedRow = reservationsTable.getSelectedRow();
+        String enteredPlate = licensePlateField.getText().trim();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a reservation to cancel.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String selectedPlate = (String) reservationsTable.getValueAt(selectedRow, 0);
+
+        if (!Objects.equals(enteredPlate, selectedPlate)) {
+            JOptionPane.showMessageDialog(this, "The entered license plate doesn't match the selected reservation.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Integer slotId = plateToSlotMap.get(selectedPlate);
+
+        if (slotId == null) {
+            JOptionPane.showMessageDialog(this, "Cannot find the slot ID for this reservation. Please refresh and try again.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            if (userController.checkUserBooking(selectedPlate)) {
+                if (parkingStatusController.cancelSlot(slotId)) {
+                    parkingStatusController.createCancelledReservation(slotId, loggedUser.getId(), selectedPlate);
+                    JOptionPane.showMessageDialog(this, "Reservation for " + selectedPlate + " has been successfully cancelled.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    refreshReservations();
+                    licensePlateField.setText("");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to cancel the reservation.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "No active reservation found for " + selectedPlate, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error during cancellation: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void goBackToUserMenu() {

@@ -15,17 +15,30 @@ import java.sql.SQLException;
 public class RegisterView extends JPanel {
     private RegisterController registerController;
 
+    private JPanel mainPanel;
+    private JTextField usernameField;
+    private JTextField emailField;
+    private JPasswordField passwordField;
+    private JPasswordField confirmPasswordField;
+
     public RegisterView() {
         try {
             registerController = new RegisterController();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(),"Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         setLayout(null);
         setPreferredSize(new Dimension(900, 500));
 
-        JPanel mainPanel = new JPanel() {
+        initMainPanel();
+        initComponents();
+
+        add(mainPanel);
+    }
+
+    private void initMainPanel() {
+        mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -37,120 +50,132 @@ public class RegisterView extends JPanel {
         };
         mainPanel.setLayout(null);
         mainPanel.setBounds(0, 0, 900, 500);
+    }
 
+    private void initComponents() {
+        // Back arrow
         JLabel backArrow = new JLabel("←");
         backArrow.setFont(new Font("Arial", Font.BOLD, 20));
         backArrow.setForeground(Color.BLACK);
         backArrow.setBounds(20, 20, 30, 30);
-        mainPanel.add(backArrow);
-
         backArrow.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(RegisterView.this);
-                parentFrame.setContentPane(new MainView());  // Cambia el contenido por MainView
+                parentFrame.setContentPane(new MainView());
                 parentFrame.revalidate();
                 parentFrame.repaint();
             }
         });
+        mainPanel.add(backArrow);
 
+        // Title
         JLabel title = new JLabel("Register");
         title.setFont(new Font("Arial", Font.BOLD, 30));
         title.setForeground(Color.BLACK);
         title.setBounds(100, 50, 200, 40);
         mainPanel.add(title);
 
+        // Username
         JLabel userLabel = new JLabel("Username");
         userLabel.setForeground(Color.BLACK);
         userLabel.setBounds(100, 100, 200, 20);
         mainPanel.add(userLabel);
 
-        JTextField usernameField = new RoundTextField(20);
+        usernameField = new RoundTextField(20);
         usernameField.setBounds(100, 120, 250, 35);
         mainPanel.add(usernameField);
 
+        // Email
         JLabel emailLabel = new JLabel("Email");
         emailLabel.setForeground(Color.BLACK);
         emailLabel.setBounds(100, 160, 200, 20);
         mainPanel.add(emailLabel);
 
-        JTextField emailField = new RoundTextField(20);
+        emailField = new RoundTextField(20);
         emailField.setBounds(100, 180, 250, 35);
         mainPanel.add(emailField);
 
+        // Password
         JLabel passLabel = new JLabel("Password");
         passLabel.setForeground(Color.BLACK);
         passLabel.setBounds(100, 220, 200, 20);
         mainPanel.add(passLabel);
 
-        JPasswordField passwordField = new RoundPasswordField(20);
+        passwordField = new RoundPasswordField(20);
         passwordField.setBounds(100, 240, 250, 35);
         mainPanel.add(passwordField);
 
+        // Confirm Password
         JLabel confirmPassLabel = new JLabel("Confirm Password");
         confirmPassLabel.setForeground(Color.BLACK);
         confirmPassLabel.setBounds(100, 280, 250, 20);
         mainPanel.add(confirmPassLabel);
 
-        JPasswordField confirmPasswordField = new RoundPasswordField(20);
+        confirmPasswordField = new RoundPasswordField(20);
         confirmPasswordField.setBounds(100, 300, 250, 35);
         mainPanel.add(confirmPasswordField);
 
+        // Register button
         JButton registerButton = new RoundButton("Register");
         registerButton.setBounds(100, 350, 250, 40);
         registerButton.setBackground(new Color(66, 133, 244));
         registerButton.setForeground(Color.WHITE);
         registerButton.setFont(new Font("Arial", Font.BOLD, 14));
+        registerButton.addActionListener(e -> handleRegister());
         mainPanel.add(registerButton);
+    }
 
-        registerButton.addActionListener(e -> {
-            String username = usernameField.getText();
-            String email = emailField.getText();
-            String password = new String(passwordField.getPassword());
-            String confirmPassword = new String(confirmPasswordField.getPassword());
+    private void handleRegister() {
+        String username = usernameField.getText();
+        String email = emailField.getText();
+        String password = new String(passwordField.getPassword());
+        String confirmPassword = new String(confirmPasswordField.getPassword());
 
-            if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, completa todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
-            } else if (!password.equals(confirmPassword)) {
-                JOptionPane.showMessageDialog(this,
-                        "Les contrasenyes no coincideixen.\nEl camp 'Confirmació de contrasenya' ha de coincidir amb el camp 'Contrasenya'.",
-                        "Error de contrasenya",
-                        JOptionPane.ERROR_MESSAGE);
-            } else if (!isPasswordSecure(password)) {
-                JOptionPane.showMessageDialog(this,
-                        "La contrasenya ha de tenir com a mínim 8 caràcters i incloure almenys:\n- una lletra majúscula\n- una lletra minúscula\n- un número",
-                        "Contrasenya insegura",
-                        JOptionPane.ERROR_MESSAGE);
-            } else {
-                if (registerController != null) {
-                    try {
-                        String result = registerController.register(username, password, email);
-                        if (result != null) {
-                            if ("success".equals(result)) {
-                                LoginController loginController = new LoginController();
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, completa todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!password.equals(confirmPassword)) {
+            JOptionPane.showMessageDialog(this,
+                    "Les contrasenyes no coincideixen.\nEl camp 'Confirmació de contrasenya' ha de coincidir amb el camp 'Contrasenya'.",
+                    "Error de contrasenya",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!isPasswordSecure(password)) {
+            JOptionPane.showMessageDialog(this,
+                    "La contrasenya ha de tenir com a mínim 8 caràcters i incloure almenys:\n- una lletra majúscula\n- una lletra minúscula\n- un número",
+                    "Contrasenya insegura",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-                                User user = loginController.getUser(email);
-                                JOptionPane.showMessageDialog(this, "Registro exitoso\nEntrando al menú principal...", "Registro Completado", JOptionPane.INFORMATION_MESSAGE);
+        if (registerController == null) {
+            JOptionPane.showMessageDialog(this, "Could not connect to database. Please check your configuration.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-                                JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(RegisterView.this);
-                                parentFrame.setContentPane(new UserMenuView(user));
-                                parentFrame.revalidate();
-                                parentFrame.repaint();
-                            } else {
-                                JOptionPane.showMessageDialog(this, result, "Error", JOptionPane.ERROR_MESSAGE);
-                            }
-                        }
-                    } catch (RegisterException ex) {
-                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de registro", JOptionPane.ERROR_MESSAGE);
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(this, "Error de base de datos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    }
+        try {
+            String result = registerController.register(username, password, email);
+            if (result != null) {
+                if ("success".equals(result)) {
+                    LoginController loginController = new LoginController();
+                    User user = loginController.getUser(email);
+                    JOptionPane.showMessageDialog(this, "Registro exitoso\nEntrando al menú principal...", "Registro Completado", JOptionPane.INFORMATION_MESSAGE);
+
+                    JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(RegisterView.this);
+                    parentFrame.setContentPane(new UserMenuView(user));
+                    parentFrame.revalidate();
+                    parentFrame.repaint();
                 } else {
-                    JOptionPane.showMessageDialog(this, "Could not connect to database. Please check your configuration.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, result, "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        });
-
-        add(mainPanel);
+        } catch (RegisterException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de registro", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error de base de datos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private boolean isPasswordSecure(String password) {

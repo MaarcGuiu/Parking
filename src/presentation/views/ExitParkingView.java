@@ -17,15 +17,23 @@ public class ExitParkingView extends JPanel {
     public ExitParkingView(User loggedUser) {
         try {
             leaveController = new LeaveController(loggedUser);
+            this.loggedUser = loggedUser;
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            showErrorMessage(e.getMessage());
+            return;
         }
 
-        this.loggedUser = loggedUser;
-        // Permitir posicionamiento absoluto
         setLayout(null);
 
-        // Panel principal con degradado
+        initializeMainPanel();
+        initializeCloseButton();
+        initializeUserInteractionPanel();
+        initializeMenuPanel();
+
+        add(mainPanel);
+    }
+
+    private void initializeMainPanel() {
         mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -36,7 +44,6 @@ public class ExitParkingView extends JPanel {
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         };
-
         mainPanel.setLayout(null);
         mainPanel.setBounds(0, 0, 900, 500);
 
@@ -45,14 +52,24 @@ public class ExitParkingView extends JPanel {
         exitParkingTitle.setFont(new Font("Arial", Font.BOLD, 20));
         exitParkingTitle.setBounds(300, 20, 500, 30);
         mainPanel.add(exitParkingTitle);
+    }
 
+    private void initializeCloseButton() {
         JLabel closeButton = new JLabel("\u2716");
         closeButton.setFont(new Font("Dialog", Font.BOLD, 22));
         closeButton.setForeground(Color.BLACK);
         closeButton.setBounds(840, 20, 30, 30);
         closeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        closeButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                switchToUserMenuView();
+            }
+        });
         mainPanel.add(closeButton);
+    }
 
+    private void initializeUserInteractionPanel() {
         JPanel userInteractionPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -61,19 +78,17 @@ public class ExitParkingView extends JPanel {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 GradientPaint gp = new GradientPaint(0, 0, new Color(190, 180, 230), getWidth(), getHeight(), new Color(140, 130, 180));
                 g2.setPaint(gp);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30); // Bordes arrodonits
-                g2.setColor(new Color(255, 255, 255, 50)); // Color del borde (blanc translúcid)
-                g2.setStroke(new BasicStroke(2)); // Amplada del borde
-                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 30, 30); // Borde arrodonit
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+                g2.setColor(new Color(255, 255, 255, 50));
+                g2.setStroke(new BasicStroke(2));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 30, 30);
                 g2.dispose();
             }
         };
         userInteractionPanel.setBounds(335, 120, 425, 270);
-
         userInteractionPanel.setLayout(null);
         userInteractionPanel.setOpaque(false);
         mainPanel.add(userInteractionPanel);
-
 
         JLabel plateLabel = new JLabel("PLATE");
         plateLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -92,6 +107,10 @@ public class ExitParkingView extends JPanel {
         leaveActionButton.setFont(new Font("Arial", Font.BOLD, 14));
         userInteractionPanel.add(leaveActionButton);
 
+        leaveActionButton.addActionListener(e -> handleLeaveAction(plateField));
+    }
+
+    private void initializeMenuPanel() {
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(null);
         menuPanel.setBackground(new Color(70, 60, 130));
@@ -100,7 +119,7 @@ public class ExitParkingView extends JPanel {
         JLabel menuTitle = new JLabel("MENU", SwingConstants.CENTER);
         menuTitle.setForeground(Color.WHITE);
         menuTitle.setFont(new Font("Arial", Font.BOLD, 20));
-        menuTitle.setBounds(0, 20, 200, 30); // Ancho igual al panel para centrar
+        menuTitle.setBounds(0, 20, 200, 30);
         menuPanel.add(menuTitle);
 
         JButton enterParkingButton = new RoundButton("Enter Parking");
@@ -108,6 +127,7 @@ public class ExitParkingView extends JPanel {
         enterParkingButton.setBackground(new Color(150, 130, 200));
         enterParkingButton.setForeground(Color.BLACK);
         enterParkingButton.setFocusPainted(false);
+        enterParkingButton.addActionListener(e -> switchToEntryParkingView());
         menuPanel.add(enterParkingButton);
 
         JButton leaveParkingButton = new RoundButton("Leave Parking");
@@ -117,71 +137,68 @@ public class ExitParkingView extends JPanel {
         leaveParkingButton.setFocusPainted(false);
         menuPanel.add(leaveParkingButton);
 
-
         mainPanel.add(menuPanel);
-        add(mainPanel);
+    }
 
-        leaveActionButton.addActionListener(e -> {
-            String plate = plateField.getText();
+    private void handleLeaveAction(JTextField plateField) {
+        String plate = plateField.getText();
 
-            try {
-                if (plate.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Enter the license plate number", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                } else {
-                    if (!leaveController.isValidPlateFormat(plate)) {
-                        JOptionPane.showMessageDialog(this, "Invalid plate format. Must be 3 uppercase letters followed by 3 digits.", "Error", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                }
-
-                String userPlate = leaveController.userPlate(loggedUser, plate);
-                if (!"success".equals(userPlate)) {
-                    JOptionPane.showMessageDialog(this, userPlate, "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                String plateInside = leaveController.isVehicleInside(plate);
-                if (!"success".equals(plateInside)) {
-                    JOptionPane.showMessageDialog(this, plateInside, "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                int slotId = leaveController.getSlotIdByPlate(plate);
-
-                String updateSlot = leaveController.updateSlot(plate);
-                if (!"success".equals(updateSlot)) {
-                    JOptionPane.showMessageDialog(this, updateSlot, "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                leaveController.registerExitLogs("leave", plate, slotId);
-
-                JOptionPane.showMessageDialog(this, "The vehicle is outside!", "Exit Parking", JOptionPane.INFORMATION_MESSAGE);
-
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        try {
+            if (plate.isEmpty()) {
+                showErrorMessage("Enter the license plate number");
+                return;
             }
-        });
-
-        enterParkingButton.addActionListener(e -> {
-            setVisible(false);
-            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            parentFrame.setContentPane(new EntryParkingView(loggedUser));
-            parentFrame.revalidate();
-            parentFrame.repaint();
-        });
-
-        closeButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                setVisible(false);
-                JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(ExitParkingView.this);
-                parentFrame.setContentPane(new UserMenuView(loggedUser));
-                parentFrame.revalidate();
-                parentFrame.repaint();
+            if (!leaveController.isValidPlateFormat(plate)) {
+                showErrorMessage("Invalid plate format. Must be 3 uppercase letters followed by 3 digits.");
+                return;
             }
-        });
+
+            String userPlate = leaveController.userPlate(loggedUser, plate);
+            if (!"success".equals(userPlate)) {
+                showErrorMessage(userPlate);
+                return;
+            }
+
+            String plateInside = leaveController.isVehicleInside(plate);
+            if (!"success".equals(plateInside)) {
+                showErrorMessage(plateInside);
+                return;
+            }
+
+            int slotId = leaveController.getSlotIdByPlate(plate);
+
+            String updateSlot = leaveController.updateSlot(plate);
+            if (!"success".equals(updateSlot)) {
+                showErrorMessage(updateSlot);
+                return;
+            }
+
+            leaveController.registerExitLogs("leave", plate, slotId);
+            JOptionPane.showMessageDialog(this, "The vehicle is outside!", "Exit Parking", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            showErrorMessage("Database error: " + ex.getMessage());
+        }
+    }
+
+    private void switchToUserMenuView() {
+        setVisible(false);
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        parentFrame.setContentPane(new UserMenuView(loggedUser));
+        parentFrame.revalidate();
+        parentFrame.repaint();
+    }
+
+    private void switchToEntryParkingView() {
+        setVisible(false);
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        parentFrame.setContentPane(new EntryParkingView(loggedUser));
+        parentFrame.revalidate();
+        parentFrame.repaint();
+    }
+
+    private void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
