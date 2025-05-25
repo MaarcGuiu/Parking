@@ -12,6 +12,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 
+/**
+ * The type Register view.
+ */
 public class RegisterView extends JPanel {
     private RegisterController registerController;
 
@@ -21,6 +24,9 @@ public class RegisterView extends JPanel {
     private JPasswordField passwordField;
     private JPasswordField confirmPasswordField;
 
+    /**
+     * Instantiates a new Register view.
+     */
     public RegisterView() {
         try {
             registerController = new RegisterController();

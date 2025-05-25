@@ -12,9 +12,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Cancelled reservation sql dao.
+ */
 public class CancelledReservationSqlDao {
     private static Connection connection;
 
+    /**
+     * Instantiates a new Cancelled reservation sql dao.
+     */
     public CancelledReservationSqlDao() {
         try {
             this.connection = ConnectionDB.getInstance();
@@ -23,6 +29,12 @@ public class CancelledReservationSqlDao {
         }
     }
 
+    /**
+     * Create cancelled reservation.
+     *
+     * @param reservation the reservation
+     * @throws SQLException the sql exception
+     */
     public void createCancelledReservation(CancelledReservation reservation) throws SQLException {
         String query = "INSERT INTO cancelled_reservations (user_id, slot_id, vehicle_plate) VALUES (?, ?, ?)";
 
@@ -34,6 +46,13 @@ public class CancelledReservationSqlDao {
         }
     }
 
+    /**
+     * Gets cancelled reservations by user id.
+     *
+     * @param userId the user id
+     * @return the cancelled reservations by user id
+     * @throws SQLException the sql exception
+     */
     public List<CancelledReservation> getCancelledReservationsByUserId(int userId) throws SQLException {
         List<CancelledReservation> cancelledReservations = new ArrayList<>();
         UserSqlDao userSqlDao = new UserSqlDao();
@@ -62,6 +81,12 @@ public class CancelledReservationSqlDao {
         return cancelledReservations;
     }
 
+    /**
+     * Delete cancelled reservations by id.
+     *
+     * @param id the id
+     * @throws SQLException the sql exception
+     */
     public void deleteCancelledReservationsById(int id) throws SQLException {
         String query = "DELETE FROM cancelled_reservations WHERE id = ?";
 

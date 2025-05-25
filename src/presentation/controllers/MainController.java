@@ -5,9 +5,15 @@ import presentation.views.MainView;
 
 import javax.swing.*;
 
+/**
+ * The type Main controller.
+ */
 public class MainController {
 
 
+    /**
+     * Run.
+     */
     public void run() {
         SwingUtilities.invokeLater(() -> {
             SimulationManager simulationManager = new SimulationManager();

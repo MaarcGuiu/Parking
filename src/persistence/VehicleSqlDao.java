@@ -7,9 +7,15 @@ import business.model.Vehicle;
 import java.sql.*;
 import java.util.ArrayList;
 
+/**
+ * The type Vehicle sql dao.
+ */
 public class VehicleSqlDao {
     private static Connection connection;
 
+    /**
+     * Instantiates a new Vehicle sql dao.
+     */
     public VehicleSqlDao() {
         try {
             this.connection = ConnectionDB.getInstance();
@@ -18,6 +24,13 @@ public class VehicleSqlDao {
         }
     }
 
+    /**
+     * Gets vehicle by plate.
+     *
+     * @param vehiclePlate the vehicle plate
+     * @return the vehicle by plate
+     * @throws SQLException the sql exception
+     */
     public Vehicle getVehicleByPlate(String vehiclePlate) throws SQLException {
         String vehicleQuery = "SELECT plate, brand, model, color, owner_id, type_vehicle FROM vehicles WHERE plate = ?";
         try (PreparedStatement stmt = connection.prepareStatement(vehicleQuery)) {
@@ -42,6 +55,13 @@ public class VehicleSqlDao {
         }
     }
 
+    /**
+     * Gets vehicle by user.
+     *
+     * @param user the user
+     * @return the vehicle by user
+     * @throws SQLException the sql exception
+     */
     public Vehicle getVehicleByUser(User user) throws SQLException {
         String query = "SELECT plate, brand, model, color, owner_id, type_vehicle FROM vehicles WHERE owner_id = ? LIMIT 1";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -63,6 +83,12 @@ public class VehicleSqlDao {
             }
         }
     }
+
+    /**
+     * Gets all vehicle.
+     *
+     * @return the all vehicle
+     */
     public ArrayList<Vehicle> getAllVehicle() {
         ArrayList<Vehicle> vehicles = new ArrayList<>();
         String query = "SELECT * FROM vehicles";

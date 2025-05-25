@@ -3,7 +3,15 @@ package presentation.components;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The type Round button.
+ */
 public class RoundButton extends JButton {
+    /**
+     * Instantiates a new Round button.
+     *
+     * @param text the text
+     */
     public RoundButton(String text) {
         super(text);
         setContentAreaFilled(false);

@@ -5,6 +5,9 @@ import presentation.components.RoundButton;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The type Main view.
+ */
 public class MainView extends JPanel {
 
     private JPanel backgroundPanel;
@@ -12,6 +15,9 @@ public class MainView extends JPanel {
     private JButton loginButton;
     private JButton signUpButton;
 
+    /**
+     * Instantiates a new Main view.
+     */
     public MainView() {
         setLayout(null);
         setPreferredSize(new Dimension(900, 500));

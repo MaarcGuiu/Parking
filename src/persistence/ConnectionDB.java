@@ -8,11 +8,20 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * The type Connection db.
+ */
 public class ConnectionDB {
     private static Connection instance;
 
     private ConnectionDB() {}
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     * @throws SQLException the sql exception
+     */
     public static Connection getInstance() throws SQLException {
         if (instance == null) {
             ConfigDao configDao = new ConfigJsonDao();
@@ -34,6 +43,11 @@ public class ConnectionDB {
         return instance;
     }
 
+    /**
+     * Close connection.
+     *
+     * @throws SQLException the sql exception
+     */
     public static void closeConnection() throws SQLException {
         if (instance != null) {
             try {

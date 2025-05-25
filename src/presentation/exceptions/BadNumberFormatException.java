@@ -6,6 +6,7 @@ package presentation.exceptions;
 public abstract class BadNumberFormatException extends PresentationException {
     /**
      * Returns the error message of this exception.
+     *
      * @param message message of the exception
      * @return The error message
      */

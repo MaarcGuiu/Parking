@@ -13,6 +13,9 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * The type Login view.
+ */
 public class LoginView extends JPanel {
     private JPanel mainPanel;
     private LoginController loginController;
@@ -20,6 +23,9 @@ public class LoginView extends JPanel {
     private JTextField nameOrEmail;
     private JPasswordField password;
 
+    /**
+     * Instantiates a new Login view.
+     */
     public LoginView() {
         initController();
         initLayout();

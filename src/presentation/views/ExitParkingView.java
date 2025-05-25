@@ -9,11 +9,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 
+/**
+ * The type Exit parking view.
+ */
 public class ExitParkingView extends JPanel {
     private JPanel mainPanel;
     private User loggedUser;
     private LeaveController leaveController;
 
+    /**
+     * Instantiates a new Exit parking view.
+     *
+     * @param loggedUser the logged user
+     */
     public ExitParkingView(User loggedUser) {
         try {
             leaveController = new LeaveController(loggedUser);

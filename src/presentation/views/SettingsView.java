@@ -11,11 +11,19 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
+/**
+ * The type Settings view.
+ */
 public class SettingsView extends JPanel {
     private JPanel mainPanel;
     private JButton deleteAccountButton;
     private JButton logoutButton;
 
+    /**
+     * Instantiates a new Settings view.
+     *
+     * @param loggedUser the logged user
+     */
     public SettingsView(User loggedUser) {
         setLayout(new BorderLayout());
 

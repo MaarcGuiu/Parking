@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Map;
 
+/**
+ * The type Remove book menu view.
+ */
 public class RemoveBookMenuView extends JPanel {
 
     private JPanel mainPanel;
@@ -35,6 +38,11 @@ public class RemoveBookMenuView extends JPanel {
     private ArrayList<Vehicle> userBookings;
     private Map<String, Integer> plateToSlotMap; // Para mapear cada matrícula a su ID de slot
 
+    /**
+     * Instantiates a new Remove book menu view.
+     *
+     * @param loggedUser the logged user
+     */
     public RemoveBookMenuView(User loggedUser) {
         this.loggedUser = loggedUser;
         initControllers();
@@ -278,6 +286,11 @@ public class RemoveBookMenuView extends JPanel {
         }
     }
 
+    /**
+     * Gets main panel.
+     *
+     * @return the main panel
+     */
     public JPanel getMainPanel() {
         return mainPanel;
     }

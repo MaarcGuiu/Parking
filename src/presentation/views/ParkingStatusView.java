@@ -12,13 +12,27 @@ import java.awt.event.*;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * The type Parking status view.
+ */
 public class ParkingStatusView {
     private static ParkingStatusController parkingStatusController;
     private static AdminController adminController;
 
+    /**
+     * Instantiates a new Parking status view.
+     */
     public ParkingStatusView() {
     }
 
+    /**
+     * Show.
+     *
+     * @param mainPanel      the main panel
+     * @param menuPanel      the menu panel
+     * @param resetMainPanel the reset main panel
+     * @param isAdmin        the is admin
+     */
     public static void show(JPanel mainPanel, JPanel menuPanel, Runnable resetMainPanel, boolean isAdmin) {
         try {
             initControllers();

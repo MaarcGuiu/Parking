@@ -6,9 +6,17 @@ import presentation.controllers.RegisterController;
 
 import java.sql.SQLException;
 
+/**
+ * The type Register manager.
+ */
 public class RegisterManager {
     private UserSqlDao userDao;
 
+    /**
+     * Instantiates a new Register manager.
+     *
+     * @throws SQLException the sql exception
+     */
     public RegisterManager() throws SQLException {
         userDao = new UserSqlDao();
     }
@@ -23,6 +31,15 @@ public class RegisterManager {
         return atPosition > 0 && dotPosition > atPosition + 1;
     }
 
+    /**
+     * Register string.
+     *
+     * @param name     the name
+     * @param password the password
+     * @param email    the email
+     * @return the string
+     * @throws RegisterException the register exception
+     */
     public String register(String name, String password, String email) throws RegisterException {
         if (!isValidEmail(email)) {
             throw new RegisterException("El correo electrónico no tiene un formato válido.");
