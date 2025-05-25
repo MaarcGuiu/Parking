@@ -61,7 +61,7 @@ public class ParkingOccupancyController {
 
                 this.currentOccupancy = newData;
                 notifyOccupancyChanged();
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
