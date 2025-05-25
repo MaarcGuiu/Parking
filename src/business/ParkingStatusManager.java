@@ -24,6 +24,7 @@ public class ParkingStatusManager {
     private ConfigJsonDao configJsonDao;
     private SlotSqlDao slotSqlDao;
     private VehicleSqlDao vehicleSqlDao;
+    private float ENTRY_THRESHOLD = 0.49f;
 
     /**
      * Instantiates a new Parking status manager.
@@ -157,7 +158,7 @@ public class ParkingStatusManager {
     public boolean calculateEntryOrExit() throws SQLException { // True un vehiculo entrará, false saldrá.
         float probabilityEntry;
         probabilityEntry = (float) slotSqlDao.getTotalSlotsFreeAndNotBooked() / slotSqlDao.getTotalSlotsNotBooked();
-        if (probabilityEntry > 0.49) { //Entry
+        if (probabilityEntry > ENTRY_THRESHOLD) { //Entry
             return true;
         } else {                      //Exit
             return false;
