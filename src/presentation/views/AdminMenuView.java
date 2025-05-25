@@ -153,15 +153,11 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
                 parkingStatusButton.setBackground(Color.YELLOW);
             }
 
-            // Prepare the refresh logic (update UI)
             Runnable refreshView = () -> SwingUtilities.invokeLater(() ->
                     ParkingStatusView.show(mainPanel, menuPanel, resetMainPanel, isAdmin)
             );
-
-            // Start the simulation via the controller
             parkingStatusController.startSimulation(refreshView);
 
-            // Show the parking status panel
             ParkingStatusView.show(mainPanel, menuPanel, resetMainPanel, isAdmin);
         });
 
@@ -492,6 +488,7 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
 
         // Add action listener to the button
         cancelButton.addActionListener(e -> {
+            parkingStatusController.stopSimulation();
             System.out.println("Reservation canceled");
             dialog.dispose(); // Close the dialog
         });
