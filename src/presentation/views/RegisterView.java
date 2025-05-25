@@ -25,7 +25,8 @@ public class RegisterView extends JPanel {
     private JPasswordField confirmPasswordField;
 
     /**
-     * Instantiates a new Register view.
+     * Constructor for RegisterView.
+     * Initializes the view and sets up the UI components.
      */
     public RegisterView() {
         try {
@@ -42,7 +43,10 @@ public class RegisterView extends JPanel {
 
         add(mainPanel);
     }
-
+    /**
+     * Initializes the main panel with a gradient background.
+     * The panel covers the entire view and provides a visually appealing background.
+     */
     private void initMainPanel() {
         mainPanel = new JPanel() {
             @Override
@@ -57,7 +61,10 @@ public class RegisterView extends JPanel {
         mainPanel.setLayout(null);
         mainPanel.setBounds(0, 0, 900, 500);
     }
-
+    /**
+     * Initializes the UI components of the RegisterView.
+     * Sets up labels, text fields, and buttons for user registration.
+     */
     private void initComponents() {
         // Back arrow
         JLabel backArrow = new JLabel("←");
@@ -130,7 +137,10 @@ public class RegisterView extends JPanel {
         registerButton.addActionListener(e -> handleRegister());
         mainPanel.add(registerButton);
     }
-
+    /**
+     * Handles the registration process when the user clicks the "Register" button.
+     * Validates input fields, checks password security, and communicates with the RegisterController.
+     */
     private void handleRegister() {
         String username = usernameField.getText();
         String email = emailField.getText();
@@ -183,7 +193,16 @@ public class RegisterView extends JPanel {
             JOptionPane.showMessageDialog(this, "Error de base de datos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    /**
+     * Checks if the provided password meets security requirements.
+     * A secure password must be at least 8 characters long and contain:
+     * - At least one uppercase letter
+     * - At least one lowercase letter
+     * - At least one digit
+     *
+     * @param password The password to check.
+     * @return true if the password is secure, false otherwise.
+     */
     private boolean isPasswordSecure(String password) {
         if (password.length() < 8) return false;
 

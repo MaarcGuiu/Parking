@@ -18,9 +18,10 @@ public class ExitParkingView extends JPanel {
     private LeaveController leaveController;
 
     /**
-     * Instantiates a new Exit parking view.
+     * Constructor for ExitParkingView.
+     * Initializes the view with the logged user and sets up the UI components.
      *
-     * @param loggedUser the logged user
+     * @param loggedUser The user who is currently logged in.
      */
     public ExitParkingView(User loggedUser) {
         try {
@@ -40,7 +41,9 @@ public class ExitParkingView extends JPanel {
 
         add(mainPanel);
     }
-
+    /**
+     * Initializes the main panel with a gradient background and title.
+     */
     private void initializeMainPanel() {
         mainPanel = new JPanel() {
             @Override
@@ -61,7 +64,9 @@ public class ExitParkingView extends JPanel {
         exitParkingTitle.setBounds(300, 20, 500, 30);
         mainPanel.add(exitParkingTitle);
     }
-
+    /**
+     * Initializes the close button that allows users to return to the user menu.
+     */
     private void initializeCloseButton() {
         JLabel closeButton = new JLabel("\u2716");
         closeButton.setFont(new Font("Dialog", Font.BOLD, 22));
@@ -76,7 +81,9 @@ public class ExitParkingView extends JPanel {
         });
         mainPanel.add(closeButton);
     }
-
+    /**
+     * Initializes the user interaction panel where users can enter their vehicle's license plate.
+     */
     private void initializeUserInteractionPanel() {
         JPanel userInteractionPanel = new JPanel() {
             @Override
@@ -117,7 +124,9 @@ public class ExitParkingView extends JPanel {
 
         leaveActionButton.addActionListener(e -> handleLeaveAction(plateField));
     }
-
+    /**
+     * Initializes the menu panel with buttons for entering and leaving parking.
+     */
     private void initializeMenuPanel() {
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(null);
@@ -147,7 +156,12 @@ public class ExitParkingView extends JPanel {
 
         mainPanel.add(menuPanel);
     }
-
+    /**
+     * Handles the leave action when the user clicks the "LEAVE" button.
+     * Validates the input and interacts with the LeaveController to process the exit.
+     *
+     * @param plateField The text field where the user enters their vehicle's license plate.
+     */
     private void handleLeaveAction(JTextField plateField) {
         String plate = plateField.getText();
 
@@ -189,7 +203,9 @@ public class ExitParkingView extends JPanel {
             showErrorMessage("Database error: " + ex.getMessage());
         }
     }
-
+    /**
+     * Switches the view to the user menu.
+     */
     private void switchToUserMenuView() {
         setVisible(false);
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -197,7 +213,9 @@ public class ExitParkingView extends JPanel {
         parentFrame.revalidate();
         parentFrame.repaint();
     }
-
+/**
+     * Switches the view to the entry parking view.
+     */
     private void switchToEntryParkingView() {
         setVisible(false);
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -205,7 +223,11 @@ public class ExitParkingView extends JPanel {
         parentFrame.revalidate();
         parentFrame.repaint();
     }
-
+    /**
+     * Displays an error message dialog.
+     *
+     * @param message The error message to display.
+     */
     private void showErrorMessage(String message) {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }

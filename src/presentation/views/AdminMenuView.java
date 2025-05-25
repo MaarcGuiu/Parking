@@ -45,15 +45,19 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
     private AtomicReference<int[]> occupancyDataRef = new AtomicReference<>(new int[60]);
 
     private JPanel timeBarChartPanel;
-
+  
     /**
-     * Instantiates a new Admin menu view.
+     * Constructor for the AdminMenuView class.
+     * Initializes the admin menu view with necessary controllers and sets up the main menu.
      */
     public AdminMenuView() {
         initializeControllers();
         principalAdminMenu();
     }
-
+    /**
+     * Initializes the controllers required for the admin menu view.
+     * Sets up the AdminController and LogsSqlDao, handling any SQL or class not found exceptions.
+     */
     private void initializeControllers() {
         try {
             adminController = new AdminController();
@@ -62,7 +66,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    /**
+     * Initializes the admin menu view with a gradient background and a side menu.
+     * Sets up buttons for creating, editing, deleting slots, viewing statistics, parking status, and logging out.
+     */
     private void principalAdminMenu() {
         setupFrame();
         setupMainPanel();
@@ -74,12 +81,16 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
         mainPanel.add(menuPanel);
         add(mainPanel);
     }
-
+    /**
+     * Sets up the main frame properties and adds an occupancy change listener.
+     */
     private void setupFrame() {
         setLayout(null);
         parkingOccupancyService.addOccupancyChangeListener(this);
     }
-
+    /**
+     * Sets up the main panel with a gradient background.
+     */
     private void setupMainPanel() {
         // Panel principal con degradado
         mainPanel = new JPanel() {
@@ -95,7 +106,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
         mainPanel.setLayout(null);
         mainPanel.setBounds(0, 0, 900, 500);
     }
-
+    /**
+     * Sets up the side menu panel with a title and buttons for various actions.
+     * The menu is styled with a dark background and buttons are styled with rounded corners.
+     */
     private void setupMenuPanel() {
         // Menú lateral
         menuPanel = new JPanel();
@@ -113,7 +127,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
         menuTitle.setBounds(0, 20, 200, 30); // Ancho igual al panel para centrar
         menuPanel.add(menuTitle);
     }
-
+    /**
+     * Sets up the buttons in the menu panel with specific actions and styles.
+     * Each button is styled with a rounded appearance and a specific color.
+     */
     private void setupMenuButtons() {
         createButton = new RoundButton("Create");
         createButton.setBounds(20, 70, 160, 40);
@@ -157,7 +174,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
         settingsButton.setFocusPainted(false);
         menuPanel.add(settingsButton);
     }
-
+    /**
+     * Resets the main panel to its initial state, removing all components and adding the menu panel.
+     * Also resets the background color of the menu buttons to their default color.
+     */
     private void resetMainPanel() {
         List<JButton> menuButtons = new ArrayList<>();
         menuButtons.add(createButton);
@@ -177,7 +197,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
         mainPanel.revalidate();
         mainPanel.repaint();
     }
-
+    /**
+     * Sets up the actions for each button in the menu.
+     * Each button has a specific action that is triggered when clicked.
+     */
     private void setupButtonActions() {
         setupParkingStatusButtonAction();
         setupCreateButtonAction();
@@ -186,7 +209,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
         setupSettingButtonAction();
         setupStatisticsButton();
     }
-
+    /**
+     * Sets up the action for the parking status button.
+     * When clicked, it shows the parking status view and highlights the button.
+     */
     private void setupParkingStatusButtonAction() {
         parkingStatusButton.addActionListener(e -> {
             boolean isAdmin = true;
@@ -194,7 +220,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
             parkingStatusButton.setBackground(Color.YELLOW);
         });
     }
-
+    /**
+     * Sets up the action for the create button.
+     * When clicked, it shows a form to create a new slot and highlights the button.
+     */
     private void setupCreateButtonAction() {
         createButton.addActionListener(e -> {
             resetMainPanel();
@@ -291,8 +320,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
             mainPanel.repaint();
         });
     }
-
-
+    /**
+     * Sets up the action for the edit button.
+     * When clicked, it shows a form to edit an existing slot and highlights the button.
+     */
     private void setupEditButtonAction() {
         editButton.addActionListener(e -> {
             resetMainPanel();
@@ -385,7 +416,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
             mainPanel.repaint();
         });
     }
-
+    /**
+     * Sets up the action for the delete button.
+     * When clicked, it shows a form to delete an existing slot and highlights the button.
+     */
     private void setupDeleteButtonAction() {
         deleteButton.addActionListener(e -> {
             resetMainPanel();
@@ -449,7 +483,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
             mainPanel.repaint();
         });
     }
-
+    /**
+     * Sets up the action for the settings button.
+     * When clicked, it shows the settings view and highlights the button.
+     */
     private void setupSettingButtonAction() {
         settingsButton.addActionListener(e -> {
             settingsButton.setBackground(Color.YELLOW);
@@ -461,7 +498,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
             parentFrame.repaint();
         });
     }
-
+    /**
+     * Sets up the action for the statistics button.
+     * When clicked, it shows the statistics view and highlights the button.
+     */
     private void setupStatisticsButton() {
         statisticsButton.addActionListener(e -> {
             try {
@@ -473,7 +513,12 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
             }
         });
     }
-
+    /**
+     * This method is called when the occupancy data changes.
+     * It updates the occupancy data reference and repaints the time bar chart panel.
+     *
+     * @param newData The new occupancy data.
+     */
     @Override
     public void onOccupancyChanged(int[] newData) {
         // Actualizar los datos y repintar en el hilo de eventos de Swing
@@ -486,14 +531,17 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
     }
 
     /**
-     * Gets main panel.
+     * Returns the main panel of the admin menu view.
      *
-     * @return the main panel
+     * @return The main panel.
      */
     public JPanel getMainPanel() {
         return mainPanel;
     }
-
+    /**
+     * Shows a pop-up dialog with reservation details.
+     * The dialog includes vehicle type, user name, user email, and buttons to confirm or cancel the reservation.
+     */
     private void showReservationPopUp() {
 
         JDialog dialog = new JDialog((Frame) null, "Reservation Details", true);
@@ -530,14 +578,20 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
         // Show the dialog
         dialog.setVisible(true);
     }
-
+    /**
+     * Initializes the statistics view by clearing the main panel, creating a chart container,
+     * updating occupancy data, and setting up the time bar chart panel.
+     */
     private void initializeStatisticsView() {
         clearMainPanel();
         JPanel chartContainer = createChartContainer();
         updateOccupancyData();
         setupTimeBarChartPanel(chartContainer);
     }
-
+    /**
+     * Clears the main panel and sets up the title for the statistics view.
+     * It also adds the menu panel back to the main panel.
+     */
     private void clearMainPanel() {
         mainPanel.removeAll();
         mainPanel.add(menuPanel);
@@ -548,7 +602,12 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
         titleLabel.setBounds(400, 30, 300, 30);
         mainPanel.add(titleLabel);
     }
-
+    /**
+     * Creates a container panel for the chart with a gradient background and a title.
+     * The panel is styled with rounded corners and positioned within the main panel.
+     *
+     * @return The chart container panel.
+     */
     private JPanel createChartContainer() {
         JPanel chartContainer = new JPanel() {
             @Override
@@ -572,7 +631,11 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
 
         return chartContainer;
     }
-
+    /**
+     * Updates the occupancy data by calling the parking occupancy service.
+     * If an error occurs, it shows a message dialog with the error message.
+     * The updated data is stored in the occupancyDataRef atomic reference.
+     */
     private void updateOccupancyData() {
         try {
             parkingOccupancyService.updateOccupancyData();
@@ -581,7 +644,13 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
         }
         occupancyDataRef.set(parkingOccupancyService.getCurrentOccupancy());
     }
-
+    /**
+     * Sets up the time bar chart panel within the chart container.
+     * The panel is responsible for rendering the occupancy data as a bar chart.
+     * It includes axes, labels, bars, and a legend.
+     *
+     * @param chartContainer The container panel for the chart.
+     */
     private void setupTimeBarChartPanel(JPanel chartContainer) {
         timeBarChartPanel = new JPanel() {
             @Override
@@ -688,7 +757,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
         mainPanel.repaint();
     }
 
-
+    /**
+     * Handles the logout action by resetting the main panel to the main view.
+     * It retrieves the parent frame and sets its content pane to a new instance of MainView.
+     */
     private void handleLogout() {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         parentFrame.setContentPane(new MainView());

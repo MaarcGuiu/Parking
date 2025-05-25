@@ -20,9 +20,10 @@ public class SettingsView extends JPanel {
     private JButton logoutButton;
 
     /**
-     * Instantiates a new Settings view.
+     * Constructor for SettingsView.
+     * Initializes the view with the logged user and sets up the UI components.
      *
-     * @param loggedUser the logged user
+     * @param loggedUser The user who is currently logged in.
      */
     public SettingsView(User loggedUser) {
         setLayout(new BorderLayout());
@@ -70,7 +71,12 @@ public class SettingsView extends JPanel {
             }
         });
     }
-
+    /**
+     * Creates the content panel for settings, including buttons for deleting account and logging out.
+     *
+     * @param loggedUser The user who is currently logged in.
+     * @return A JPanel containing the settings content.
+     */
     private JPanel createSettingsContentPanel(User loggedUser) {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -115,7 +121,12 @@ public class SettingsView extends JPanel {
 
         return contentPanel;
     }
-
+    /**
+     * Handles the deletion of the user's account.
+     * Prompts the user for confirmation and deletes the account if confirmed.
+     *
+     * @param loggedUser The user who is currently logged in.
+     */
     private void handleDeleteAccount(User loggedUser) {
         int option = JOptionPane.showConfirmDialog(
                 this,
@@ -140,7 +151,10 @@ public class SettingsView extends JPanel {
             }
         }
     }
-
+    /**
+     * Handles the logout action.
+     * Switches the content of the JFrame to the main view.
+     */
     private void handleLogout() {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         parentFrame.setContentPane(new MainView());
