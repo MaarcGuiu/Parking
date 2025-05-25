@@ -123,6 +123,7 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
         settingsButton.setFocusPainted(false);
         menuPanel.add(settingsButton);
 
+
         mainPanel.add(menuPanel);
         add(mainPanel);
 
