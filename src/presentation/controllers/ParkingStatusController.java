@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ParkingStatusController {
 
-    private static ParkingStatusManager parkingStatusManager;
+    private static  ParkingStatusManager parkingStatusManager;
     private SimulationParkingStatusManager simulationManager;
     private Thread simulationThread;
 
