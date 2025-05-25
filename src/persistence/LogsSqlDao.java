@@ -51,6 +51,7 @@ public class LogsSqlDao {
                 LocalDateTime entryTime = rs.getTimestamp("timestamp", cal).toLocalDateTime();
                 activeEntries.add(new VehicleEntry(plate, entryTime));
             }
+        } catch(SQLException e) {
         }
 
         return activeEntries;
@@ -82,6 +83,7 @@ public class LogsSqlDao {
                 LocalDateTime timestamp = rs.getTimestamp("timestamp", cal).toLocalDateTime();
                 events.add(new VehicleEvent(plate, action, timestamp));
             }
+        } catch (SQLException e) {
         }
 
         return events;

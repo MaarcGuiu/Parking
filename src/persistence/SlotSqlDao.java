@@ -390,6 +390,8 @@ public class SlotSqlDao {
                 );
                 slots.add(slot);
             }
+        } catch (SQLException ex) {
+
         }
         return slots;
     }

@@ -945,6 +945,9 @@ ALTER TABLE `slots`
   ADD KEY `parking_id` (`plant`),
   ADD KEY `vehicle_plate` (`vehicle_plate`);
 
+ALTER TABLE slots
+    ADD COLUMN reservation_date DATETIME DEFAULT NULL;
+
 --
 -- Indices de la tabla `users`
 --
