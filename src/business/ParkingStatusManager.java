@@ -127,6 +127,12 @@ public class ParkingStatusManager {
         } while (!flag);
         return vv;
     }
+    public int getTotalSlots() throws SQLException {
+        return slotSqlDao.getTotalSlots();
+    }
+    public int getOccupiedSlotsCount() throws SQLException {
+        return slotSqlDao.getOccupiedSlotsCount();
+    }
     public Slot simulateExit () throws SQLException { // Despues de esta funcion queda hacer update de que queda libre
         ArrayList<Slot> slotsOccupied = new ArrayList<>();
         slotsOccupied = slotSqlDao.getOccupiedSlots();

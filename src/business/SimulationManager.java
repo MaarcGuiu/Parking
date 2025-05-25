@@ -12,6 +12,7 @@ public class SimulationManager implements Runnable {
     @Override
     public void run() {
         running = true;
+        long fr = 1000L;
 
         try {
             parkingStatusManager = new ParkingStatusManager();
@@ -20,7 +21,7 @@ public class SimulationManager implements Runnable {
         }
 
         if (parkingStatusManager != null) {
-            long frequency = parkingStatusManager.calculateFrequency() * 1000L;
+            long frequency = parkingStatusManager.calculateFrequency() * fr;
             while (running) {
                 try {
                     Thread.sleep(frequency);

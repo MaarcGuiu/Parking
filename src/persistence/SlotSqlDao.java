@@ -77,6 +77,18 @@ public class SlotSqlDao {
         }
         return 0;
     }
+    public int getOccupiedSlotsCount() throws SQLException {
+        String query = "SELECT COUNT(slots.id) FROM slots WHERE slots.is_occupied = 1 ";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
     public int getTotalSlotsFreeAndNotBooked() throws SQLException {
         String query = "SELECT COUNT(slots.id) FROM slots WHERE slots.booked = 0 AND slots.is_occupied = 0 ";
 

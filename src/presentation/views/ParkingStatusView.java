@@ -3,7 +3,6 @@ package presentation.views;
 import business.model.Slot;
 import presentation.components.RoundButton;
 import presentation.controllers.AdminController;
-import presentation.controllers.LoginController;
 import presentation.controllers.ParkingStatusController;
 
 import javax.swing.*;
@@ -29,8 +28,10 @@ public class ParkingStatusView {
 
             JTable table = createTable(slots);
             JScrollPane scrollPane = createScrollPane(table);
+            JLabel slotCounterLabel = createSlotCounterLabel();
 
-            setupMainPanel(mainPanel, menuPanel, scrollPane);
+
+            setupMainPanel(mainPanel, menuPanel, scrollPane, slotCounterLabel);
 
             addTableClickListener(table, slots, mainPanel, menuPanel, scrollPane, isAdmin);
 
@@ -69,6 +70,23 @@ public class ParkingStatusView {
         return table;
     }
 
+    private static void updateSlotCounterLabel(JLabel slotCounterLabel) {
+        try {
+            int total = parkingStatusController.getAllSlots().size();
+            int occupied = 0;
+            for (Slot slot : parkingStatusController.getAllSlots()) {
+                if (slot.getAvailabilityState() == 1) {
+                    occupied++;
+                }
+            }
+            slotCounterLabel.setText("Plazas ocupadas: " + occupied + "/" + total);
+        } catch (SQLException e) {
+            slotCounterLabel.setText("Error al obtener los datos");
+            e.printStackTrace();
+        }
+    }
+
+
     private static void styleTable(JTable table) {
         JTableHeader header = table.getTableHeader();
         header.setFont(new Font("Arial", Font.BOLD, 14));
@@ -92,13 +110,34 @@ public class ParkingStatusView {
         return scrollPane;
     }
 
-    private static void setupMainPanel(JPanel mainPanel, JPanel menuPanel, JScrollPane scrollPane) {
+    private static JLabel createSlotCounterLabel() {
+        JLabel slotCounterLabel = new JLabel();
+        slotCounterLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        slotCounterLabel.setBounds(220, 10, 600, 30);
+        slotCounterLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        slotCounterLabel.setForeground(Color.WHITE);
+        updateSlotCounterLabel(slotCounterLabel);
+        return slotCounterLabel;
+    }
+
+
+    private static void setupMainPanel(JPanel mainPanel, JPanel menuPanel, JScrollPane scrollPane, JLabel slotCounterLabel) {
         mainPanel.removeAll();
+        mainPanel.setLayout(null);
+
         mainPanel.add(menuPanel);
+
+        updateSlotCounterLabel(slotCounterLabel);
+        mainPanel.add(slotCounterLabel);
+
+        scrollPane.setBounds(220, 50, 600, 400);
         mainPanel.add(scrollPane);
+
         mainPanel.revalidate();
         mainPanel.repaint();
     }
+
+
 
     private static void addTableClickListener(JTable table, List<Slot> slots, JPanel mainPanel,
                                               JPanel menuPanel, JScrollPane scrollPane, boolean isAdmin) {
