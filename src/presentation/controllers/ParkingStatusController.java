@@ -10,15 +10,26 @@ import java.util.List;
 public class ParkingStatusController {
 
     private static ParkingStatusManager parkingStatusManager;
-    private SimulationParkingStatusManager simulationParkingStatusManager;
+    private SimulationParkingStatusManager simulationManager;
+    private Thread simulationThread;
 
     public ParkingStatusController() {
         parkingStatusManager = new ParkingStatusManager();
     }
+    public void startSimulation(Runnable refreshView) {
+        if (simulationThread == null || !simulationThread.isAlive()) {
+            simulationManager = new SimulationParkingStatusManager(refreshView);
+            simulationThread = new Thread(simulationManager);
+            simulationThread.start();
+        }
+    }
 
-    public SimulationParkingStatusManager createThreadSimulation (Runnable refreshView) {
-        SimulationParkingStatusManager simulationParkingStatusManager = new SimulationParkingStatusManager(refreshView);
-        return simulationParkingStatusManager;
+    public void stopSimulation() {
+        if (simulationManager != null) {
+            simulationManager.stop();
+            simulationManager = null;
+            simulationThread = null;
+        }
     }
 
     public List<Slot> getAllSlots() {

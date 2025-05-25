@@ -1,12 +1,14 @@
 package presentation.views;
 
 import business.ParkingOccupancyManager;
+import business.SimulationParkingStatusManager;
 import business.model.Slot;
 import persistence.LogsSqlDao;
 import presentation.components.RoundButton;
 import presentation.components.RoundTextField;
 import presentation.controllers.AdminController;
 import presentation.controllers.ParkingOccupancyController;
+import presentation.controllers.ParkingStatusController;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -33,6 +35,10 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
     private AtomicReference<int[]> occupancyDataRef = new AtomicReference<>(new int[60]);
 
     private JPanel timeBarChartPanel;
+    private Thread simulationThread;
+    private final ParkingStatusController parkingStatusController = new ParkingStatusController();
+
+
 
     public AdminMenuView() {
         // Permitir posicionamiento absoluto
@@ -142,14 +148,25 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
 
         parkingStatusButton.addActionListener(e -> {
             boolean isAdmin = true;
+
             if (parkingStatusButton != null) {
                 parkingStatusButton.setBackground(Color.YELLOW);
             }
+
+            // Prepare the refresh logic (update UI)
+            Runnable refreshView = () -> SwingUtilities.invokeLater(() ->
+                    ParkingStatusView.show(mainPanel, menuPanel, resetMainPanel, isAdmin)
+            );
+
+            // Start the simulation via the controller
+            parkingStatusController.startSimulation(refreshView);
+
+            // Show the parking status panel
             ParkingStatusView.show(mainPanel, menuPanel, resetMainPanel, isAdmin);
         });
 
-
         createButton.addActionListener(e -> {
+            parkingStatusController.stopSimulation();
             resetMainPanel.run();
             createButton.setBackground(Color.YELLOW);
             mainPanel.removeAll();
@@ -211,6 +228,8 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
             formPanel.add(confirmButton);
 
             confirmButton.addActionListener(ev -> {
+                parkingStatusController.stopSimulation();
+
                 try {
                     int id = Integer.parseInt(idField.getText());
                     int floor = Integer.parseInt((String) floorCombo.getSelectedItem());
@@ -243,6 +262,8 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
         });
 
         editButton.addActionListener(e -> {
+            parkingStatusController.stopSimulation();
+
             resetMainPanel.run();
             editButton.setBackground(Color.YELLOW);
 
@@ -302,6 +323,8 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
             formPanel.add(editConfirmButton);
 
             editConfirmButton.addActionListener(ev -> {
+                parkingStatusController.stopSimulation();
+
                 try {
                     int id = Integer.parseInt(idField.getText());
                     int floor = (Integer) floorCombo.getSelectedItem();
@@ -333,6 +356,8 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
 
 
         deleteButton.addActionListener(e -> {
+            parkingStatusController.stopSimulation();
+
             resetMainPanel.run();
             deleteButton.setBackground(Color.YELLOW);
 
@@ -374,6 +399,8 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
             formPanel.add(deleteConfirmButton);
 
             deleteConfirmButton.addActionListener(ev -> {
+                parkingStatusController.stopSimulation();
+
                 try {
                     int id = Integer.parseInt(idField.getText());
                     String deleted = adminController.deleteSlot(id);
@@ -394,6 +421,8 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
 
 
         settingsButton.addActionListener(e -> {
+            parkingStatusController.stopSimulation();
+
             settingsButton.setBackground(Color.YELLOW);
 
             setVisible(true);
@@ -406,6 +435,8 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener{
 
 
         statisticsButton.addActionListener(e -> {
+            parkingStatusController.stopSimulation();
+
             resetMainPanel.run();
             statisticsButton.setBackground(Color.YELLOW);
             initializeStatisticsView(); // Llamamos a la nueva función

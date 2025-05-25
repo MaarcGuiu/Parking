@@ -18,19 +18,6 @@ public class ParkingStatusView {
     private static AdminController adminController;
 
     public static void show(JPanel mainPanel, JPanel menuPanel, Runnable resetMainPanel, boolean isAdmin) {
-
-        Runnable refreshView = () -> SwingUtilities.invokeLater(() ->
-                ParkingStatusView.show(mainPanel, menuPanel, resetMainPanel, isAdmin)
-        );
-
-        ParkingStatusController parkingStatusController1 = new ParkingStatusController();
-
-        SimulationParkingStatusManager simulation = parkingStatusController1.createThreadSimulation(refreshView);
-
-        Thread simulationThread = new Thread(simulation);
-
-        simulationThread.start();
-
         parkingStatusController = new ParkingStatusController();
         adminController = new AdminController();
         resetMainPanel.run();
