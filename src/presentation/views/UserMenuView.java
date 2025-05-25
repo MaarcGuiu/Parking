@@ -13,6 +13,7 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class UserMenuView extends JPanel implements OccupancyChangeListener{
@@ -230,11 +231,15 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
 
                 // Draw Y labels and ticks
                 g2d.setFont(new Font("Arial", Font.PLAIN, 12));
-                int maxOccupancy = 60;
-                int yStep = 10;
-                for (int i = 0; i <= 5; i++) {
-                    int value = i * yStep;
-                    int y = getHeight() - bottomMargin - (i * chartHeight / 5);
+
+                int[] currentData = occupancyDataRef.get();
+                int maxOccupancy = Arrays.stream(currentData).max().orElse(10);
+                maxOccupancy = ((maxOccupancy + 9) / 10) * 10; // Redondear al múltiplo de 10 más cercano
+
+                int steps = 5;
+                for (int i = 0; i <= steps; i++) {
+                    int value = i * maxOccupancy / steps;
+                    int y = getHeight() - bottomMargin - (i * chartHeight / steps);
                     g2d.drawString(String.valueOf(value), leftMargin - 30, y + 5);
                     g2d.drawLine(leftMargin - 5, y, leftMargin, y);
                 }
@@ -262,7 +267,7 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
 
                 // Draw bars
                 int barWidth = chartWidth / 65;
-                int[] currentData = occupancyDataRef.get();
+                currentData = occupancyDataRef.get();
 
                 for (int i = 0; i < 60; i++) {
                     int totalVehicles = currentData[i];

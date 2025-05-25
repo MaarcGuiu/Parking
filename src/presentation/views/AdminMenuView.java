@@ -513,7 +513,6 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
 
         // Add action listener to the button
         cancelButton.addActionListener(e -> {
-            System.out.println("Reservation canceled");
             dialog.dispose(); // Close the dialog
         });
 
@@ -591,14 +590,20 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
 
                 // Draw Y labels and ticks
                 g2d.setFont(new Font("Arial", Font.PLAIN, 12));
-                int maxOccupancy = 60;
-                int yStep = 10;
-                for (int i = 0; i <= 5; i++) {
-                    int value = i * yStep;
-                    int y = getHeight() - bottomMargin - (i * chartHeight / 5);
+
+                int[] currentData = occupancyDataRef.get();
+                int maxOccupancy = Arrays.stream(currentData).max().orElse(10);
+                maxOccupancy = ((maxOccupancy + 9) / 10) * 10; // Redondear al múltiplo de 10 más cercano
+
+
+                int steps = 5;
+                for (int i = 0; i <= steps; i++) {
+                    int value = i * maxOccupancy / steps;
+                    int y = getHeight() - bottomMargin - (i * chartHeight / steps);
                     g2d.drawString(String.valueOf(value), leftMargin - 30, y + 5);
                     g2d.drawLine(leftMargin - 5, y, leftMargin, y);
                 }
+
 
                 // Y axis title
                 g2d.setFont(new Font("Arial", Font.BOLD, 12));
@@ -623,7 +628,7 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
 
                 // Draw bars
                 int barWidth = chartWidth / 65;
-                int[] currentData = occupancyDataRef.get();
+                currentData = occupancyDataRef.get();
 
                 for (int i = 0; i < 60; i++) {
                     int totalVehicles = currentData[i];
