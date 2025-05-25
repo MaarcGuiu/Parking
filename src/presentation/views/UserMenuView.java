@@ -42,14 +42,10 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
     }
 
     private void initDaoAndServices() {
-        try {
-            LogsSqlDao = new LogsSqlDao();
-            ParkingOccupancyManager = new ParkingOccupancyManager(LogsSqlDao);
-            parkingOccupancyService = new ParkingOccupancyController(ParkingOccupancyManager);
-            parkingOccupancyService.addOccupancyChangeListener(this);
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        ParkingOccupancyManager = new ParkingOccupancyManager();
+        parkingOccupancyService = new ParkingOccupancyController(ParkingOccupancyManager);
+        parkingOccupancyService.addOccupancyChangeListener(this);
+
     }
 
     private void initMainAndMenuPanels() {

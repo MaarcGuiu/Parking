@@ -10,11 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParkingOccupancyManager {
-    private final LogsSqlDao repository;
+    private final LogsSqlDao repository = new LogsSqlDao();
     private static final List<OccupancyChangeListener> listeners = new ArrayList<>();
 
-    public ParkingOccupancyManager(LogsSqlDao repository) {
-        this.repository = repository;
+    public ParkingOccupancyManager() {
     }
 
     /**

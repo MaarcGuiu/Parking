@@ -36,7 +36,7 @@ public class AdminMenuView extends JPanel implements OccupancyChangeListener {
 
     private AdminController adminController;
     private persistence.LogsSqlDao LogsSqlDao;
-    private business.ParkingOccupancyManager ParkingOccupancyManager = new ParkingOccupancyManager(LogsSqlDao);
+    private business.ParkingOccupancyManager ParkingOccupancyManager = new ParkingOccupancyManager();
     private final ParkingOccupancyController parkingOccupancyService = new ParkingOccupancyController(ParkingOccupancyManager);
 
     private AtomicReference<int[]> occupancyDataRef = new AtomicReference<>(new int[60]);
