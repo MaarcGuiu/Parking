@@ -1,6 +1,6 @@
 {
-  "DbPort": 3306,
-  "serverIp": "jdbc:mysql://localhost:3306/",
+  "dbPort": 3306,
+  "serverIp": "jdbc:mysql://localhost:",
   "dbName": "parkingdpo",
   "user": "root",
   "pwd": "",

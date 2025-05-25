@@ -31,7 +31,7 @@ public class ConnectionDB {
             } catch (ClassNotFoundException e) {
                 throw new SQLException("MySQL JDBC Driver no encontrado.");
             }
-            String url = config.getServerIp() + config.getDbName();
+            String url = config.getServerIp() + config.getDbPort() + '/' + config.getDbName();
             String usr = config.getUser();
             String pwd = config.getPwd();
             try {
