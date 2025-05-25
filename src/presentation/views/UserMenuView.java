@@ -318,6 +318,9 @@ public class UserMenuView extends JPanel implements OccupancyChangeListener{
                 for (int i = 0; i < 60; i++) {
                     int totalVehicles = currentData[i];
                     int x = leftMargin + (i * chartWidth / 60);
+                    if (maxOccupancy == 0) {
+                        maxOccupancy = 1;
+                    }
                     int y = getHeight() - bottomMargin - (totalVehicles * chartHeight / maxOccupancy);
                     int height = (totalVehicles * chartHeight / maxOccupancy);
 

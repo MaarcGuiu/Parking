@@ -197,7 +197,10 @@ public class UserSqlDao {
                     }
                 }
             }
+        } catch (SQLException e) {
+
         }
+        return "";
     }
 
     /**
@@ -221,6 +224,8 @@ public class UserSqlDao {
                     return "success";
                 }
             }
+        } catch (SQLException e) {
+
         }
 
         //Comprovem addicionalment si aquesta matrícula està dins del parking o no hi és.
@@ -235,7 +240,10 @@ public class UserSqlDao {
                     return "No user has this license plate registered.";
                 }
             }
+        } catch (SQLException e) {
+
         }
+        return "";
     }
 
     /**
@@ -252,7 +260,10 @@ public class UserSqlDao {
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
+        } catch (SQLException e) {
+
         }
+        return false;
     }
 
     /**
@@ -273,6 +284,8 @@ public class UserSqlDao {
                     return "The vehicle entered is not registered.";
                 }
             }
+        } catch (SQLException e) {
+
         }
 
         //Comprovem si està dins del pàrking
@@ -288,7 +301,11 @@ public class UserSqlDao {
                     return "success";
                 }
             }
+
+        } catch (SQLException e) {
+
         }
+        return "";
     }
 
 
@@ -311,6 +328,8 @@ public class UserSqlDao {
         try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
             stmt.setInt(1, ownerId);
             stmt.executeUpdate();
+        } catch (SQLException e) {
+
         }
 
         return "success";
@@ -330,6 +349,8 @@ public class UserSqlDao {
         try (PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery)) {
             deleteStmt.setInt(1, ownerId);
             deleteStmt.executeUpdate();
+        } catch (SQLException e) {
+
         }
 
         return "success";
@@ -350,6 +371,8 @@ public class UserSqlDao {
         try (PreparedStatement updateStmt = connection.prepareStatement(updateSlotQuery)) {
             updateStmt.setString(1, plate);
             updateStmt.executeUpdate();
+        } catch (SQLException e) {
+
         }
 
         return "success";
@@ -382,7 +405,10 @@ public class UserSqlDao {
                     return null;
                 }
             }
+        } catch (SQLException e) {
+
         }
+        return "";
     }
 
     /**
@@ -418,7 +444,10 @@ public class UserSqlDao {
                     return null;
                 }
             }
+        } catch (SQLException e) {
+
         }
+        return "";
     }
 
     /**
@@ -439,7 +468,10 @@ public class UserSqlDao {
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
+        } catch (SQLException e) {
+
         }
+        return false;
     }
 
     /**
@@ -457,7 +489,10 @@ public class UserSqlDao {
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
+        } catch (SQLException e) {
+
         }
+        return false;
     }
 
     /**
@@ -487,7 +522,10 @@ public class UserSqlDao {
             } else {
                 return "Error al registrar el vehicle.";
             }
+        } catch (SQLException ex) {
+
         }
+        return "";
     }
 
     /**
@@ -510,6 +548,8 @@ public class UserSqlDao {
                     throw new SQLException("No slot found for the given plate.");
                 }
             }
+        } catch (SQLException e) {
+
         }
 
         return slotId;
@@ -531,6 +571,9 @@ public class UserSqlDao {
             stmt.setString(2, vehiclePlate);
             stmt.setString(3, action);
             stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+
         }
     }
 
@@ -553,7 +596,9 @@ public class UserSqlDao {
             try (ResultSet rs = stmt.executeQuery()) {
                 return (rs.next());
             }
+        } catch (SQLException e) {
         }
+        return false;
     }
 
     /**
@@ -569,6 +614,8 @@ public class UserSqlDao {
             if (rs.next()) {
                 return rs.getInt(1);
             }
+        } catch (SQLException e) {
+
         }
         return 0;
     }
